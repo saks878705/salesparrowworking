@@ -210,7 +210,7 @@ router.patch('/updateProfile',(req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.find({_id:user_id}).exec().then(user_data=>{
-      if(user_data.length>1){
+      if(user_data.length>0){
         var updated_admin = {};
         if(req.body.companyName){
           updated_admin.company_name = req.body.companyName;
