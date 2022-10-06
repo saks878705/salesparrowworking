@@ -166,6 +166,7 @@ router.post('/register',(req,res)=>{
 });
 
 router.post('/adminLogin',(req,res)=>{
+  console.log(req.body);
   var email = req.body.email?req.body.email:"";
   var password = req.body.password?req.body.password:"";
   if(email!=""){
@@ -202,5 +203,78 @@ router.post('/adminLogin',(req,res)=>{
     })
   }
 });
+
+router.patch('/updateProfile',(req,res)=>{
+  var token = req.body.token?req.body.token:"";
+  if(token!=""){
+    var decodedToken = jwt.verify(token, "test");
+    var user_id = decodedToken.user_id;
+    Admin.find({_id:user_id}).exec().then(user_data=>{
+      if(user_data.length>1){
+        var updated_admin = {};
+        if(req.body.companyName){
+          updated_admin.company_name = req.body.companyName;
+        }
+        if(req.body.contactPersonName){
+          updated_admin.contactPersonName = req.body.contactPersonName;
+        }
+        if(req.body.email){
+          updated_admin.email = req.body.email;
+        }
+        if(req.body.phone){
+          updated_admin.phone = req.body.phone;
+        }
+        if(req.body.companyAddress){
+          updated_admin.companyAddress = req.body.companyAddress;
+        }
+        if(req.body.pincode){
+          updated_admin.pincode = req.body.pincode;
+        }
+        if(req.body.state){
+          updated_admin.state = req.body.state;
+        }
+        if(req.body.city){
+          updated_admin.city = req.body.city;
+        }
+        if(req.body.district){
+          updated_admin.district = req.body.district;
+        }
+        if(req.body.GSTNo){
+          updated_admin.GSTNo = req.body.GSTNo;
+        }
+        if(req.body.companyCatagory){
+          updated_admin.companyCatagory = req.body.companyCatagory;
+        }
+        if(req.body.companyDescription){
+          updated_admin.companyDescription = req.body.companyDescription;
+        }
+        if(req.body.companyType){
+          updated_admin.companyType = req.body.companyType;
+        }
+        updated_admin.Updated_date = get_current_date();
+        Admin.findOneAndUpdate({_id:user_id},updated_admin,{new:true},(err,doc)=>{
+          if(doc){
+            res.status(200).json({
+              status:true,
+              message:"Updated successfully",
+              details:updated_admin
+            })
+          }else{
+            res.json({
+              status:false,
+              message:"Eroor",
+              details:err
+            })
+          }
+        })
+      }else{
+        res.json({
+          status:false,
+          message:"user not found . Please check the token."
+        })
+      }
+    })
+  }
+})
 
 module.exports = router;
