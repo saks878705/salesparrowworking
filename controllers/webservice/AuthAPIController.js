@@ -165,7 +165,7 @@ router.post('/register',(req,res)=>{
   }
 });
 
-router.get('/adminLogin',(req,res)=>{
+router.post('/adminLogin',(req,res)=>{
   var email = req.body.email?req.body.email:"";
   var password = req.body.password?req.body.password:"";
   if(email!=""){
