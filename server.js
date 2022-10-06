@@ -15,9 +15,7 @@ app.use(cors());
 
 app.use(bodyparser.json());
 app.use("/images", express.static(__dirname + "/images"));
-app.listen(PORT, "localhost", () => {
-  console.log("Express server started at port : 3000");
-});
+
 
 app.get("/", (req, res) => {
   res.status(200).send("Homepage");
@@ -44,3 +42,7 @@ app.use(
   require("./controllers/webservice/productCatagoryController")
 );
 app.use("/auth_api", require("./controllers/webservice/productController"));
+
+app.listen(PORT, () => {
+  console.log("Express server started at port : 3000");
+});
