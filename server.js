@@ -11,7 +11,10 @@ app.use(
     extended: true,
   })
 );
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  })
+);
 
 app.use(bodyparser.json());
 app.use("/images", express.static(__dirname + "/images"));
