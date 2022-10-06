@@ -114,4 +114,14 @@ router.post('/addProduct',(req,res)=>{
     }
 });
 
+router.get('/getAllProducts',(req,res)=>{
+    Product.find().exec().then(product_data=>{
+        res.json({
+            status:true,
+            message:"Get successfully",
+            result:product_data
+        })
+    })
+});
+
 module.exports = router;
