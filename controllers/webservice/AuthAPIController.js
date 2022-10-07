@@ -168,50 +168,7 @@ router.post('/register',(req,res)=>{
 
 router.post('/register2',(req,res)=>{
   console.log(req.body);
-  var password = req.body.password ? req.body.password : "";
-  var email = req.body.email ? req.body.email : "";
-      if (password != "") {
-        if (email != "") {
-                  Admin.find({ email: email }).exec().then((email_info) => {
-                    if (email_info.length < 1) {
-                      bcrypt.hash(password, 10, function (err, hash) {
-                        var new_admin = new Admin({
-                          password: hash,
-                          email: email,
-                          Created_date: get_current_date(),
-                          Updated_date: get_current_date(),
-                          status: "Active",
-                        });
-                        new_admin.save().then((data) => {
-                          res.status(200).json({
-                            status: true,
-                            message: "New Admin is created successfully",
-                            results: data,
-                          });
-                        });
-                      });
-                    } else {
-                      res.status(200).json({
-                        status: false,
-                        message: "Email already exists",
-                        result: null,
-                      });
-                    }
-                  });
-        } else {
-          return res.json({
-            status: false,
-            message: "Email is required",
-            results: null,
-          });
-        }
-      } else {
-        return res.json({
-          status: false,
-          message: "Password is required",
-          results: null,
-        });
-      }
+  res.send(req.body);
 });
 
 router.post('/adminLogin',(req,res)=>{
