@@ -218,6 +218,7 @@ router.post('/adminLogin',(req,res)=>{
 });
 
 router.post('/updateProfile',(req,res)=>{
+  console.log(req.body);
   var token = req.body.token?req.body.token:"";
   if(token!=""){
     var decodedToken = jwt.verify(token, "test");
@@ -291,6 +292,7 @@ router.post('/updateProfile',(req,res)=>{
 });
 
 router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,res)=>{
+  console.log(req.body);
   var token = req.body.token?req.body.token:"";
   if(token!=""){
     var decodedToken = jwt.verify(token, "test");
@@ -332,6 +334,7 @@ router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,re
 })
 
 router.get('/getadminprofile',(req,res)=>{
+  console.log(req.body);
   var token = req.body.token?req.body.token:"";
   if(token!=""){
     var decodedToken = jwt.verify(token, "test");
