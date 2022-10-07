@@ -403,6 +403,84 @@ router.post('/addSignature',imageUpload.fields([{name:"signature_image"}]),(req,
       message:"Token is required."
     })
   }
+});
+
+router.post('/forgotPasswordAdmin',(req,res)=>{
+  var email = req.body.email?req.body.email:"";
+  Admin.findOne({email:email}).exec().then(admin_data=>{
+    const token = jwt.sign({ user_id: admin_data._id, is_token_valid: 1 },"test");
+    const api_key =  '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';
+    sgmail.setApiKey(api_key);
+    const message = {
+      to:admin_data.email,
+      from:{
+        name:'SaleSparrow',
+        email:'Saksham1840097@akgec.ac.in',
+      },
+      subject:'Regarding Password Change',
+      html: `<a href="http://localhost:3000/resetpassword/${token}">Reset password</a>`
+      //text:token
+    }
+    sgmail.send(message).then((err,data)=>{
+      if(err) {
+        console.log(err);
+    } else {
+        console.log('Email sent successfully');
+        res.json({
+          status:true,
+          message:"Check your Email",
+        })
+    }
+    })
+    res.json({
+      status:true,
+      message:"Check your Email",
+    })
+
+  })
+});
+
+router.post('/resetPasswordAdmin',(req,res)=>{
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
+  var password = req.body.password?req.body.password:"";
+  if(token!=""){
+    if(password!=""){
+      const decodedToken = jwt.verify(token,"test");
+      const Admin_id = decodedToken.user_id;
+      Admin.findOne({_id:Admin_id}).exec().then(data=>{
+        bcrypt.hash(password,10,function(err,hash){
+          var updated_admin = {};
+          updated_admin.password = hash;
+          Admin.findOneAndUpdate({_id:Admin_id},updated_admin,{ new: true },(err, doc)=>{
+            if(doc){
+              res.json({
+                status:true,
+                message:"Password updated successfully",
+                result:updated_admin
+              })
+            }else{
+              res.json({
+                status:false,
+                message:"Error",
+                result:err
+              })
+            }
+          })
+        }) 
+      })
+    }else{
+      res.json({
+        status:false,
+        message:"Password is required"
+      })
+    }
+  }else{
+    res.json({
+      status:false,
+      message:"Token is required"
+    })
+  }
 })
 
 module.exports = router;
