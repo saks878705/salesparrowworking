@@ -59,6 +59,7 @@ const getDecodedToken = async (authHeader) => {
 }
 
 router.post('/register',(req,res)=>{
+  console.log(req.body);
   var companyName = req.body.companyName ? req.body.companyName : "";
   var phone = req.body.phone ? req.body.phone : "";
   var password = req.body.password ? req.body.password : "";
