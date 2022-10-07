@@ -334,8 +334,9 @@ router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,re
 })
 
 router.get('/getadminprofile',(req,res)=>{
-  console.log(req.body);
-  var token = req.body.token?req.body.token:"";
+  console.log(req.headers['authorization']);
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
   if(token!=""){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
@@ -360,6 +361,48 @@ router.get('/getadminprofile',(req,res)=>{
     })
   }
 
+});
+
+router.post('/addSignature',imageUpload.fields([{name:"signature_image"}]),(req,res)=>{
+  console.log(req.body);
+  var token = req.body.token?req.body.token:"";
+  if(token!=""){
+    var decodedToken = jwt.verify(token, "test");
+    var user_id = decodedToken.user_id;
+    Admin.find({_id:user_id}).exec().then(user_data=>{
+      if(admin_data){
+        updated_admin  = {};
+        if(req.files.signature_image){
+          updated_admin.signatureImage = base_url+req.files.signature_image[0].path;
+        }
+        Admin.findOneAndUpdate({_id:user_id},updated_admin,{new:true},(err,doc)=>{
+          if(doc){
+            res.status(200).json({
+              status:true,
+              message:"Updated Successfully",
+              result:updated_admin
+            })
+          }else{
+            res.json({
+              status:false,
+              message:"Error",
+              result:err
+            })
+          }
+        })
+      }else{
+        res.json({
+          status:false,
+          message:"Token must be correct."
+        })
+      }
+    })
+  }else{
+    res.json({
+      status:false,
+      message:"Token is required."
+    })
+  }
 })
 
 module.exports = router;
