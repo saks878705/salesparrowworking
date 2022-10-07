@@ -178,23 +178,31 @@ router.post('/adminLogin',(req,res)=>{
   if(email!=""){
     if(password!=""){
       Admin.findOne({email:email}).exec().then(admin_data=>{
-        bcrypt.compare(password,admin_data.password,function (err, result){
-          console.log(result);
-          if(result){
-            const token = jwt.sign({ user_id: admin_data._id, is_token_valide: 1 },"test");
-            res.json({
-              status:true,
-              message:"Login Successful",
-              result:admin_data,
-              token:token
-          })
-          }else{
-            res.json({
-              status:false,
-              message:"password is not matched.please check"
+        if(admin_data){
+          bcrypt.compare(password,admin_data.password,function (err, result){
+            console.log(result);
+            if(result){
+              const token = jwt.sign({ user_id: admin_data._id, is_token_valide: 1 },"test");
+              res.json({
+                status:true,
+                message:"Login Successful",
+                result:admin_data,
+                token:token
             })
-          }
-        })
+            }else{
+              res.json({
+                status:false,
+                message:"password is not matched.please check"
+              })
+            }
+          })
+        }else{
+          res.json({
+            status:false,
+            message:"Admin not found"
+          })
+        }
+
       })
     }else{
       res.json({
