@@ -165,10 +165,58 @@ router.post('/register',(req,res)=>{
   }
 });
 
+router.post('/register2',(req,res)=>{
+  console.log(req.body);
+  var password = req.body.password ? req.body.password : "";
+  var email = req.body.email ? req.body.email : "";
+      if (password != "") {
+        if (email != "") {
+                  Admin.find({ email: email }).exec().then((email_info) => {
+                    if (email_info.length < 1) {
+                      bcrypt.hash(password, 10, function (err, hash) {
+                        var new_admin = new Admin({
+                          password: hash,
+                          email: email,
+                          Created_date: get_current_date(),
+                          Updated_date: get_current_date(),
+                          status: "Active",
+                        });
+                        new_admin.save().then((data) => {
+                          res.status(200).json({
+                            status: true,
+                            message: "New Admin is created successfully",
+                            results: data,
+                          });
+                        });
+                      });
+                    } else {
+                      res.status(200).json({
+                        status: false,
+                        message: "Email already exists",
+                        result: null,
+                      });
+                    }
+                  });
+        } else {
+          return res.json({
+            status: false,
+            message: "Email is required",
+            results: null,
+          });
+        }
+      } else {
+        return res.json({
+          status: false,
+          message: "Password is required",
+          results: null,
+        });
+      }
+});
+
 router.post('/adminLogin',(req,res)=>{
   console.log(req.body);
-  var email = req.body.email?req.body.email:"";
-  var password = req.body.password?req.body.password:"";
+  var email = (req.body.email) ? req.body.email : "";
+  var password = (req.body.password) ? req.body.password : "";
   if(email!=""){
     if(password!=""){
       Admin.findOne({email:email}).exec().then(admin_data=>{
@@ -204,7 +252,7 @@ router.post('/adminLogin',(req,res)=>{
   }
 });
 
-router.patch('/updateProfile',(req,res)=>{
+router.post('/updateProfile',(req,res)=>{
   var token = req.body.token?req.body.token:"";
   if(token!=""){
     var decodedToken = jwt.verify(token, "test");
