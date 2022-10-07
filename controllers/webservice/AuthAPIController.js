@@ -1,6 +1,6 @@
 const express      = require('express');
 var router         = express.Router();
-const base_url     = 'http://43.205.115.51';
+const base_url     = 'http://salesparrow.herokuapp.com/';
 const jwt          = require('jsonwebtoken');
 const bcrypt       = require('bcrypt');
 const mongoose     = require('mongoose');
@@ -20,11 +20,14 @@ const multer = require("multer");
 const path = require('path');
 
 const imageStorage = multer.diskStorage({
-  destination: 'images/user_img', 
+  destination: 'images/admin_img', 
   filename: (req, file, cb) => {
-    cb(null, file.fieldname + '_' + Date.now() 
-     + path.extname(file.originalname))
-  }
+    cb(null, file.fieldname + '_' + Date.now());
+  },
+});
+
+const imageUpload = multer({
+  storage: imageStorage,
 });
 
 /*const imageUpload = multer({
@@ -166,10 +169,6 @@ router.post('/register',(req,res)=>{
   }
 });
 
-router.post('/register2',(req,res)=>{
-  console.log(req.body);
-  res.send(req.body);
-});
 
 router.post('/adminLogin',(req,res)=>{
   console.log(req.body);
@@ -289,6 +288,75 @@ router.post('/updateProfile',(req,res)=>{
       }
     })
   }
+});
+
+router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,res)=>{
+  var token = req.body.token?req.body.token:"";
+  if(token!=""){
+    var decodedToken = jwt.verify(token, "test");
+    var user_id = decodedToken.user_id;
+    Admin.find({_id:user_id}).exec().then(user_data=>{
+      if(admin_data){
+        updated_admin  = {};
+        if(req.files.profile_image){
+          updated_admin.profileImage = base_url+req.files.profile_image[0].path;
+        }
+        Admin.findOneAndUpdate({_id:user_id},updated_admin,{new:true},(err,doc)=>{
+          if(doc){
+            res.status(200).json({
+              status:true,
+              message:"Updated Successfully",
+              result:updated_admin
+            })
+          }else{
+            res.json({
+              status:false,
+              message:"Error",
+              result:err
+            })
+          }
+        })
+      }else{
+        res.json({
+          status:false,
+          message:"Token must be correct."
+        })
+      }
+    })
+  }else{
+    res.json({
+      status:false,
+      message:"Token is required."
+    })
+  }
+})
+
+router.get('/getadminprofile',(req,res)=>{
+  var token = req.body.token?req.body.token:"";
+  if(token!=""){
+    var decodedToken = jwt.verify(token, "test");
+    var user_id = decodedToken.user_id;
+    Admin.find({_id:user_id}).exec().then(admin_data=>{
+      if(admin_data){
+        res.status(200).json({
+          status:true,
+          message:"Get Successfully",
+          result:admin_data
+        })
+      }else{
+        res.json({
+          status:false,
+          message:"Token must be correct."
+        })
+      }
+    })
+  }else{
+    res.json({
+      status:false,
+      message:"Token is required."
+    })
+  }
+
 })
 
 module.exports = router;
