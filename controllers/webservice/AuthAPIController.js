@@ -4,7 +4,8 @@ const base_url     = 'http://salesparrow.herokuapp.com/';
 const jwt          = require('jsonwebtoken');
 const bcrypt       = require('bcrypt');
 const mongoose     = require('mongoose');
-const Admin     = mongoose.model('AdminInfo')
+const Admin     = mongoose.model('AdminInfo');
+const sgmail = require("@sendgrid/mail");
 
 
 function get_current_date(){
