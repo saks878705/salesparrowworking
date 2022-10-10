@@ -522,9 +522,10 @@ router.post('/changePassword',(req,res)=>{
         const Admin_id = decodedToken.user_id;
         Admin.findOne({_id:Admin_id}).exec().then(async (company_data)=>{
           if(company_data){
-            const hash =await bcrypt.hash(req.body.oldPassword, 10); 
-            Admin.findOne({password:hash}).exec().then(async (data)=>{
-              if(data){
+            console.log(company_data);
+            const hash =await bcrypt.compare(company_data.password, req.body.oldPassword); 
+              if(hash){
+                console.log(hash);
                 const newhash =await bcrypt.hash(req.body.newPassword, 10);
                 var updated_admin = {};
                 updated_admin.password = newhash;
@@ -550,7 +551,6 @@ router.post('/changePassword',(req,res)=>{
                   message:"Password didn't match."
                 });
               }
-            })
           }else{
             res.json({
               status:false,
