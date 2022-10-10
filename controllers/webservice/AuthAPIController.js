@@ -516,22 +516,15 @@ router.post('/changePassword',(req,res)=>{
   const token = authHeader && authHeader.split(" ")[1];
   var oldPassword = req.body.oldPassword?req.body.oldPassword:"";
   var newPassword = req.body.newPassword?req.body.newPassword:"";
-  //console.log(token, oldPassword, newPassword);
   if(token!=""){
     if(oldPassword!=""){
       if(newPassword!=""){
         const decodedToken = jwt.verify(token,"test");
         const Admin_id = decodedToken.user_id;
-        //console.log(Admin_id);
         Admin.findOne({_id:Admin_id}).exec().then(async (company_data)=>{
-          //console.log(company_data);
           if(company_data){
-            //console.log("company_data");
-            const hash =await bcrypt.compare(company_data.password, req.body.oldPassword); 
-            console.log(hash);
-            console.log("company_data");
-              if(hash){
-                const newhash =await bcrypt.hash(req.body.newPassword, 10);
+            bcrypt.compare(oldPassword,company_data.password,function (err, result){
+              if(result){
                 var updated_admin = {};
                 updated_admin.password = newhash;
                 updated_admin.Updated_date = get_current_date();
@@ -556,6 +549,7 @@ router.post('/changePassword',(req,res)=>{
                   message:"Password didn't match."
                 });
               }
+            })
           }else{
             res.json({
               status:false,
