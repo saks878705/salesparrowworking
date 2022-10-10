@@ -301,7 +301,7 @@ router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,re
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.find({_id:user_id}).exec().then(user_data=>{
-      if(admin_data){
+      if(user_data){
         updated_admin  = {};
         if(req.files.profile_image){
           updated_admin.profileImage = base_url+req.files.profile_image[0].path;
