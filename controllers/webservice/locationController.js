@@ -52,9 +52,9 @@ router.post('/addLocation',(req,res)=>{
 });
 
 router.get('/getLocation',(req,res)=>{
-    console.log(req.body);
-    var p_id = req.body.p_id?req.body.p_id:"";
-    var subp_id = req.body.subp_id?req.body.subp_id:"";
+    console.log(req.query);
+    var p_id = req.query.p_id?req.query.p_id:"";
+    var subp_id = req.query.subp_id?req.query.subp_id:"";
     if(p_id=="" && subp_id==""){
         Location.find({$and:[{P_id:""},{subP_id:""}]}).exec().then(state_data=>{
             res.json({
