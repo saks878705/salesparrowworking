@@ -523,9 +523,10 @@ router.post('/changePassword',(req,res)=>{
         const Admin_id = decodedToken.user_id;
         Admin.findOne({_id:Admin_id}).exec().then(async (company_data)=>{
           if(company_data){
-            bcrypt.compare(oldPassword,company_data.password,function (err, result){
+            bcrypt.compare(oldPassword,company_data.password,async function (err, result){
               if(result){
                 var updated_admin = {};
+                const newhash = await bcrypt.hash(newPassword, 10);
                 updated_admin.password = newhash;
                 updated_admin.Updated_date = get_current_date();
                 Admin.findOneAndUpdate({_id:user_id},updated_admin,{new:true},(err,doc)=>{

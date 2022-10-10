@@ -11,14 +11,15 @@ app.use(
     extended: true,
   })
 );
-app.use(cors({
-  origin: "*",
+app.use(
+  cors({
+    origin: "https://salesparrow.herokuapp.com/",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   })
 );
 
 app.use(bodyparser.json());
 app.use("/images", express.static(__dirname + "/images"));
-
 
 app.get("/", (req, res) => {
   res.status(200).send("Homepage");
