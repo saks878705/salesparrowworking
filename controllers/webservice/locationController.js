@@ -74,7 +74,7 @@ router.get('/getLocation',(req,res)=>{
         Location.find({$and:[{P_id:p_id},{subP_id:subp_id}]}).exec().then(area_data=>{
             res.json({
                 status:true,
-                message:"City data fetch successfully",
+                message:"Area data fetch successfully",
                 result:area_data
             });
         });
