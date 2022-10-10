@@ -511,25 +511,26 @@ router.post('/resetPasswordAdmin',(req,res)=>{
 });
 
 router.post('/changePassword',(req,res)=>{
-  console.log(req.body);
+  //console.log(req.body);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
   var oldPassword = req.body.oldPassword?req.body.oldPassword:"";
   var newPassword = req.body.newPassword?req.body.newPassword:"";
-  console.log(token, oldPassword, newPassword);
+  //console.log(token, oldPassword, newPassword);
   if(token!=""){
     if(oldPassword!=""){
       if(newPassword!=""){
         const decodedToken = jwt.verify(token,"test");
         const Admin_id = decodedToken.user_id;
-        console.log(Admin_id);
+        //console.log(Admin_id);
         Admin.findOne({_id:Admin_id}).exec().then(async (company_data)=>{
-          console.log(company_data);
+          //console.log(company_data);
           if(company_data){
-            console.log("company_data");
+            //console.log("company_data");
             const hash =await bcrypt.compare(company_data.password, req.body.oldPassword); 
+            console.log(hash);
+            console.log("company_data");
               if(hash){
-                console.log(hash);
                 const newhash =await bcrypt.hash(req.body.newPassword, 10);
                 var updated_admin = {};
                 updated_admin.password = newhash;
