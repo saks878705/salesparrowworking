@@ -6,6 +6,7 @@ const bcrypt       = require('bcrypt');
 const mongoose     = require('mongoose');
 const Admin     = mongoose.model('AdminInfo');
 const sgmail = require("@sendgrid/mail");
+const nodemailer = require("nodemailer");
 
 
 function get_current_date(){
@@ -447,7 +448,7 @@ router.post('/forgotPasswordAdmin',(req,res)=>{
       from: 'anamika.gautam@zoxima.com',
       to: 'sakshamdubey469@gmail.com',
       subject: 'Password change',
-      html: `<a href="http://localhost:3000/resetpassword/${token}">Reset password</a>`
+      html: `<a href="https://salesparrow.herokuapp.com/resetPasswordAdmin/${token}">Reset password</a>`
       //text: token
   };
    
