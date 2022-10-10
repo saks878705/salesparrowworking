@@ -529,7 +529,7 @@ router.post('/changePassword',(req,res)=>{
                 const newhash = await bcrypt.hash(newPassword, 10);
                 updated_admin.password = newhash;
                 updated_admin.Updated_date = get_current_date();
-                Admin.findOneAndUpdate({_id:user_id},updated_admin,{new:true},(err,doc)=>{
+                Admin.findOneAndUpdate({_id:Admin_id},updated_admin,{new:true},(err,doc)=>{
                   if(doc){
                     res.status(200).json({
                       status:true,
