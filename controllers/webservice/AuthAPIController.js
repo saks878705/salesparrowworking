@@ -367,7 +367,8 @@ router.get('/getadminprofile',(req,res)=>{
 
 router.post('/addSignature',imageUpload.fields([{name:"signature_image"}]),(req,res)=>{
   console.log(req.body);
-  var token = req.body.token?req.body.token:"";
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
   if(token!=""){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
