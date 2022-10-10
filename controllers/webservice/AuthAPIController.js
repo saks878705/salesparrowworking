@@ -520,12 +520,14 @@ router.post('/changePassword',(req,res)=>{
       if(newPassword!=""){
         const decodedToken = jwt.verify(token,"test");
         const Admin_id = decodedToken.user_id;
-        Admin.findOne({_id:Admin_id}).exec().then(company_data=>{
+        Admin.findOne({_id:Admin_id}).exec().then(async (company_data)=>{
           if(company_data){
-            Admin.findOne({password:oldPassword}).exec().then(data=>{
+            const hash =await bcrypt.hash(req.body.oldPassword, 10); 
+            Admin.findOne({password:hash}).exec().then(async (data)=>{
               if(data){
+                const newhash =await bcrypt.hash(req.body.newPassword, 10);
                 var updated_admin = {};
-                updated_admin.password = newPassword;
+                updated_admin.password = newhash;
                 updated_admin.Updated_date = get_current_date();
                 Admin.findOneAndUpdate({_id:user_id},updated_admin,{new:true},(err,doc)=>{
                   if(doc){
