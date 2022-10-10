@@ -294,7 +294,8 @@ router.post('/updateProfile',(req,res)=>{
 
 router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,res)=>{
   console.log(req.body);
-  var token = req.body.token?req.body.token:"";
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
   if(token!=""){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
@@ -410,7 +411,7 @@ router.post('/forgotPasswordAdmin',(req,res)=>{
   var email = req.body.email?req.body.email:"";
   Admin.findOne({email:email}).exec().then(admin_data=>{
     const token = jwt.sign({ user_id: admin_data._id, is_token_valid: 1 },"test");
-    const api_key =  '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';
+    /*const api_key =  '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';
     sgmail.setApiKey(api_key);
     const message = {
       to:admin_data.email,
@@ -432,7 +433,30 @@ router.post('/forgotPasswordAdmin',(req,res)=>{
           message:"Check your Email",
         })
     }
+    })*/
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        //api_key: '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',
+        user: 'anamika.gautam@zoxima.com',
+        pass: 'Kanpur@8787'
+      }
     })
+    let mailDetails = {
+      from: 'anamika.gautam@zoxima.com',
+      to: 'sakshamdubey469@gmail.com',
+      subject: 'Password change',
+      html: `<a href="http://localhost:3000/resetpassword/${token}">Reset password</a>`
+      //text: token
+  };
+   
+  transporter.sendMail(mailDetails, function(err, data) {
+      if(err) {
+          console.log(err);
+      } else {
+          console.log('Email sent successfully');
+      }
+  });
     res.json({
       status:true,
       message:"Check your Email",
@@ -481,6 +505,72 @@ router.post('/resetPasswordAdmin',(req,res)=>{
       status:false,
       message:"Token is required"
     })
+  }
+});
+
+router.post('/changePassword',(req,res)=>{
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
+  var oldPassword = req.body.oldPassword?req.body.oldPassword:"";
+  var newPassword = req.body.newPassword?req.body.newPassword:"";
+  if(token!=""){
+    if(oldPassword!=""){
+      if(newPassword!=""){
+        const decodedToken = jwt.verify(token,"test");
+        const Admin_id = decodedToken.user_id;
+        Admin.findOne({_id:Admin_id}).exec().then(company_data=>{
+          if(company_data){
+            Admin.findOne({password:oldPassword}).exec().then(data=>{
+              if(data){
+                var updated_admin = {};
+                updated_admin.password = newPassword;
+                updated_admin.Updated_date = get_current_date();
+                Admin.findOneAndUpdate({_id:user_id},updated_admin,{new:true},(err,doc)=>{
+                  if(doc){
+                    res.status(200).json({
+                      status:true,
+                      message:"Updated Successfully",
+                      result:updated_admin
+                    })
+                  }else{
+                    res.json({
+                      status:false,
+                      message:"Error",
+                      result:err
+                    })
+                  }
+                })
+              }else{
+                res.json({
+                  status:false,
+                  message:"Password didn't match."
+                });
+              }
+            })
+          }else{
+            res.json({
+              status:false,
+              message:"No company found."
+            });
+          }
+        })
+      }else{
+        res.json({
+          status:false,
+          message:"New Password is required"
+        });
+      }
+    }else{
+      res.json({
+        status:false,
+        message:"Old Password is required"
+      });
+    }
+  }else{
+    res.json({
+      status:false,
+      message:"Token is required"
+    });
   }
 })
 
