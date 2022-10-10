@@ -374,7 +374,7 @@ router.post('/addSignature',imageUpload.fields([{name:"signature_image"}]),(req,
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.find({_id:user_id}).exec().then(user_data=>{
-      if(admin_data){
+      if(user_data){
         updated_admin  = {};
         if(req.files.signature_image){
           updated_admin.signatureImage = base_url+req.files.signature_image[0].path;
