@@ -41,7 +41,7 @@ function get_current_date() {
     var pincode = req.body.pincode ? req.body.pincode : "";
     var district = req.body.district ? req.body.district : "";
     var experience = req.body.experience ? req.body.experience : "";
-    var qualification = req.body.qualifications ? req.body.qualifications : "";
+    var qualification = req.body.qualifications ? req.body.qualification : "";
     if (employeeName != "") {
       if (phone != "") {
         if (email != "") {
@@ -74,7 +74,7 @@ function get_current_date() {
                         });
                       });
                   } else {
-                    res.status(200).json({
+                    res.json({
                       status: false,
                       message: "Email already exists",
                       result: null,
