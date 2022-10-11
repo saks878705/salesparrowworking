@@ -409,7 +409,7 @@ router.post('/addSignature',imageUpload.fields([{name:"signature_image"}]),(req,
   }
 });
 
-router.post('/removeSignature',(req,res)=>{
+router.get('/removeSignature',(req,res)=>{
   console.log(req.headers['authorization']);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
