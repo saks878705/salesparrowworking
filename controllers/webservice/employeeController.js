@@ -117,8 +117,8 @@ router.patch('/editEmployee',(req,res)=>{
       Employee.find({ _id: id }).exec().then(async (employee_info) => {
         if (employee_info.length> 0) {
             var updated_employee = {};
-            if (req.body.name) {
-              updated_employee.employeeName = req.body.name;
+            if (req.body.employeeName) {
+              updated_employee.employeeName = req.body.employeeName;
             }
             if (req.body.phone) {
               updated_employee.phone = req.body.phone;
