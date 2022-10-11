@@ -31,6 +31,7 @@ function get_current_date() {
   };
 
   router.post("/addEmployee",imageUpload.fields([{name:"Employee_image"}]), (req, res) => {
+    console.log(req.body);
     var employeeName = req.body.employeeName ? req.body.employeeName : "";
     var phone = req.body.phone ? req.body.phone : "";
     var email = req.body.email ? req.body.email : "";
