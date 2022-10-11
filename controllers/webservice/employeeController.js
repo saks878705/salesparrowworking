@@ -74,8 +74,8 @@ function get_current_date() {
                         });
                       });
                   } else {
-                    res.status(401).json({
-                      status: true,
+                    res.status(200).json({
+                      status: false,
                       message: "Email already exists",
                       result: null,
                     });
