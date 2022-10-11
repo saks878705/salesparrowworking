@@ -4,6 +4,10 @@ const Employee = mongoose.model("Employee");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
+const sid = "ACc3f03d291aaa9b78b8088eb0b77bf616";
+const auth_token = "b088eeb84d39bd2cc2679faea930b620";
+const twilio = require("twilio")(sid,auth_token);
+const jwt          = require('jsonwebtoken');
 
 const imageStorage = multer.diskStorage({
   destination: "images/Employee_image",
@@ -199,6 +203,45 @@ router.delete('/deleteEmployee',(req,res)=>{
         message:"Employee deleted successfully",
     })
 })
-})
+});
+
+router.post('/sendOtp',(req,res)=>{
+  var to_phone_number = req.body.to_phone_number?req.body.to_phone_number:"";
+  if(to_phone_number!=""){
+    Employee.findOne({phone:to_phone_number}).exec().then(data=>{
+      var OTP = Math.floor(1000 + Math.random() * 9000);
+      const token = jwt.sign({ user_id: data._id, is_token_valide: 1 },"test");
+      if(data){
+        twilio.messages.create({
+          from:"+18505186447",
+          to:to_phone_number,
+          body:OTP,
+      }).then(()=>{
+          res.json({
+              status:true,
+              message:"Message has been sent",
+              token:token
+          })
+      }).catch((err)=>{
+          console.log(err);
+          res.json({
+              status:false,
+              message:"There is some error."
+          })
+      })
+      }else{
+        res.json({
+          status:false,
+          message:"Not registered yet.please contact your admin."
+      })
+      }
+    })
+}else{
+    res.json({
+        status:false,
+        message:"Phone number is required"
+    })
+}
+});
 
 module.exports = router;
