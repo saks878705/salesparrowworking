@@ -409,6 +409,36 @@ router.post('/addSignature',imageUpload.fields([{name:"signature_image"}]),(req,
   }
 });
 
+router.post('/removeSignature',(req,res)=>{
+  console.log(req.headers['authorization']);
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(token!=""){
+    var decodedToken = jwt.verify(token, "test");
+    var user_id = decodedToken.user_id;
+    Admin.updateOne({_id:user_id},{$set:{signatureImage:""}},(err,data)=>{
+      if(err){
+        res.json({
+          status:false,
+          message:"User not found"
+        })
+      }else{
+        res.json({
+          status:true,
+          message:"Updated Successfully",
+          result:data
+        })
+      }
+    })
+
+  }else{
+    res.json({
+      status:false,
+      message:"Token is required."
+    })
+  }
+})
+
 router.post('/forgotPasswordAdmin',(req,res)=>{
   var email = req.body.email?req.body.email:"";
   Admin.findOne({email:email}).exec().then(admin_data=>{

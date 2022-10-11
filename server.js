@@ -48,5 +48,5 @@ app.use(
 app.use("/auth_api", require("./controllers/webservice/productController"));
 
 app.listen(PORT, () => {
-  console.log("Express server started at port : 3000");
+  console.log(`Express server started at port : ${PORT}`);
 });

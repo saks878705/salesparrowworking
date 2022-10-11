@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const router = express.Router();
-const base_url = "localhost:5000";
+const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
 
 const imageStorage = multer.diskStorage({
