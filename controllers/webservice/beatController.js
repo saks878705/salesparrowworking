@@ -162,16 +162,16 @@ router.get('/getAllBeat',(req,res)=>{
     })
 });
 
-router.get('/getBeat',(req,res)=>{
-    var id = req.body.id?req.body.id:"";
-    Beat.find({_id:id}).exec().then(beat_data=>{
-        res.json({
-            status:true,
-            message:"Beat found successfully",
-            result:beat_data
-        })
-    })
-});
+// router.get('/getBeat',(req,res)=>{
+//     var id = req.body.id?req.body.id:"";
+//     Beat.find({_id:id}).exec().then(beat_data=>{
+//         res.json({
+//             status:true,
+//             message:"Beat found successfully",
+//             result:beat_data
+//         })
+//     })
+// });
 
 router.delete("/deleteBeat", (req, res) => {
     var id = req.query.id ?? "";
