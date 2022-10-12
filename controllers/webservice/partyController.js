@@ -2,11 +2,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Party = mongoose.model("Party");
 const router = express.Router();
-const base_url = "localhost:5000";
+const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
 
 const imageStorage = multer.diskStorage({
-  destination: "images/Employee_image",
+  destination: "images/party_image",
   filename: (req, file, cb) => {
     cb(null, file.fieldname + "_" + Date.now());
   },
@@ -26,7 +26,7 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 };
 
-router.post('/addParty',imageUpload.fields([{name:"Part_image"}]),(req,res)=>{
+router.post('/addParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
     var partyType = req.body.partyType?req.body.partyType:"";
     var firmName = req.body.firmName?req.body.firmName:"";
     var GSTNo = req.body.GSTNo?req.body.GSTNo:"";
@@ -52,6 +52,7 @@ router.post('/addParty',imageUpload.fields([{name:"Part_image"}]),(req,res)=>{
                                         partyType:partyType,
                                         firmName:firmName,
                                         GSTNo:GSTNo,
+                                        image: base_url+req.files.party_image[0].path,
                                         contactPersonName:contactPersonName,
                                         mobileNo:mobileNo,
                                         email:email,

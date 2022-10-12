@@ -5,6 +5,9 @@ const party_schema = new Schema({
     partyType:{
         type:String,
     },
+    image:{
+        type:String,
+    },
     pincode:{
         type:Number
     },
