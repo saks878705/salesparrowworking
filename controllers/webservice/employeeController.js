@@ -251,7 +251,7 @@ router.post('/employeeProfileImage',imageUpload.fields([{name:"Employee_image"}]
   console.log(req.body);
   const id = req.body.id?req.body.id:"";
   if(id!=""){
-    Admin.find({_id:id}).exec().then(user_data=>{
+    Employee.find({_id:id}).exec().then(user_data=>{
       if(user_data){
         updated_employee  = {};
         if(req.files.Employee_image){
