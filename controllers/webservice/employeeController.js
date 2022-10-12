@@ -176,7 +176,9 @@ router.patch('/editEmployee',(req,res)=>{
 });
 
 router.get('/getAllEmployee',(req,res)=>{
-    Employee.find().exec().then(employee_data=>{
+  var page = req.body.page ? req.body.page : "1";
+  var limit = 5;
+    Employee.find().limit(limit * 1).skip((page - 1) * limit).exec().then(employee_data=>{
         res.json({
             status:true,
             message:"All Employees found successfully",
