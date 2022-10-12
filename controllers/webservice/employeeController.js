@@ -245,4 +245,44 @@ router.post('/sendOtp',(req,res)=>{
 }
 });
 
+router.post('/employeeProfileImage',imageUpload.fields([{name:"Employee_image"}]),(req,res)=>{
+  console.log(req.body);
+  const id = req.body.id?req.body.id:"";
+  if(id!=""){
+    Admin.find({_id:id}).exec().then(user_data=>{
+      if(user_data){
+        updated_employee  = {};
+        if(req.files.Employee_image){
+          updated_employee.image = base_url+req.files.Employee_image[0].path;
+        }
+        Employee.findOneAndUpdate({_id:id},updated_employee,{new:true},(err,doc)=>{
+          if(doc){
+            res.status(200).json({
+              status:true,
+              message:"Updated Successfully",
+              result:updated_employee
+            })
+          }else{
+            res.json({
+              status:false,
+              message:"Error",
+              result:err
+            })
+          }
+        })
+      }else{
+        res.json({
+          status:false,
+          message:"Id must be correct."
+        })
+      }
+    })
+  }else{
+    res.json({
+      status:false,
+      message:"Id is required."
+    })
+  }
+})
+
 module.exports = router;
