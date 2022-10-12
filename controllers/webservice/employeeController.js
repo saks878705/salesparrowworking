@@ -184,7 +184,7 @@ router.post('/getAllEmployee',async (req,res)=>{
             status:true,
             message:"All Employees found successfully",
             result:employee_data,
-            totalLength:count.length
+            pageLength:Math.ceil(count.length/limit)
         })
     })
 });
