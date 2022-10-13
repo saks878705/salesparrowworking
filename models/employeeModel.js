@@ -6,6 +6,15 @@ const employee_schema = new Schema({
         type:String,
         require:true
     },
+    companyId:{
+        type:String
+    },
+    roleId:{
+        type:String
+    },
+    manager:{
+        type:String
+    },
     phone:{
         type:String
     },

@@ -32,6 +32,10 @@ function get_current_date() {
 
   router.post("/addEmployee",imageUpload.fields([{name:"Employee_image"}]), (req, res) => {
     console.log(req.body);
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(" ")[1];
+    var decodedToken = jwt.verify(token, "test");
+    var user_id = decodedToken.user_id;
     var employeeName = req.body.employeeName ? req.body.employeeName : "";
     var phone = req.body.phone ? req.body.phone : "";
     var email = req.body.email ? req.body.email : "";
@@ -56,6 +60,7 @@ function get_current_date() {
                         email: email,
                         address: address,
                         city: city,
+                        companyId:user_id,
                         image:base_url + req.files.Employee_image[0].path,
                         state: state,
                         district: district,
@@ -120,6 +125,12 @@ router.patch('/editEmployee',(req,res)=>{
             if (req.body.employeeName) {
               updated_employee.employeeName = req.body.employeeName;
             }
+            if (req.body.roleId) {
+              updated_employee.roleId = req.body.roleId;
+            }
+            if (req.body.manager) {
+              updated_employee.manager = req.body.manager;
+            }
             if (req.body.phone) {
               updated_employee.phone = req.body.phone;
             }
@@ -176,6 +187,10 @@ router.patch('/editEmployee',(req,res)=>{
 });
 
 router.post('/getAllEmployee',async (req,res)=>{
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
+  var decodedToken = jwt.verify(token, "test");
+  var user_id = decodedToken.user_id;
   var page = req.body.page ? req.body.page : "1";
   var state = req.body.state?req.body.state:"";
   var limit = 10;
@@ -189,7 +204,7 @@ router.post('/getAllEmployee',async (req,res)=>{
     })
     })
   }else{
-    Employee.find().limit(limit * 1).skip((page - 1) * limit).exec().then(employee_data=>{
+    Employee.find({companyId:user_id}).limit(limit * 1).skip((page - 1) * limit).exec().then(employee_data=>{
       res.json({
           status:true,
           message:"All Employees found successfully",
@@ -200,26 +215,26 @@ router.post('/getAllEmployee',async (req,res)=>{
   }
 });
 
-router.get('/getEmployee',(req,res)=>{
-    var id = req.body.id?req.body.id:"";
-    Employee.find({_id:id}).exec().then(employee_data=>{
-        res.json({
-            status:true,
-            message:"Employee found successfully",
-            result:employee_data
-        })
-    })
-});
+// router.get('/getEmployee',(req,res)=>{
+//     var id = req.body.id?req.body.id:"";
+//     Employee.find({_id:id}).exec().then(employee_data=>{
+//         res.json({
+//             status:true,
+//             message:"Employee found successfully",
+//             result:employee_data
+//         })
+//     })
+// });
 
-router.delete('/deleteEmployee',(req,res)=>{
-  var id = req.body.id?req.body.id:"";
-  Employee.deleteOne({_id:id}).exec().then(employee_data=>{
-    res.json({
-        status:true,
-        message:"Employee deleted successfully",
-    })
-})
-});
+// router.delete('/deleteEmployee',(req,res)=>{
+//   var id = req.body.id?req.body.id:"";
+//   Employee.deleteOne({_id:id}).exec().then(employee_data=>{
+//     res.json({
+//         status:true,
+//         message:"Employee deleted successfully",
+//     })
+// })
+// });
 
 router.post('/sendOtp',(req,res)=>{
   var to_phone_number = req.body.to_phone_number?req.body.to_phone_number:"";
