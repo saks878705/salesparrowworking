@@ -152,10 +152,10 @@ router.patch('/editBeat',(req,res)=>{
     }
 });
 
-router.post('/getAllBeat',(req,res)=>{
+router.post('/getAllBeat',async (req,res)=>{
   var page = req.body.page?req.body.page:"1";
   var limit = 5;
-  var count = Beat.find();
+  var count =await Beat.find();
     Beat.find().limit( limit * 1).skip((page -1) * limit).exec().then(beat_data=>{
         res.json({
             status:true,

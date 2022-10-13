@@ -188,10 +188,10 @@ router.patch('/editParty',(req,res)=>{
     })
 });
 
-router.post('/getAllParty',(req,res)=>{
+router.post('/getAllParty',async (req,res)=>{
     var page = req.body.page?req.body.page:"1";
     var limit = 5;
-    var count = Party.find();
+    var count =await Party.find();
     Party.find().limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
         res.json({
             status:true,
