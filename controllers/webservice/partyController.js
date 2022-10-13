@@ -189,11 +189,15 @@ router.patch('/editParty',(req,res)=>{
 });
 
 router.get('/getAllParty',(req,res)=>{
-    Party.find().exec().then(party_data=>{
+    var page = req.body.page?req.body.page:"";
+    var limit = 5;
+    var count = Party.find();
+    Party.find().limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
         res.json({
             status:true,
             message:"All Party found successfully",
-            result:party_data
+            result:party_data,
+            pageLength:Math.ceil(count.length/limit)
         })
     })
 });

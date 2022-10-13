@@ -153,11 +153,15 @@ router.patch('/editBeat',(req,res)=>{
 });
 
 router.get('/getAllBeat',(req,res)=>{
-    Beat.find().exec().then(beat_data=>{
+  var page = req.body.page?reqbody.page:"";
+  var limit = 5;
+  var count = Beat.find();
+    Beat.find().limit( limit * 1).skip((page -1) * limit).exec().then(beat_data=>{
         res.json({
             status:true,
             message:"All Beats found successfully",
-            result:beat_data
+            result:beat_data,
+            pageLength:Math.ceil(count.length/limit)
         })
     })
 });
