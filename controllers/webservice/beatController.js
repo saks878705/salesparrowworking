@@ -124,6 +124,9 @@ router.patch('/editBeat',(req,res)=>{
                   if (req.body.district) {
                     updated_beat.district = req.body.district;
                   }
+                  if (req.body.status) {
+                    updated_beat.status = req.body.status;
+                  }
                   updated_beat.Updated_date = get_current_date();
                   Beat.findOneAndUpdate({ _id: id },updated_beat,{ new: true },(err, doc) => {
                       if (doc) {
