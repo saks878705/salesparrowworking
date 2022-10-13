@@ -471,12 +471,12 @@ router.post('/forgotPasswordAdmin',(req,res)=>{
       service: 'gmail',
       auth: {
         //api_key: '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',
-        user: 'devilsaksham8787@gmail.com',
+        user: 'anamika.gautam@zoxima.com',
         pass: 'Kanpur@8787'
       }
     })
     let mailDetails = {
-      from: 'devilsaksham8787@gmail.com',
+      from: 'anamika.gautam@zoxima.com',
       to: email,
       subject: 'Password change',
       html: `<a href="https://salesparrow.herokuapp.com/resetPasswordAdmin/${token}">Reset password</a>`
@@ -493,6 +493,7 @@ router.post('/forgotPasswordAdmin',(req,res)=>{
     res.json({
       status:true,
       message:"Check your Email",
+      token:token
     })
 
   })
