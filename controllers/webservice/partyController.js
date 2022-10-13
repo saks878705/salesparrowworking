@@ -52,7 +52,7 @@ router.post('/addParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
                                         partyType:partyType,
                                         firmName:firmName,
                                         GSTNo:GSTNo,
-                                        image: base_url+req.files.party_image[0].path,
+                                        image: base_url+req.files.Party_image[0].path,
                                         contactPersonName:contactPersonName,
                                         mobileNo:mobileNo,
                                         email:email,
@@ -192,7 +192,7 @@ router.get('/getAllParty',(req,res)=>{
     Party.find().exec().then(party_data=>{
         res.json({
             status:true,
-            message:"All Beats found successfully",
+            message:"All Party found successfully",
             result:party_data
         })
     })
@@ -203,7 +203,7 @@ router.get('/getParty',(req,res)=>{
     Party.find({_id:id}).exec().then(party_data=>{
         res.json({
             status:true,
-            message:"Beat found successfully",
+            message:"Party found successfully",
             result:party_data
         })
     })

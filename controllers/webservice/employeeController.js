@@ -69,7 +69,7 @@ function get_current_date() {
                       new_employee.save().then((data) => {
                         res.status(200).json({
                           status: true,
-                          message: "New subAdmin is created successfully",
+                          message: "New Employee is created successfully",
                           results: data,
                         });
                       });

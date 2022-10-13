@@ -80,6 +80,8 @@ router.get('/getLocation',(req,res)=>{
             });
         });
     }
-})
+});
+
+
 
 module.exports = router;
