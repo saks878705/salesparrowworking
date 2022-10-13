@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const emp_grp_schema = new Schema({
-    grp_id:{
+const grp_schema = new Schema({
+    grp_name:{
         type:String,
     },
-    emp_id:{
+    grp_description:{
         type:String,
     },
     company_id:{
@@ -29,4 +29,4 @@ const emp_grp_schema = new Schema({
     }
 });
 
-module.exports = mongoose.model('EmployeeGrouping',emp_grp_schema)
+module.exports = mongoose.model('Group',grp_schema)

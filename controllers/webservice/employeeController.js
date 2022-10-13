@@ -125,6 +125,12 @@ router.patch('/editEmployee',(req,res)=>{
             if (req.body.employeeName) {
               updated_employee.employeeName = req.body.employeeName;
             }
+            if (req.body.userExpenses) {
+              updated_employee.userExpenses = req.body.userExpenses;
+            }
+            if (req.body.transportWays) {
+              updated_employee.transportWays = req.body.transportWays;
+            }
             if (req.body.roleId) {
               updated_employee.roleId = req.body.roleId;
             }
@@ -196,7 +202,7 @@ router.post('/getAllEmployee',async (req,res)=>{
   var limit = 10;
   let count =await Employee.find();
   if(state!=""){
-    Employee.find({state:state}).exec().then(data=>{
+    Employee.find({$and:[{state:state},{companyId:user_id}]}).exec().then(data=>{
       res.json({
         status:true,
         message:"All Employees found successfully",

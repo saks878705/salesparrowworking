@@ -45,6 +45,42 @@ const employee_schema = new Schema({
     qualification:{
         type:String
     },
+    userExpenses:{
+        type:Object,
+        /*basicSalary:{
+            type:String
+        },
+        convyenceSalary:{
+            type:String
+        },
+        takm:{
+            type:String
+        },
+        da:{
+            type:String
+        },*/
+    },
+    // transportWay:{
+    //     type:String
+    // },
+    transportWays:{
+        type:Object,
+        /*hraSalary:{
+            type:String
+        },
+        takmPubTrans:{
+            type:String
+        },
+        type:{
+            type:String
+        },
+        takmBike:{
+            type:String
+        },
+        nightMaxAllowance:{
+            type:String
+        },*/
+    },
     Created_date: {
         type: String,
         default: ""
