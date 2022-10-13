@@ -189,7 +189,7 @@ router.patch('/editParty',(req,res)=>{
 });
 
 router.post('/getAllParty',(req,res)=>{
-    var page = req.body.page?req.body.page:"";
+    var page = req.body.page?req.body.page:"1";
     var limit = 5;
     var count = Party.find();
     Party.find().limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{

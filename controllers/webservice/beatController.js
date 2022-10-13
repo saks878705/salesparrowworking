@@ -153,7 +153,7 @@ router.patch('/editBeat',(req,res)=>{
 });
 
 router.post('/getAllBeat',(req,res)=>{
-  var page = req.body.page?req.body.page:"";
+  var page = req.body.page?req.body.page:"1";
   var limit = 5;
   var count = Beat.find();
     Beat.find().limit( limit * 1).skip((page -1) * limit).exec().then(beat_data=>{
