@@ -125,7 +125,7 @@ router.post('/addParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
 
 });
 
-router.patch('/editParty',(req,res)=>{
+router.patch('/editParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
     var id = req.body.id?req.body.id:"";
     Party.find({_id:id}).exec().then(party_data=>{
         if(party_data.length>0){
@@ -166,8 +166,14 @@ router.patch('/editParty',(req,res)=>{
             if (req.body.contactPersonName) {
                 updated_party.contactPersonName = req.body.contactPersonName;
             }
+            if (req.files.Party_image) {
+                updated_party.image = base_url+req.files.Party_image[0].path;
+            }
             if (req.body.address) {
                 updated_party.address = req.body.address;
+            }
+            if (req.body.status) {
+                updated_party.status = req.body.status;
             }
             updated_party.Updated_date = get_current_date();
             Party.findOneAndUpdate({ _id: id },updated_party,{ new: true },(err, doc) => {
