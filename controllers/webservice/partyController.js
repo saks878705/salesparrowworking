@@ -188,7 +188,7 @@ router.patch('/editParty',(req,res)=>{
     })
 });
 
-router.get('/getAllParty',(req,res)=>{
+router.post('/getAllParty',(req,res)=>{
     var page = req.body.page?req.body.page:"";
     var limit = 5;
     var count = Party.find();
