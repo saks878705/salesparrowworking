@@ -177,16 +177,27 @@ router.patch('/editEmployee',(req,res)=>{
 
 router.post('/getAllEmployee',async (req,res)=>{
   var page = req.body.page ? req.body.page : "1";
+  var state = req.body.state?req.body.state:"";
   var limit = 10;
-  let count =await Employee.find()
-    Employee.find().limit(limit * 1).skip((page - 1) * limit).exec().then(employee_data=>{
-        res.json({
-            status:true,
-            message:"All Employees found successfully",
-            result:employee_data,
-            pageLength:Math.ceil(count.length/limit)
-        })
+  let count =await Employee.find();
+  if(state!=""){
+    Employee.find({state:state}).exec().then(data=>{
+      res.json({
+        status:true,
+        message:"All Employees found successfully",
+        result:data
     })
+    })
+  }else{
+    Employee.find().limit(limit * 1).skip((page - 1) * limit).exec().then(employee_data=>{
+      res.json({
+          status:true,
+          message:"All Employees found successfully",
+          result:employee_data,
+          pageLength:Math.ceil(count.length/limit)
+      })
+  })
+  }
 });
 
 router.get('/getEmployee',(req,res)=>{
@@ -287,6 +298,8 @@ router.post('/employeeProfileImage',imageUpload.fields([{name:"Employee_image"}]
       message:"Id is required."
     })
   }
-})
+});
+
+
 
 module.exports = router;
