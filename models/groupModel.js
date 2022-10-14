@@ -8,6 +8,9 @@ const grp_schema = new Schema({
     grp_description:{
         type:String,
     },
+    state:{
+        type:String,
+    },
     company_id:{
         type:String
     },

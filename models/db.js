@@ -19,6 +19,7 @@ require('./bankDetailsModel');
 require('./empTargetModel');
 require('./goodDetailsModel');
 require('./empGroupingModel');
+require('./groupModel');
 require('./leadModel');
 require('./bannerModel');
 require('./unitModel');
