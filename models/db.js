@@ -25,4 +25,5 @@ require('./bannerModel');
 require('./unitModel');
 require('./productCatagoryModel');
 require('./productModel');
+require('./routeModel');
 

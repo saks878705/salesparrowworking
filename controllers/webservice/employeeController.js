@@ -1,13 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
+const Location = mongoose.model("Location");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
 const sid = "ACc3f03d291aaa9b78b8088eb0b77bf616";
 const auth_token = "b088eeb84d39bd2cc2679faea930b620";
-const twilio = require("twilio")(sid,auth_token);
-const jwt          = require('jsonwebtoken');
+const twilio = require("twilio")(sid, auth_token);
+const jwt = require("jsonwebtoken");
 
 const imageStorage = multer.diskStorage({
   destination: "images/Employee_image",
@@ -21,18 +22,21 @@ const imageUpload = multer({
 });
 
 function get_current_date() {
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0");
-    var yyyy = today.getFullYear();
-    var time =
-      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    return (today = yyyy + "-" + mm + "-" + dd + " " + time);
-  };
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var yyyy = today.getFullYear();
+  var time =
+    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  return (today = yyyy + "-" + mm + "-" + dd + " " + time);
+}
 
-  router.post("/addEmployee",imageUpload.fields([{name:"Employee_image"}]), (req, res) => {
+router.post(
+  "/addEmployee",
+  imageUpload.fields([{ name: "Employee_image" }]),
+  (req, res) => {
     console.log(req.body);
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
@@ -49,57 +53,57 @@ function get_current_date() {
     if (employeeName != "") {
       if (phone != "") {
         if (email != "") {
-            if (address != "") {
-              Employee.find({ email: email })
-                .exec()
-                .then((email_info) => {
-                  if (email_info.length < 1) {
-                    var new_employee = new Employee({
-                        employeeName: employeeName,
-                        phone: phone,
-                        email: email,
-                        address: address,
-                        city: city,
-                        companyId:user_id,
-                        image:base_url + req.files.Employee_image[0].path,
-                        state: state,
-                        district: district,
-                        pincode: pincode,
-                        qualification: qualification,
-                        experience: experience,
-                        Created_date: get_current_date(),
-                        Updated_date: get_current_date(),
-                        status: "Active",
-                      });
-                      new_employee.save().then((data) => {
-                        res.status(200).json({
-                          status: true,
-                          message: "New Employee is created successfully",
-                          results: data,
-                        });
-                      });
-                  } else {
-                    res.json({
-                      status: false,
-                      message: "Email already exists",
-                      result: null,
+          if (address != "") {
+            Employee.find({ email: email })
+              .exec()
+              .then((email_info) => {
+                if (email_info.length < 1) {
+                  var new_employee = new Employee({
+                    employeeName: employeeName,
+                    phone: phone,
+                    email: email,
+                    address: address,
+                    city: city,
+                    companyId: user_id,
+                    image: base_url + req.files.Employee_image[0].path,
+                    state: state,
+                    district: district,
+                    pincode: pincode,
+                    qualification: qualification,
+                    experience: experience,
+                    Created_date: get_current_date(),
+                    Updated_date: get_current_date(),
+                    status: "Active",
+                  });
+                  new_employee.save().then((data) => {
+                    res.status(200).json({
+                      status: true,
+                      message: "New Employee is created successfully",
+                      results: data,
                     });
-                  }
-                });
-            } else {
-              return res.json({
-                status: false,
-                message: "Address is required",
-                results: null,
+                  });
+                } else {
+                  res.json({
+                    status: false,
+                    message: "Email already exists",
+                    result: null,
+                  });
+                }
               });
-            }
           } else {
             return res.json({
               status: false,
-              message: "Email is required",
+              message: "Address is required",
               results: null,
             });
           }
+        } else {
+          return res.json({
+            status: false,
+            message: "Email is required",
+            results: null,
+          });
+        }
       } else {
         return res.json({
           status: false,
@@ -114,110 +118,175 @@ function get_current_date() {
         results: null,
       });
     }
-  });
+  }
+);
 
-router.patch('/editEmployee',(req,res)=>{
-    var id = req.body.id ? req.body.id : "";
-    if (id != "") {
-      Employee.find({ _id: id }).exec().then(async (employee_info) => {
-        if (employee_info.length> 0) {
-            var updated_employee = {};
-            if (req.body.employeeName) {
-              updated_employee.employeeName = req.body.employeeName;
-            }
-            if (req.body.userExpenses) {
-              updated_employee.userExpenses = req.body.userExpenses;
-            }
-            if (req.body.transportWays) {
-              updated_employee.transportWays = req.body.transportWays;
-            }
-            if (req.body.roleId) {
-              updated_employee.roleId = req.body.roleId;
-            }
-            if (req.body.manager) {
-              updated_employee.manager = req.body.manager;
-            }
-            if (req.body.phone) {
-              updated_employee.phone = req.body.phone;
-            }
-            if (req.body.email) {
-              updated_employee.email = req.body.email;
-            }
-            if (req.body.address) {
-              updated_employee.address = req.body.address;
-            }
-            if (req.body.city) {
-              updated_employee.city = req.body.city;
-            }
-            if (req.body.state) {
-              updated_employee.state = req.body.state;
-            }
-            if (req.body.pincode) {
-              updated_employee.pincode = req.body.pincode;
-            }
-            if (req.body.district) {
-              updated_employee.district = req.body.district;
-            }
-            if (req.body.experience) {
-              updated_employee.experience = req.body.experience;
-            }
-            if (req.body.qualification) {
-              updated_employee.qualification = req.body.qualification;
-            }
-            updated_employee.Updated_date = get_current_date();
-            Employee.findOneAndUpdate({ _id: id },updated_employee,{ new: true },(err, doc) => {
-                if (doc) {
-                  res.status(200).json({
-                    status: true,
-                    message: "Update successfully",
-                    results: updated_employee,
-                  });
-                }
-              }
-            );
-          } else {
-            res.json({
-              status: false,
-              message: "Employee not found.",
-              result: null,
-            });
+router.patch("/editEmployee", (req, res) => {
+  var id = req.body.id ? req.body.id : "";
+  if (id != "") {
+    Employee.find({ _id: id })
+      .exec()
+      .then(async (employee_info) => {
+        if (employee_info.length > 0) {
+          var updated_employee = {};
+          if (req.body.employeeName) {
+            updated_employee.employeeName = req.body.employeeName;
           }
-        });
-    } else {
-      return res.json({
-        status: false,
-        message: "ID is required",
-        result: null,
+          if (req.body.userExpenses) {
+            updated_employee.userExpenses = req.body.userExpenses;
+          }
+          if (req.body.transportWays) {
+            updated_employee.transportWays = req.body.transportWays;
+          }
+          if (req.body.roleId) {
+            updated_employee.roleId = req.body.roleId;
+          }
+          if (req.body.manager) {
+            updated_employee.manager = req.body.manager;
+          }
+          if (req.body.phone) {
+            updated_employee.phone = req.body.phone;
+          }
+          if (req.body.email) {
+            updated_employee.email = req.body.email;
+          }
+          if (req.body.address) {
+            updated_employee.address = req.body.address;
+          }
+          if (req.body.city) {
+            updated_employee.city = req.body.city;
+          }
+          if (req.body.state) {
+            updated_employee.state = req.body.state;
+          }
+          if (req.body.pincode) {
+            updated_employee.pincode = req.body.pincode;
+          }
+          if (req.body.district) {
+            updated_employee.district = req.body.district;
+          }
+          if (req.body.experience) {
+            updated_employee.experience = req.body.experience;
+          }
+          if (req.body.qualification) {
+            updated_employee.qualification = req.body.qualification;
+          }
+          updated_employee.Updated_date = get_current_date();
+          Employee.findOneAndUpdate(
+            { _id: id },
+            updated_employee,
+            { new: true },
+            (err, doc) => {
+              if (doc) {
+                res.status(200).json({
+                  status: true,
+                  message: "Update successfully",
+                  results: updated_employee,
+                });
+              }
+            }
+          );
+        } else {
+          res.json({
+            status: false,
+            message: "Employee not found.",
+            result: null,
+          });
+        }
       });
-    }
+  } else {
+    return res.json({
+      status: false,
+      message: "ID is required",
+      result: null,
+    });
+  }
 });
 
-router.post('/getAllEmployee',async (req,res)=>{
-  const authHeader = req.headers['authorization'];
+router.post("/getAllEmployee", async (req, res) => {
+  const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   var decodedToken = jwt.verify(token, "test");
   var user_id = decodedToken.user_id;
   var page = req.body.page ? req.body.page : "1";
-  var state = req.body.state?req.body.state:"";
+  var state = req.body.state ? req.body.state : "";
   var limit = 10;
-  let count =await Employee.find();
-  if(state!=""){
-    Employee.find({$and:[{state:state},{companyId:user_id}]}).exec().then(data=>{
-      res.json({
-        status:true,
-        message:"All Employees found successfully",
-        result:data
-    })
-    })
-  }else{
-    Employee.find({companyId:user_id}).limit(limit * 1).skip((page - 1) * limit).exec().then(employee_data=>{
-      res.json({
-          status:true,
-          message:"All Employees found successfully",
-          result:employee_data,
-          pageLength:Math.ceil(count.length/limit)
-      })
-  })
+  let count = await Employee.find();
+  if (state != "") {
+    Employee.find({ $and: [{ state: state }, { companyId: user_id }] })
+      .exec()
+      .then((emp_data) => {
+        Location.findOne({ _id: emp_data[0].state })
+          .exec()
+          .then((state_data) => {
+            Location.findOne({ _id: emp_data[0].city })
+              .exec()
+              .then((city_data) => {
+                Location.findOne({ _id: emp_data[0].district })
+                  .exec()
+                  .then((area_data) => {
+                    var result = {};
+                    result.data = data;
+                    result.state_data = state_data.name;
+                    result.city_data = city_data.name;
+                    result.area_data = area_data.name;
+                    res.json({
+                      status: true,
+                      message: "All Employees found successfully",
+                      result: result,
+                    });
+                  });
+              });
+          });
+      });
+    } else {
+    var list = [];
+    Employee.find({ companyId: user_id })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec()
+      .then((employee_data) => {
+        let counInfo = 0;
+        for (let i = 0; i < employee_data.length; i++) {
+          Location.findOne({ _id: employee_data[i].state })
+            .exec()
+            .then((state_data) => {
+              Location.findOne({ _id: employee_data[i].city })
+                .exec()
+                .then((city_data) => {
+                  Location.findOne({ _id: employee_data[i].district })
+                    .exec()
+                    .then(async (area_data) => {
+                      await (async function (rowData) {
+                        var u_data = {
+                          employeeName: rowData.employeeName,
+                          phone: rowData.phone,
+                          email: rowData.email,
+                          address: rowData.address,
+                          pincode: rowData.pincode,
+                          state: state_data.name,
+                          image: rowData.image,
+                          city: city_data.name,
+                          district: area_data.name,
+                          experience: rowData.experience,
+                          qualification: rowData.qualification,
+                        };
+                        list.push(u_data);
+                      })(employee_data[i]);
+                      counInfo++
+                      if(counInfo == employee_data.length){
+                        res.json({
+                          status:true,
+                          message:"All Employees found successfully",
+                          result:list,
+                          pageLength:Math.ceil(count.length/limit)
+                        })
+                      }
+                    });
+                });
+            });
+        }
+      });
   }
 });
 
@@ -242,85 +311,105 @@ router.post('/getAllEmployee',async (req,res)=>{
 // })
 // });
 
-router.post('/sendOtp',(req,res)=>{
-  var to_phone_number = req.body.to_phone_number?req.body.to_phone_number:"";
-  if(to_phone_number!=""){
-    Employee.findOne({phone:to_phone_number}).exec().then(data=>{
-      var OTP = Math.floor(1000 + Math.random() * 9000);
-      const token = jwt.sign({ user_id: data._id, is_token_valide: 1 },"test");
-      if(data){
-        twilio.messages.create({
-          from:"+18505186447",
-          to:to_phone_number,
-          body:OTP,
-      }).then(()=>{
+router.post("/sendOtp", (req, res) => {
+  var to_phone_number = req.body.to_phone_number
+    ? req.body.to_phone_number
+    : "";
+  if (to_phone_number != "") {
+    Employee.findOne({ phone: to_phone_number })
+      .exec()
+      .then((data) => {
+        var OTP = Math.floor(1000 + Math.random() * 9000);
+        const token = jwt.sign(
+          { user_id: data._id, is_token_valide: 1 },
+          "test"
+        );
+        if (data) {
+          twilio.messages
+            .create({
+              from: "+18505186447",
+              to: to_phone_number,
+              body: OTP,
+            })
+            .then(() => {
+              res.json({
+                status: true,
+                message: "Message has been sent",
+                token: token,
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+              res.json({
+                status: false,
+                message: "There is some error.",
+              });
+            });
+        } else {
           res.json({
-              status:true,
-              message:"Message has been sent",
-              token:token
-          })
-      }).catch((err)=>{
-          console.log(err);
-          res.json({
-              status:false,
-              message:"There is some error."
-          })
-      })
-      }else{
-        res.json({
-          status:false,
-          message:"Not registered yet.please contact your admin."
-      })
-      }
-    })
-}else{
-    res.json({
-        status:false,
-        message:"Phone number is required"
-    })
-}
-});
-
-router.post('/employeeProfileImage',imageUpload.fields([{name:"Employee_image"}]),(req,res)=>{
-  console.log(req.body);
-  const id = req.body.id?req.body.id:"";
-  if(id!=""){
-    Employee.find({_id:id}).exec().then(user_data=>{
-      if(user_data){
-        updated_employee  = {};
-        if(req.files.Employee_image){
-          updated_employee.image = base_url+req.files.Employee_image[0].path;
+            status: false,
+            message: "Not registered yet.please contact your admin.",
+          });
         }
-        Employee.findOneAndUpdate({_id:id},updated_employee,{new:true},(err,doc)=>{
-          if(doc){
-            res.status(200).json({
-              status:true,
-              message:"Updated Successfully",
-              result:updated_employee
-            })
-          }else{
-            res.json({
-              status:false,
-              message:"Error",
-              result:err
-            })
-          }
-        })
-      }else{
-        res.json({
-          status:false,
-          message:"Id must be correct."
-        })
-      }
-    })
-  }else{
+      });
+  } else {
     res.json({
-      status:false,
-      message:"Id is required."
-    })
+      status: false,
+      message: "Phone number is required",
+    });
   }
 });
 
-
+router.post(
+  "/employeeProfileImage",
+  imageUpload.fields([{ name: "Employee_image" }]),
+  (req, res) => {
+    console.log(req.body);
+    const id = req.body.id ? req.body.id : "";
+    if (id != "") {
+      Employee.find({ _id: id })
+        .exec()
+        .then((user_data) => {
+          if (user_data) {
+            updated_employee = {};
+            if (req.files.Employee_image) {
+              updated_employee.image =
+                base_url + req.files.Employee_image[0].path;
+            }
+            Employee.findOneAndUpdate(
+              { _id: id },
+              updated_employee,
+              { new: true },
+              (err, doc) => {
+                if (doc) {
+                  res.status(200).json({
+                    status: true,
+                    message: "Updated Successfully",
+                    result: updated_employee,
+                  });
+                } else {
+                  res.json({
+                    status: false,
+                    message: "Error",
+                    result: err,
+                  });
+                }
+              }
+            );
+          } else {
+            res.json({
+              status: false,
+              message: "Id must be correct.",
+            });
+          }
+        });
+    } else {
+      res.json({
+        status: false,
+        message: "Id is required.",
+      });
+    }
+  }
+);
 
 module.exports = router;

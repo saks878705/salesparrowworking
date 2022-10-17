@@ -50,7 +50,7 @@ router.get('/getAllRoles',(req,res)=>{
     Role.find().exec().then(role_data=>{
         res.status(200).json({
             status:true,
-            message:"Roles etched succesfully",
+            message:"Roles fetched succesfully",
             result:role_data
         })
     })

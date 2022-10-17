@@ -118,9 +118,20 @@ router.post('/empGrpList',async (req,res)=>{
             }
         })
     }else{
-        res.json({
-            status:false,
-            message:"please provide the state ."
+        Group.findOne({company_id}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+            if(group_data){
+                res.json({
+                    status:true,
+                    message:"Employee groups of this state listed successfully.",
+                    result:group_data,
+                    pageLength:Math.ceil(count.length/limit)
+                })
+            }else{
+                res.json({
+                    status:false,
+                    message:"No EmpGroup found for this org."
+                })
+            }
         })
     }
 });
