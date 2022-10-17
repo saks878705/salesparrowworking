@@ -223,6 +223,7 @@ router.post('/getGrpWiseEmpList',(req,res)=>{
         Location.find({_id:grp_data[0].state}).exec().then(state_data=>{
             EmployeeGrouping.find({grp_id:id}).exec().then(empgrp_data=>{
                 var u_data = {
+                    id:grp_data[0]._id,
                     grp_name:grp_data[0].grp_name,
                     grp_description:grp_data[0].grp_description,
                     state:state_data[0].name,
