@@ -102,7 +102,7 @@ router.post('/empGrpList',async (req,res)=>{
     let count =await Group.find()
     var limit = 10;
     if(state!=""){
-        Group.findOne({$and:[{state},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+        Group.find({$and:[{state},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
             if(group_data){
                 res.json({
                     status:true,
@@ -118,7 +118,7 @@ router.post('/empGrpList',async (req,res)=>{
             }
         })
     }else{
-        Group.findOne({company_id}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+        Group.find({company_id}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
             if(group_data){
                 res.json({
                     status:true,
