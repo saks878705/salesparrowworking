@@ -110,6 +110,7 @@ router.post('/empGrpList',async (req,res)=>{
                 for(let i = 0;i<group_data.length;i++){
                     Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
                         await (async function(rowData){
+                            // console.log(rowData);
                             var u_data = {
                                 grp_name:rowData.grp_name,
                                 grp_description:rowData.grp_description,
@@ -213,6 +214,27 @@ router.post('/editGrp',(req,res)=>{
                 message:"some error"
             });
         }
+    })
+});
+
+router.post('/getGrpWiseEmpList',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    Group.find({_id:id}).exec().then(grp_data=>{
+        Location.find({_id:grp_data[0].state}).exec().then(state_data=>{
+            EmployeeGrouping.find({grp_id:id}).exec().then(empgrp_data=>{
+                var u_data = {
+                    grp_name:grp_data[0].grp_name,
+                    grp_description:grp_data[0].grp_description,
+                    state:state_data[0].name,
+                    emp_data:empgrp_data
+                }
+                res.json({
+                    status:true,
+                    message:"data found successfully",
+                    result:u_data
+                })
+            })
+        })
     })
 })
 
