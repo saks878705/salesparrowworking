@@ -171,4 +171,63 @@ router.post('/empGrpList',async (req,res)=>{
     }
 });
 
+router.post('/editGrp',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(" ")[1];
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    var updated_grp = {};
+    if(req.body.grp_name){
+        updated_grp.grp_name = req.body.grp_name;
+    }
+    if(req.body.grp_description){
+        updated_grp.grp_description = req.body.grp_description;
+    }
+    updated_grp.Updated_date = get_current_date();
+    Group.findOneAndUpdate({_id:id},updated_grp,{new:true},(err,doc)=>{
+        if(doc){
+            if(req.body.empIdStr){
+                var empIdArr = req.body.empIdStr.split(",");
+                EmployeeGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
+                        for(let i = 0; i < empIdArr.length; i++){
+                            var new_emp_grp = new EmployeeGrouping({
+                                grp_id:id,
+                                emp_id:empIdArr[i],
+                                company_id:company_id,
+                                Created_date:get_current_date(),
+                                Updated_date:get_current_date(),
+                                status:"Active"
+                            });
+                            await new_emp_grp.save();
+                        }
+                        res.json({
+                            status:true,
+                            message:"Updated successfully"
+                        })
+                })
+            }
+        }else{
+            res.json({
+                status:false,
+                message:"some error"
+            });
+        }
+    })
+})
+
+router.delete('/deleteEmpGrp',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    EmployeeGrouping.deleteMany({grp_id:id}).exec().then(doc=>{
+        if(doc){
+            Group.deleteOne({_id:id}).exec().then(doc2=>{
+                res.json({
+                    status:true,
+                    message:"group deleted successfully"
+                });
+            })
+        }
+    })
+})
+
 module.exports = router;

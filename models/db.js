@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://Saksham:SWw4cLQniR7Plsgh@cluster0.enmu34o.mongodb.net/salesparrow?retryWrites=true&w=majority', { useNewUrlParser: true }, (err) => {
+mongoose.connect('mongodb+srv://Saksham:SWw4cLQniR7Plsgh@cluster0.enmu34o.mongodb.net/salesparrow?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+  }, (err) => {
     if (!err) { console.log('MongoDB Connection Succeeded.') }
     else { console.log('Error in DB connection : ' + err) }
 });

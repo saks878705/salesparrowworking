@@ -222,6 +222,7 @@ router.post("/getAllEmployee", async (req, res) => {
               Location.findOne({ _id: emp_data[0].district }).exec().then(async (area_data) => {
                 await (async function (rowData) {
                   var u_data = {
+                    id:rowData._id,
                     employeeName: rowData.employeeName,
                     phone: rowData.phone,
                     email: rowData.email,
@@ -270,6 +271,7 @@ router.post("/getAllEmployee", async (req, res) => {
                     .then(async (area_data) => {
                       await (async function (rowData) {
                         var u_data = {
+                          id:rowData._id,
                           employeeName: rowData.employeeName,
                           phone: rowData.phone,
                           email: rowData.email,
