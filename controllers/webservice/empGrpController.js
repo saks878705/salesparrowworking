@@ -112,6 +112,7 @@ router.post('/empGrpList',async (req,res)=>{
                         await (async function(rowData){
                             // console.log(rowData);
                             var u_data = {
+                                id:rowData._id,
                                 grp_name:rowData.grp_name,
                                 grp_description:rowData.grp_description,
                                 state:state_data.name
@@ -145,6 +146,7 @@ router.post('/empGrpList',async (req,res)=>{
                     Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
                         await (async function(rowData){
                             var u_data = {
+                                id:rowData._id,
                                 grp_name:rowData.grp_name,
                                 grp_description:rowData.grp_description,
                                 state:state_data.name
