@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const Group = mongoose.model("Group");
+const Location = mongoose.model("Location");
 const EmployeeGrouping = mongoose.model("EmployeeGrouping");
 const jwt = require("jsonwebtoken");
 
@@ -102,14 +103,31 @@ router.post('/empGrpList',async (req,res)=>{
     let count =await Group.find()
     var limit = 10;
     if(state!=""){
+        var list = [];
         Group.find({$and:[{state},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+            let counInfo = 0;
             if(group_data){
-                res.json({
-                    status:true,
-                    message:"Employee groups of this state listed successfully.",
-                    result:group_data,
-                    pageLength:Math.ceil(count.length/limit)
-                })
+                for(let i = 0;i<group_data.length;i++){
+                    Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
+                        await (async function(rowData){
+                            var u_data = {
+                                grp_name:rowData.grp_name,
+                                grp_description:rowData.grp_description,
+                                state:state_data.name
+                            }
+                            list.push(u_data);
+                        })(group_data[i])
+                        counInfo++;
+                    if(counInfo==group_data.length){
+                        res.json({
+                            status:true,
+                            message:"Employee groups of this state listed successfully.",
+                            result:list,
+                            pageLength:Math.ceil(count.length/limit)
+                        })
+                    }
+                    });
+                }
             }else{
                 res.json({
                     status:false,
@@ -118,14 +136,31 @@ router.post('/empGrpList',async (req,res)=>{
             }
         })
     }else{
+        var list = [];
         Group.find({company_id}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+            let counInfo = 0;
             if(group_data){
-                res.json({
-                    status:true,
-                    message:"Employee groups of this state listed successfully.",
-                    result:group_data,
-                    pageLength:Math.ceil(count.length/limit)
-                })
+                for(let i = 0;i<group_data.length;i++){
+                    Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
+                        await (async function(rowData){
+                            var u_data = {
+                                grp_name:rowData.grp_name,
+                                grp_description:rowData.grp_description,
+                                state:state_data.name
+                            }
+                            list.push(u_data);
+                        })(group_data[i])
+                        counInfo++;
+                    if(counInfo==group_data.length){
+                        res.json({
+                            status:true,
+                            message:"Employee groups  listed successfully.",
+                            result:list,
+                            pageLength:Math.ceil(count.length/limit)
+                        })
+                    }
+                    });
+                }
             }else{
                 res.json({
                     status:false,
