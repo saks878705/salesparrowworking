@@ -213,32 +213,43 @@ router.post("/getAllEmployee", async (req, res) => {
   var limit = 10;
   let count = await Employee.find();
   if (state != "") {
-    Employee.find({ $and: [{ state: state }, { companyId: user_id }] })
-      .exec()
-      .then((emp_data) => {
-        Location.findOne({ _id: emp_data[0].state })
-          .exec()
-          .then((state_data) => {
-            Location.findOne({ _id: emp_data[0].city })
-              .exec()
-              .then((city_data) => {
-                Location.findOne({ _id: emp_data[0].district })
-                  .exec()
-                  .then((area_data) => {
-                    var result = {};
-                    result.data = data;
-                    result.state_data = state_data.name;
-                    result.city_data = city_data.name;
-                    result.area_data = area_data.name;
-                    res.json({
-                      status: true,
-                      message: "All Employees found successfully",
-                      result: result,
-                    });
-                  });
-              });
-          });
-      });
+    var list = [];
+    Employee.find({ $and: [{ state: state }, { companyId: user_id }] }).exec().then((emp_data) => {
+      let counInfo = 0;
+      for(let i=0;i<emp_data.length;i++){
+        Location.findOne({ _id: emp_data[0].state }).exec().then((state_data) => {
+          Location.findOne({ _id: emp_data[0].city }).exec().then((city_data) => {
+              Location.findOne({ _id: emp_data[0].district }).exec().then(async (area_data) => {
+                await (async function (rowData) {
+                  var u_data = {
+                    employeeName: rowData.employeeName,
+                    phone: rowData.phone,
+                    email: rowData.email,
+                    address: rowData.address,
+                    pincode: rowData.pincode,
+                    state: state_data.name,
+                    image: rowData.image,
+                    city: city_data.name,
+                    district: area_data.name,
+                    experience: rowData.experience,
+                    qualification: rowData.qualification,
+                  };
+                  list.push(u_data);
+                })(emp_data[i]);
+                counInfo++
+                if(counInfo == emp_data.length){
+                  res.json({
+                    status:true,
+                    message:"All Employees found successfully",
+                    result:list,
+                    pageLength:Math.ceil(count.length/limit)
+                  })
+                }
+                });
+            });
+        });
+    }
+  });
     } else {
     var list = [];
     Employee.find({ companyId: user_id })
