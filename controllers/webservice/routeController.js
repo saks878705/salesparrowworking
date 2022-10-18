@@ -94,7 +94,54 @@ router.post('addRoute',(req,res)=>{
 });
 
 router.post('routeListing',(req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    var state = req.body.state?req.body.state:"";
+    var city = req.body.city?req.body.city:"";
+    var area = req.body.area?req.body.area:"";
+    if(state!=""){
+        if(city!=""){
+            if(area!=""){
+                Route.find({$and:[{company_id},{state},{city},{area}]}).exec().then(route_data=>{
+                    res.json({
+                        status:true,
+                        message:"Routes get successfully",
+                        result:route_data
+                    });
+                });
+            }else{
+                res.json({
+                    status:false,
+                    message:"Area is required."
+                });
+            }
+        }else{
+            res.json({
+                status:false,
+                message:"City is required."
+            });
+        }
+    }else{
+        Route.find({company_id}).exec().then(route_data=>{
+            res.json({
+                status:true,
+                message:"All Routes get successfully",
+                result:route_data
+            });
+        });
+    }
+});
 
+router.delete('deleteRoute',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    Route.delete({_id:id}).exec().then(()=>{
+        res.json({
+            status:true,
+            message:"Deleted successfully"
+        });
+    })
 })
 
 module.exports = router;
