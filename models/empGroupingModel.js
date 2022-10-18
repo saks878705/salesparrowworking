@@ -11,7 +11,7 @@ const emp_grp_schema = new Schema({
     company_id:{
         type:String
     },
-    emp_name:{
+    employeeName:{
         type:String
     },
     Created_date: {
