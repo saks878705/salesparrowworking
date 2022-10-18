@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const Group = mongoose.model("Group");
 const Location = mongoose.model("Location");
+const Employee = mongoose.model("Employee");
 const EmployeeGrouping = mongoose.model("EmployeeGrouping");
 const jwt = require("jsonwebtoken");
 
@@ -42,26 +43,31 @@ router.post('/addEmpGrp',(req,res)=>{
                     });
                     new_grp.save().then(doc=>{
                         if(doc){
-                            Group.findOne({grp_name}).exec().then(async (data)=>{
+                            Group.findOne({grp_name}).exec().then((data)=>{
                                 for(let i = 0; i < empIdArr.length; i++){
-                                    var new_emp_grp = new EmployeeGrouping({
-                                        grp_id:data._id,
-                                        emp_id:empIdArr[i],
-                                        company_id:company_id,
-                                        Created_date:get_current_date(),
-                                        Updated_date:get_current_date(),
-                                        status:"Active"
+                                    Employee.findOne({_id:empIdArr[i]}).exec().then(async (emp_data)=>{
+                                        var new_emp_grp = new EmployeeGrouping({
+                                            grp_id:data._id,
+                                            emp_id:empIdArr[i],
+                                            emp_name:emp_data.employeeName,
+                                            company_id:company_id,
+                                            Created_date:get_current_date(),
+                                            Updated_date:get_current_date(),
+                                            status:"Active"
+                                        });
+                                        await new_emp_grp.save()
                                     });
-                                    await new_emp_grp.save()
                                 }
-                                EmployeeGrouping.find({grp_id:data._id}).exec().then(egdata=>{
-                                    res.json({
-                                        status:true,
-                                        message:"Employee group created succesfully",
-                                        grpDetails:data,
-                                        empGrpDetails:egdata
+                                Group.findOne({grp_name}).exec().then((data2)=>{
+                                    EmployeeGrouping.find({grp_id:data2._id}).exec().then(egdata=>{
+                                        res.json({
+                                            status:true,
+                                            message:"Employee group created succesfully",
+                                            grpDetails:data,
+                                            empGrpDetails:egdata
+                                        });
                                     });
-                                });
+                                })
                             });
                         }else{
                             res.json({
@@ -193,17 +199,20 @@ router.post('/editGrp',(req,res)=>{
             if(req.body.empIdStr){
                 var empIdArr = req.body.empIdStr.split(",");
                 EmployeeGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
-                        for(let i = 0; i < empIdArr.length; i++){
+                    for(let i = 0; i < empIdArr.length; i++){
+                        Employee.findOne({_id:empIdArr[i]}).exec().then(async (emp_data)=>{
                             var new_emp_grp = new EmployeeGrouping({
-                                grp_id:id,
+                                grp_id:data._id,
                                 emp_id:empIdArr[i],
+                                emp_name:emp_data.employeeName,
                                 company_id:company_id,
                                 Created_date:get_current_date(),
                                 Updated_date:get_current_date(),
                                 status:"Active"
                             });
-                            await new_emp_grp.save();
-                        }
+                            await new_emp_grp.save()
+                        })
+                    }
                         res.json({
                             status:true,
                             message:"Updated successfully"
