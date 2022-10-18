@@ -240,7 +240,7 @@ router.post("/edit_route", (req, res) => {
 
 router.delete("/deleteRoute", (req, res) => {
   var id = req.body.id ? req.body.id : "";
-  Route.delete({ _id: id })
+  Route.deleteOne({ _id: id })
     .exec()
     .then(() => {
       res.json({
