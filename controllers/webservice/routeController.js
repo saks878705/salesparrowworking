@@ -41,20 +41,12 @@ router.post('/addRoute',(req,res)=>{
                                 Updated_date:get_current_date(),
                                 status:"Active"
                             });
-                            new_route.save().then((err,data)=>{
-                                if(err){
-                                    res.json({
-                                        status:false,
-                                        message:"Error",
-                                        result:err
-                                    });
-                                }else{
-                                    res.json({
-                                        status:true,
-                                        message:"Route created successfully",
-                                        result:data
-                                    });
-                                }
+                            new_route.save().then((data)=>{
+                                res.json({
+                                    status:true,
+                                    message:"Route created successfully",
+                                    result:data
+                                });
                             })
                         }else{
                             res.json({
