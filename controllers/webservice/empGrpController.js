@@ -202,7 +202,7 @@ router.post('/editGrp',(req,res)=>{
                     for(let i = 0; i < empIdArr.length; i++){
                         Employee.findOne({_id:empIdArr[i]}).exec().then(async (emp_data)=>{
                             var new_emp_grp = new EmployeeGrouping({
-                                grp_id:data._id,
+                                grp_id:id,
                                 emp_id:empIdArr[i],
                                 emp_name:emp_data.employeeName,
                                 company_id:company_id,
