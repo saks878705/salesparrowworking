@@ -215,6 +215,21 @@ router.post("/edit_route", (req, res) => {
     if (req.body.end_point) {
       updated_route.end_point = req.body.end_point;
     }
+    Route.findOneAndUpdate({_id:id},updated_route,{new:true},(err,doc)=>{
+        if(doc){
+            res.json({
+                status:true,
+                message:"Route updated successfully",
+                result:updated_route
+            })
+        }else{
+            res.json({
+                status:false,
+                message:"Error",
+                result:err
+            })
+        }
+    })
   } else {
     res.json({
       status: false,
