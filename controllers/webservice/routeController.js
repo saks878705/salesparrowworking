@@ -13,7 +13,7 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 };
 
-router.post('addRoute',(req,res)=>{
+router.post('/addRoute',(req,res)=>{
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     var decodedToken = jwt.verify(token, "test");
@@ -93,7 +93,7 @@ router.post('addRoute',(req,res)=>{
     }
 });
 
-router.post('routeListing',(req,res)=>{
+router.post('/routeListing',(req,res)=>{
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     var decodedToken = jwt.verify(token, "test");
@@ -134,7 +134,34 @@ router.post('routeListing',(req,res)=>{
     }
 });
 
-router.delete('deleteRoute',(req,res)=>{
+router.post('/edit_route',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    if(id!=""){
+        var updated_route ={};
+        if(req.body.state){
+            updated_route.state = req.body.state;
+        } 
+        if(req.body.city){
+            updated_route.city = req.body.city;
+        } 
+        if(req.body.area){
+            updated_route.area = req.body.area;
+        } 
+        if(req.body.start_point){
+            updated_route.start_point = req.body.start_point;
+        } 
+        if(req.body.end_point){
+            updated_route.end_point = req.body.end_point;
+        } 
+    }else{
+        res.json({
+            status:false,
+            message:"Id is required."
+        });
+    }
+})
+
+router.delete('/deleteRoute',(req,res)=>{
     var id = req.body.id?req.body.id:"";
     Route.delete({_id:id}).exec().then(()=>{
         res.json({

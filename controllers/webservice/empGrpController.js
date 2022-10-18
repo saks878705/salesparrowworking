@@ -49,7 +49,7 @@ router.post('/addEmpGrp',(req,res)=>{
                                         var new_emp_grp = new EmployeeGrouping({
                                             grp_id:data._id,
                                             emp_id:empIdArr[i],
-                                            emp_name:emp_data.employeeName,
+                                            employeeName:emp_data.employeeName,
                                             company_id:company_id,
                                             Created_date:get_current_date(),
                                             Updated_date:get_current_date(),
