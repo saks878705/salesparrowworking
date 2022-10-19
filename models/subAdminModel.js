@@ -14,6 +14,9 @@ var subAdminSchema = new Schema({
         type:String,
         default:""
     },
+    company_id:{
+        type:String
+    },
     email:{
         type:String,
         default:""

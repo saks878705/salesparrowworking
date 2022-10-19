@@ -18,6 +18,10 @@ function get_current_date() {
 }
 
 router.post("/addSubAdmin", (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(" ")[1];
+  var decodedToken = jwt.verify(token, "test");
+  var company_id = decodedToken.user_id;
   var name = req.body.name ? req.body.name : "";
   var role = req.body.role ? req.body.role : "";
   var phone = req.body.phone ? req.body.phone : "";
@@ -39,6 +43,7 @@ router.post("/addSubAdmin", (req, res) => {
                       phone: phone,
                       password: hash,
                       email: email,
+                      company_id:company_id,
                       role:role,
                       address: address,
                       Created_date: get_current_date(),
@@ -165,8 +170,50 @@ router.patch("/editSubAdmin", (req, res) => {
     }
 });
 
-router.get('/getAllSubAdmins',(req,res)=>{
-    subAdmin.find().exec().then(subadmin_data=>{
+router.get('/getAllSubAdmins',async (req,res)=>{
+  const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(" ")[1];
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    var list = [];
+    var limit = 10;
+    var count = await subAdmin.find({company_id})
+    subAdmin.find({company_id}).limit(limit*1).skip((page-1)*limit).exec().then(subadmin_data=>{
+      let counInfo = 0;
+      for(let i=0;i<subadmin_data.length;i++){
+        Location.findOne({ _id: subadmin_data[i].state }).exec().then((state_data) => {
+          Location.findOne({ _id: subadmin_data[i].city }).exec().then((city_data) => {
+              Location.findOne({ _id: subadmin_data[i].district }).exec().then(async (area_data) => {
+                await (async function (rowData) {
+                  var u_data = {
+                    id:rowData._id,
+                    employeeName: rowData.employeeName,
+                    phone: rowData.phone,
+                    email: rowData.email,
+                    address: rowData.address,
+                    pincode: rowData.pincode,
+                    state: state_data.name,
+                    image: rowData.image,
+                    city: city_data.name,
+                    district: area_data.name,
+                    experience: rowData.experience,
+                    qualification: rowData.qualification,
+                  };
+                  list.push(u_data);
+                })(subadmin_data[i]);
+                counInfo++
+                if(counInfo == subadmin_data.length){
+                  res.json({
+                    status:true,
+                    message:"All Employees found successfully",
+                    result:list,
+                    pageLength:Math.ceil(count.length/limit)
+                  })
+                }
+                });
+            });
+        });
+    }
         res.json({
             status:true,
             message:"admins found successfully",

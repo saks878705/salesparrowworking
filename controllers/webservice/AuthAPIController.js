@@ -345,9 +345,9 @@ router.get('/getadminprofile',(req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.find({_id:user_id}).exec().then(admin_data=>{
-        Location.findOne({ _id: emp_data[0].state }).exec().then((state_data) => {
-          Location.findOne({ _id: emp_data[0].city }).exec().then((city_data) => {
-              Location.findOne({ _id: emp_data[0].district }).exec().then(async (area_data) => {
+        Location.findOne({ _id: admin_data[0].state }).exec().then((state_data) => {
+          Location.findOne({ _id: admin_data[0].city }).exec().then((city_data) => {
+              Location.findOne({ _id: admin_data[0].district }).exec().then(async (area_data) => {
                   var u_data = {
                     id:admin_data._id,
                     company_name:admin_data.company_name,
