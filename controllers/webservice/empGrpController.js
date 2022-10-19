@@ -194,6 +194,7 @@ router.post('/editGrp',(req,res)=>{
         updated_grp.grp_description = req.body.grp_description;
     }
     updated_grp.Updated_date = get_current_date();
+    console.log(updated_grp);
     Group.findOneAndUpdate({_id:id},updated_grp,{new:true},(err,doc)=>{
         if(doc){
             if(req.body.empIdStr){
