@@ -372,7 +372,7 @@ router.get('/getadminprofile',(req,res)=>{
                   res.status(200).json({
                     status:true,
                     message:"Get Successfully",
-                    result:u_data
+                    result:[u_data]
                   })
                 }else{
                   var u_data = {
@@ -397,7 +397,7 @@ router.get('/getadminprofile',(req,res)=>{
                   res.status(200).json({
                     status:true,
                     message:"Get Successfully",
-                    result:u_data
+                    result:[u_data]
                   })
                 }
                 });
