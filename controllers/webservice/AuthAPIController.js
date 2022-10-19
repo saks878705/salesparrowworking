@@ -349,6 +349,7 @@ router.get('/getadminprofile',(req,res)=>{
         Location.findOne({ _id: admin_data[0].state }).exec().then((state_data) => {
           Location.findOne({ _id: admin_data[0].city }).exec().then((city_data) => {
               Location.findOne({ _id: admin_data[0].district }).exec().then(async (area_data) => {
+                if(area_data){
                   var u_data = {
                     id:admin_data._id,
                     company_name:admin_data.company_name,
@@ -373,6 +374,32 @@ router.get('/getadminprofile',(req,res)=>{
                     message:"Get Successfully",
                     result:u_data
                   })
+                }else{
+                  var u_data = {
+                    id:admin_data._id,
+                    company_name:admin_data.company_name,
+                    phone:admin_data.phone,
+                    password:admin_data.password,
+                    email:admin_data.email,
+                    city:city_data.name,
+                    state:state_data.name,
+                    pincode:admin_data.pincode,
+                    GSTNo:admin_data.GSTNo,
+                    companyAddress:admin_data.companyAddress,
+                    companyCatagory:admin_data.companyCatagory,
+                    companyDescription:admin_data.companyDescription,
+                    companyType:admin_data.companyType,
+                    contactPersonName:admin_data.contactPersonName,
+                    district:"",
+                    signatureImage:admin_data.signatureImage,
+                    profileImage:admin_data.profileImage,
+                  };
+                  res.status(200).json({
+                    status:true,
+                    message:"Get Successfully",
+                    result:u_data
+                  })
+                }
                 });
             });
         });
