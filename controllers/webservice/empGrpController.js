@@ -199,8 +199,10 @@ router.post('/editGrp',(req,res)=>{
         if(doc){
             if(req.body.empIdStr){
                 var empIdArr = req.body.empIdStr.split(",");
+                console.log(empIdArr);
                 EmployeeGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
                     for(let i = 0; i < empIdArr.length; i++){
+                        console.log(empIdArr[i]);
                         Employee.findOne({_id:empIdArr[i]}).exec().then(async (emp_data)=>{
                             console.log(emp_data)
                             var new_emp_grp = new EmployeeGrouping({
