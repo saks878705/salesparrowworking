@@ -346,10 +346,12 @@ router.get('/getadminprofile',(req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.findOne({_id:user_id}).exec().then(admin_data=>{
+      console.log(admin_data)
         Location.findOne({ _id: admin_data.state }).exec().then((state_data) => {
           Location.findOne({ _id: admin_data.city }).exec().then((city_data) => {
               Location.findOne({ _id: admin_data.district }).exec().then(async (area_data) => {
                 if(area_data){
+                  console.log("inside if");
                   var u_data = {
                     id:admin_data._id,
                     company_name:admin_data.company_name,
@@ -365,7 +367,7 @@ router.get('/getadminprofile',(req,res)=>{
                     companyDescription:admin_data.companyDescription,
                     companyType:admin_data.companyType,
                     contactPersonName:admin_data.contactPersonName,
-                    district:area_data.name,
+                    district:{name:area_data.name,id:area_data._id},
                     signatureImage:admin_data.signatureImage,
                     profileImage:admin_data.profileImage,
                   };
@@ -375,6 +377,7 @@ router.get('/getadminprofile',(req,res)=>{
                     result:[u_data]
                   })
                 }else{
+                  console.log("inside else");
                   var u_data = {
                     id:admin_data._id,
                     company_name:admin_data.company_name,

@@ -17,6 +17,10 @@ function get_current_date() {
   };
 
 router.post('/addEmpTarget',(req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
     var state = req.body.state?req.body.state:"";
     var employee = req.body.employee?req.body.employee:"";
     var date = req.body.date?req.body.date:"";
@@ -32,6 +36,7 @@ router.post('/addEmpTarget',(req,res)=>{
                             state_id:state,
                             employee_id:employee,
                             party_id:party,
+                            company_id:company_id,
                             month:date,
                             primary_target:primTarget,
                             Secondary_target:secTarget,

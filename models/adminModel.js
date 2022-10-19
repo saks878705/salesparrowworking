@@ -34,6 +34,38 @@ var AdminSchema = new Schema({
         type:Number,
         default:""
     },
+    companyAddress:{
+        type:String,
+        default:""
+    },
+    companyCatagory:{
+        type:String,
+        default:""
+    },
+    companyDescription:{
+        type:String,
+        default:""
+    },
+    companyType:{
+        type:String,
+        default:""
+    },
+    contactPersonName:{
+        type:String,
+        default:""
+    },
+    district:{
+        type:String,
+        default:""
+    },
+    signatureImage:{
+        type:String,
+        default:""
+    },
+    profileImage:{
+        type:String,
+        default:""
+    },
     Created_date: {
         type: String,
         default: ""

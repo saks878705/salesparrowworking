@@ -5,6 +5,9 @@ const employee_target_schema = new Schema({
     state_id:{
         type:String
     },
+    company_id:{
+        type:String
+    },
     employee_id:{
         type:String
     },
