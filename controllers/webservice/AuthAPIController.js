@@ -5,6 +5,7 @@ const jwt          = require('jsonwebtoken');
 const bcrypt       = require('bcrypt');
 const mongoose     = require('mongoose');
 const Admin     = mongoose.model('AdminInfo');
+const Location     = mongoose.model('Location');
 const sgmail = require("@sendgrid/mail");
 const nodemailer = require("nodemailer");
 
