@@ -102,7 +102,8 @@ router.post("/routeListing", async (req, res) => {
         Route.find({ $and: [{ company_id }, { state }] })
           .exec()
           .then((route_data) => {
-            let counInfo = 0;
+            if(route_data.length>0){
+              let counInfo = 0;
             for (let i = 0; i < route_data.length; i++) {
               Location.findOne({ _id: route_data[i].state })
                 .exec()
@@ -137,13 +138,21 @@ router.post("/routeListing", async (req, res) => {
                     });
                 });
             }
+            }else{
+              res.json({
+                status:false,
+                message:"No route found for this state",
+                result:[]
+              })
+            }
           });
   } else {
     var list = [];
     Route.find({ company_id })
       .exec()
       .then((route_data) => {
-        let counInfo = 0;
+        if(route_data.length>0){
+          let counInfo = 0;
         for (let i = 0; i < route_data.length; i++) {
           Location.findOne({ _id: route_data[i].state })
             .exec()
@@ -177,6 +186,13 @@ router.post("/routeListing", async (req, res) => {
                     });
                 });
             });
+        }
+        }else{
+          res.json({
+            status:false,
+            message:"No route found ",
+            result:[]
+          })
         }
       });
   }

@@ -5,20 +5,17 @@ const beat_schema = new Schema({
     beatName:{
         type:String,
     },
-    pincode:{
-        type:Number
+    employee_id:{
+        type:String,
     },
-    state:{
-        type:String
+    day:{
+        type:String,
     },
-    area:{
-        type:String
+    company_id:{
+        type:String,
     },
-    city:{
-        type:String
-    },
-    district:{
-        type:String
+    route_id:{
+        type:String,
     },
     Created_date: {
         type: String,
