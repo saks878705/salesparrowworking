@@ -93,15 +93,13 @@ router.post("/routeListing", async (req, res) => {
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
   var state = req.body.state ? req.body.state : "";
-  var city = req.body.city ? req.body.city : "";
-  var area = req.body.area ? req.body.area : "";
+  // var city = req.body.city ? req.body.city : "";
+  // var area = req.body.area ? req.body.area : "";
   var count = await Route.find({ company_id });
   var limit = 10;
   if (state != "") {
-    if (city != "") {
-      if (area != "") {
         var list = [];
-        Route.find({ $and: [{ company_id }, { state }, { city }, { area }] })
+        Route.find({ $and: [{ company_id }, { state }] })
           .exec()
           .then((route_data) => {
             let counInfo = 0;
@@ -140,18 +138,6 @@ router.post("/routeListing", async (req, res) => {
                 });
             }
           });
-      } else {
-        res.json({
-          status: false,
-          message: "Area is required.",
-        });
-      }
-    } else {
-      res.json({
-        status: false,
-        message: "City is required.",
-      });
-    }
   } else {
     var list = [];
     Route.find({ company_id })
