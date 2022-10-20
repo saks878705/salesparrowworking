@@ -19,13 +19,11 @@ router.post("/addBeat", (req, res) => {
   var state = req.body.state ? req.body.state : "";
   var city = req.body.city ? req.body.city : "";
   var pincode = req.body.pincode ? req.body.pincode : "";
-  var district = req.body.district ? req.body.district : "";
   if (beatName != "") {
     if (area != "") {
       if (state != "") {
         if (city != "") {
           if (pincode != "") {
-            if (district != "") {
               Beat.find({ beatName: beatName })
                 .exec()
                 .then((beat_info) => {
@@ -35,7 +33,6 @@ router.post("/addBeat", (req, res) => {
                       area: area,
                       city: city,
                       state: state,
-                      district: district,
                       pincode: pincode,
                       Created_date: get_current_date(),
                       Updated_date: get_current_date(),
@@ -56,13 +53,6 @@ router.post("/addBeat", (req, res) => {
                     });
                   }
                 });
-            } else {
-                return res.json({
-                    status: false,
-                    message: "District is required",
-                    results: null,
-                  });
-            }
           } else {
             return res.json({
                 status: false,
@@ -120,9 +110,6 @@ router.patch('/editBeat',(req,res)=>{
                   }
                   if (req.body.pincode) {
                     updated_beat.pincode = req.body.pincode;
-                  }
-                  if (req.body.district) {
-                    updated_beat.district = req.body.district;
                   }
                   if (req.body.status) {
                     updated_beat.status = req.body.status;

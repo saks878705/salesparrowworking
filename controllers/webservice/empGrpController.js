@@ -147,7 +147,9 @@ router.post('/empGrpList',async (req,res)=>{
         var list = [];
         Group.find({company_id}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
             let counInfo = 0;
-            if(group_data){
+            console.log(group_data);
+            if(group_data.length>0){
+                console.log("inside else if")
                 for(let i = 0;i<group_data.length;i++){
                     Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
                         await (async function(rowData){
@@ -171,9 +173,11 @@ router.post('/empGrpList',async (req,res)=>{
                     });
                 }
             }else{
+                console.log("no data")
                 res.json({
                     status:false,
-                    message:"No EmpGroup found for this org."
+                    message:"No EmpGroup found for this org.",
+                    result:[]
                 })
             }
         })
