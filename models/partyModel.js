@@ -39,10 +39,13 @@ const party_schema = new Schema({
         type:String
     },
     DOB:{
-        type:Date
+        type:String
     },
     DOA:{
-        type:Date
+        type:String
+    },
+    route:{
+        type:Array
     },
     Created_date: {
         type: String,

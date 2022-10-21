@@ -148,13 +148,18 @@ router.post('/editBeat',(req,res)=>{
 router.post('/getAllBeat',async (req,res)=>{
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  var decodedToken = jwt.verify(token, "test");
-  var company_id = decodedToken.user_id;
+  if(!token){
+    return res.json({
+      status:false,
+      message:"Token must be provided"
+    })
+  }
   var page = req.body.page?req.body.page:"1";
   var limit = 5;
   var count =await Beat.find({company_id});
   var list = [];
-  if(token!=""){
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
     Beat.find({company_id}).limit( limit * 1).skip((page -1) * limit).sort({Created_date:-1}).exec().then(beat_data=>{
       let counInfo = 0;
       if(beat_data.length>0){
@@ -191,13 +196,6 @@ router.post('/getAllBeat',async (req,res)=>{
         });
       }
     })
-  }else{
-    res.json({
-      status:true,
-      message:"Token is required",
-      result:[]
-    })
-  }
 });
 
 // router.get('/getBeat',(req,res)=>{

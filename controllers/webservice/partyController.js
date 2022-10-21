@@ -40,6 +40,7 @@ router.post('/addParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
     var address = req.body.address?req.body.address:"";
     var DOB = req.body.DOB?req.body.DOB:"";
     var DOA = req.body.DOA?req.body.DOA:"";
+    var route = req.body.route?req.body.route:"";
     if(partyType!=""){
         if(firmName!=""){
             if(mobileNo!=""){
@@ -58,6 +59,7 @@ router.post('/addParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
                                         email:email,
                                         pincode:pincode,
                                         state:state,
+                                        route:route,
                                         city:city,
                                         district:district,
                                         address:address,
@@ -135,6 +137,9 @@ router.patch('/editParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>
             }
             if (req.body.firmName) {
                 updated_party.firmName = req.body.firmName;
+            }
+            if (req.body.route) {
+                updated_party.route = req.body.route;
             }
             if (req.body.GSTNo) {
                 updated_party.GSTNo = req.body.GSTNo;
