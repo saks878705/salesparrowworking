@@ -97,7 +97,7 @@ router.post("/routeListing", async (req, res) => {
   // var area = req.body.area ? req.body.area : "";
   var count = await Route.find({ company_id });
   var limit = 10;
-  if (state != "") {
+  if (state != "" && city =="") {
         var list = [];
         Route.find({ $and: [{ company_id }, { state }] })
           .exec()
