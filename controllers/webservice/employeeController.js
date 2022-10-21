@@ -216,7 +216,8 @@ router.post("/getAllEmployee", async (req, res) => {
   if (state != "") {
     var list = [];
     Employee.find({ $and: [{ state: state }, { companyId: user_id }] }).exec().then((emp_data) => {
-      let counInfo = 0;
+      if(emp_data.length>0){
+        let counInfo = 0;
       for(let i=0;i<emp_data.length;i++){
         Location.findOne({ _id: emp_data[0].state }).exec().then((state_data) => {
           Location.findOne({ _id: emp_data[0].city }).exec().then((city_data) => {
@@ -250,12 +251,20 @@ router.post("/getAllEmployee", async (req, res) => {
                 });
             });
         });
-    }
+      }
+      }else{
+        res.json({
+          status:false,
+          message:"No employee found",
+          result:[]
+        })
+      }
   });
 } else if(state!="" && city!=""){
       var list = [];
     Employee.find({ $and: [{ state: state }, { companyId: user_id } ,{ city }] }).exec().then((emp_data) => {
-      let counInfo = 0;
+      if(emp_data.length>0){
+        let counInfo = 0;
       for(let i=0;i<emp_data.length;i++){
         Location.findOne({ _id: emp_data[i].state }).exec().then((state_data) => {
           Location.findOne({ _id: emp_data[i].city }).exec().then((city_data) => {
@@ -290,6 +299,13 @@ router.post("/getAllEmployee", async (req, res) => {
             });
         });
     }
+      }else{
+        res.json({
+          status:false,
+          message:"No employee found",
+          result:[]
+        })
+      }
   })
 }else {
     var list = [];
@@ -298,7 +314,8 @@ router.post("/getAllEmployee", async (req, res) => {
       .skip((page - 1) * limit)
       .exec()
       .then((employee_data) => {
-        let counInfo = 0;
+        if(employee_data.length>0){
+          let counInfo = 0;
         for (let i = 0; i < employee_data.length; i++) {
           Location.findOne({ _id: employee_data[i].state })
             .exec()
@@ -338,6 +355,13 @@ router.post("/getAllEmployee", async (req, res) => {
                     });
                 });
             });
+        }
+        }else{
+          res.json({
+            status:false,
+            message:"No employee found",
+            result:[]
+          })
         }
       });
   }
