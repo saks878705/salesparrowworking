@@ -195,6 +195,7 @@ router.post('/getAllBeat',async (req,res)=>{
                     route:route_data._id,
                     beatName:rowData.beatName,
                     day:rowData.day,
+                    status:rowData.status
                   };
                   list.push(u_data);
                 })(beat_data[i]);
