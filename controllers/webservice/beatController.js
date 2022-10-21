@@ -228,10 +228,10 @@ router.post('/getBeat',(req,res)=>{
     var id = req.body.id?req.body.id:"";
     Beat.findOne({_id:id}).exec().then(beat_data=>{
       if(beat_data){
-        Location.find({_id:beat_data.state}).exec().then(state_data=>{
-          Location.find({_id:beat_data.city}).exec().then(city_data=>{
-            Employee.find({_id:beat_data.employee_id}).exec().then(emp_data=>{
-              Route.find({_id:beat_data.route_id}).exec().then(route_data=>{
+        Location.findOne({_id:beat_data.state}).exec().then(state_data=>{
+          Location.findOne({_id:beat_data.city}).exec().then(city_data=>{
+            Employee.findOne({_id:beat_data.employee_id}).exec().then(emp_data=>{
+              Route.findOne({_id:beat_data.route_id}).exec().then(route_data=>{
                 var u_data = {
                   id:beat_data._id,
                   state:{name:state_data.name,id:beat_data.state},
