@@ -19,13 +19,18 @@ function get_current_date() {
 router.post("/addBeat", (req, res) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    return res.json({
+      status:false,
+      message:"Token must be provided"
+    })
+  }
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
   var beatName = req.body.beatName ? req.body.beatName : "";
   var employee_id = req.body.employee_id ? req.body.employee_id : "";
   var day = req.body.day ? req.body.day : "";
   var route_id = req.body.route_id ? req.body.route_id : "";
-  if(token!=""){
     if (beatName != "") {
       if (employee_id != "") {
         if (day != "") {
@@ -87,13 +92,6 @@ router.post("/addBeat", (req, res) => {
         results: null,
       });
     }
-  }else{
-    return res.json({
-      status: false,
-      message: "Token is required",
-      results: null,
-    });
-  }
 });
 
 router.post('/editBeat',(req,res)=>{
