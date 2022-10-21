@@ -96,7 +96,7 @@ router.post("/addBeat", (req, res) => {
   }
 });
 
-router.patch('/editBeat',(req,res)=>{
+router.post('/editBeat',(req,res)=>{
     var id = req.body.id?req.body.id:"";
     if(id!=""){
         Beat.find({_id:id}).exec().then(beat_data=>{
@@ -154,16 +154,17 @@ router.post('/getAllBeat',async (req,res)=>{
   var limit = 5;
   var count =await Beat.find({company_id});
   var list = [];
-    Beat.find({company_id}).limit( limit * 1).skip((page -1) * limit).exec().then(beat_data=>{
+  if(token!=""){
+    Beat.find({company_id}).limit( limit * 1).skip((page -1) * limit).sort({Created_date:-1}).exec().then(beat_data=>{
       let counInfo = 0;
       if(beat_data.length>0){
         for(let i = 0;i<beat_data.length;i++){
           Employee.findOne({_id:beat_data[i].employee_id}).exec().then(emp_data=>{
-            Route.findOne({_id:beat_data[i].route_id}).exec().then(route_data=>{
+            Route.findOne({_id:beat_data[i].route_id}).exec().then(async (route_data)=>{
                 await (async function (rowData) {
                   var u_data = {
                     id:rowData._id,
-                    employee_name:emp_data._id,
+                    employee_name:emp_data.employeeName,
                     route:route_data._id,
                     beatName:rowData.beatName,
                     day:rowData.day,
@@ -190,6 +191,13 @@ router.post('/getAllBeat',async (req,res)=>{
         });
       }
     })
+  }else{
+    res.json({
+      status:true,
+      message:"Token is required",
+      result:[]
+    })
+  }
 });
 
 // router.get('/getBeat',(req,res)=>{
@@ -203,18 +211,23 @@ router.post('/getAllBeat',async (req,res)=>{
 //     })
 // });
 
-router.delete("/deleteBeat", (req, res) => {
-    var id = req.query.id ?? "";
-    if (id != "") {
-      Beat.deleteOne({ _id: id })
-        .exec()
-        .then(() => {
-          res.status(200).json({
-            status: true,
-            message: "Deleted successfully",
-            result: null,
-          });
-        });
-    }
-  });
+// router.delete("/deleteBeat", (req,res) => {
+//     var id = req.query.id ?? "";
+//     if (id != "") {
+//       Beat.findByIdAndDelete({_id:id}).exec().then((doc) => {
+//         if(doc){
+//           res.status(200).json({
+//             status: true,
+//             message: "Deleted successfully",
+//             result: [],
+//           });
+//         }else{
+//           res.json({
+//             status: false,
+//             message: "Some error",
+//           });
+//         }
+//         });
+//     }
+//   });
 module.exports = router;
