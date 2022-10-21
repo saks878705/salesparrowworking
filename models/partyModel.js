@@ -8,6 +8,9 @@ const party_schema = new Schema({
     image:{
         type:String,
     },
+    company_id:{
+        type:String,
+    },
     pincode:{
         type:Number
     },

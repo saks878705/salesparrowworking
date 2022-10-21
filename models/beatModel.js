@@ -11,6 +11,12 @@ const beat_schema = new Schema({
     day:{
         type:String,
     },
+    state:{
+        type:String,
+    },
+    city:{
+        type:String,
+    },
     company_id:{
         type:String,
     },

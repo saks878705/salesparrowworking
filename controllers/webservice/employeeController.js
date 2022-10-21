@@ -210,6 +210,7 @@ router.post("/getAllEmployee", async (req, res) => {
   var user_id = decodedToken.user_id;
   var page = req.body.page ? req.body.page : "1";
   var state = req.body.state ? req.body.state : "";
+  var city = req.body.city ? req.body.city : "";
   var limit = 10;
   let count = await Employee.find();
   if (state != "") {
@@ -251,7 +252,46 @@ router.post("/getAllEmployee", async (req, res) => {
         });
     }
   });
-    } else {
+} else if(state!="" && city!=""){
+      var list = [];
+    Employee.find({ $and: [{ state: state }, { companyId: user_id } ,{ city }] }).exec().then((emp_data) => {
+      let counInfo = 0;
+      for(let i=0;i<emp_data.length;i++){
+        Location.findOne({ _id: emp_data[i].state }).exec().then((state_data) => {
+          Location.findOne({ _id: emp_data[i].city }).exec().then((city_data) => {
+              Location.findOne({ _id: emp_data[i].district }).exec().then(async (area_data) => {
+                await (async function (rowData) {
+                  var u_data = {
+                    id:rowData._id,
+                    employeeName: rowData.employeeName,
+                    phone: rowData.phone,
+                    email: rowData.email,
+                    address: rowData.address,
+                    pincode: rowData.pincode,
+                    state: state_data.name,
+                    image: rowData.image,
+                    city: city_data.name,
+                    district: area_data.name,
+                    experience: rowData.experience,
+                    qualification: rowData.qualification,
+                  };
+                  list.push(u_data);
+                })(emp_data[i]);
+                counInfo++
+                if(counInfo == emp_data.length){
+                  res.json({
+                    status:true,
+                    message:"All Employees found successfully",
+                    result:list,
+                    pageLength:Math.ceil(count.length/limit)
+                  })
+                }
+                });
+            });
+        });
+    }
+  })
+}else {
     var list = [];
     Employee.find({ companyId: user_id })
       .limit(limit * 1)

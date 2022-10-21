@@ -176,11 +176,15 @@ router.post('/getAllBeat',async (req,res)=>{
                 })(beat_data[i]);
                 counInfo++;
                 if(counInfo==beat_data.length){
+                  let c = Math.ceil(count.length/limit);
+                  if(c==0){
+                     c+=1;
+                  }
                   res.json({
                     status:true,
                     message:"All Beats found successfully",
                     result:list,
-                    pageLength:Math.ceil(count.length/limit)
+                    pageLength:c
                 })
                 }
             })

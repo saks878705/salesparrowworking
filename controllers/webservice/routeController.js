@@ -93,7 +93,7 @@ router.post("/routeListing", async (req, res) => {
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
   var state = req.body.state ? req.body.state : "";
-  // var city = req.body.city ? req.body.city : "";
+  var city = req.body.city ? req.body.city : "";
   // var area = req.body.area ? req.body.area : "";
   var count = await Route.find({ company_id });
   var limit = 10;
@@ -146,7 +146,54 @@ router.post("/routeListing", async (req, res) => {
               })
             }
           });
-  } else {
+  } else if(state!="" && city!=""){
+    var list = [];
+        Route.find({ $and: [{ company_id }, { state } , {city}] }).exec().then((route_data) => {
+            if(route_data.length>0){
+              let counInfo = 0;
+            for (let i = 0; i < route_data.length; i++) {
+              Location.findOne({ _id: route_data[i].state })
+                .exec()
+                .then((state_data) => {
+                  Location.findOne({ _id: route_data[i].city })
+                    .exec()
+                    .then((city_data) => {
+                      Location.findOne({ _id: route_data[i].area })
+                        .exec()
+                        .then(async (area_data) => {
+                          await (async function (rowData) {
+                            var u_data = {
+                              id: rowData._id,
+                              state: state_data.name,
+                              city: city_data.name,
+                              area: area_data.name,
+                              start_point: rowData.start_point,
+                              end_point: rowData.end_point,
+                            };
+                            list.push(u_data);
+                          })(route_data[i]);
+                          counInfo++;
+                          if (counInfo == route_data.length) {
+                            res.json({
+                              status: true,
+                              message: "All Routes found successfully",
+                              result: list,
+                              pageLength: Math.ceil(count.length / limit),
+                            });
+                          }
+                        });
+                    });
+                });
+            }
+            }else{
+              res.json({
+                status:false,
+                message:"No route found for this state",
+                result:[]
+              })
+            }
+          });
+  }else {
     var list = [];
     Route.find({ company_id })
       .exec()
