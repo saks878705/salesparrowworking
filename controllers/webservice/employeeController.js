@@ -213,7 +213,8 @@ router.post("/getAllEmployee", async (req, res) => {
   var city = req.body.city ? req.body.city : "";
   var limit = 10;
   let count = await Employee.find();
-  if (state != "") {
+  if (state != "" && city=="") {
+    console.log("inside if")
     var list = [];
     Employee.find({ $and: [{ state: state }, { companyId: user_id }] }).exec().then((emp_data) => {
       if(emp_data.length>0){
@@ -261,6 +262,7 @@ router.post("/getAllEmployee", async (req, res) => {
       }
   });
 } else if(state!="" && city!=""){
+  console.log("else if")
       var list = [];
     Employee.find({ $and: [{ state: state }, { companyId: user_id } ,{ city }] }).exec().then((emp_data) => {
       if(emp_data.length>0){
@@ -308,12 +310,9 @@ router.post("/getAllEmployee", async (req, res) => {
       }
   })
 }else {
+  console.log("inside else");
     var list = [];
-    Employee.find({ companyId: user_id })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .exec()
-      .then((employee_data) => {
+    Employee.find({ companyId: user_id }).limit(limit * 1).skip((page - 1) * limit).exec().then(employee_data => {
         if(employee_data.length>0){
           let counInfo = 0;
         for (let i = 0; i < employee_data.length; i++) {
