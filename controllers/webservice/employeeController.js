@@ -366,16 +366,112 @@ router.post("/getAllEmployee", async (req, res) => {
   }
 });
 
-// router.get('/getEmployee',(req,res)=>{
-//     var id = req.body.id?req.body.id:"";
-//     Employee.find({_id:id}).exec().then(employee_data=>{
-//         res.json({
-//             status:true,
-//             message:"Employee found successfully",
-//             result:employee_data
-//         })
-//     })
-// });
+router.get('/getEmployee',(req,res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    res.json({
+      status:false,
+      message:"Token is required"
+    })
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var user_id = decodedToken.user_id;
+    Employee.findOne({_id:user_id}).exec().then(employee_data=>{
+      Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
+        Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
+            Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
+              var u_data = {
+                employeeName:employee_data.employeeName,
+                roleId:employee_data.roleId,
+                companyId:employee_data.companyId,
+                manager:employee_data.manager,
+                phone:employee_data.phone,
+                email:employee_data.email,
+                address:employee_data.address,
+                pincode:employee_data.pincode,
+                state:state_data.name,
+                image:employee_data.image,
+                city:city_data.name,
+                district:area_data.name,
+                experience:employee_data.experience,
+                qualification:employee_data.qualification,
+                userExpenses:employee_data.userExperience,
+                transportWays:employee_data.transportWays,
+                status:employee_data.status,
+              }
+              res.json({
+                status:true,
+                message:"Employee found successfully",
+                result:u_data
+            })
+            })
+          })
+        })
+    })
+});
+
+router.post('/profile_update',(req,res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    res.json({
+      status:false,
+      message:"Token is required"
+    })
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var user_id = decodedToken.user_id;
+  Employee.findOne({_id:user_id}).exec().then(emp_data=>{
+    if(emp_data.status=="Active"){
+      var updated_emp = {}
+      if(req.body.phone){
+        updated_emp.phone = req.body.phone;
+      }
+      if(req.body.email){
+        updated_emp.email = req.body.email;
+      }
+      if(req.body.qualification){
+        updated_emp.qualification = req.body.qualification;
+      }
+      if(req.body.experience){
+        updated_emp.experience = req.body.experience;
+      }
+      if(req.body.address){
+        updated_emp.address = req.body.address;
+      }
+      if(req.body.state){
+        updated_emp.state = req.body.state;
+      }
+      if(req.body.city){
+        updated_emp.city = req.body.city;
+      }
+      if(req.body.district){
+        updated_emp.district = req.body.district;
+      }
+      if(req.body.pincode){
+        updated_emp.pincode = req.body.pincode;
+      }
+      if(req.body.image){
+        updated_emp.image = req.body.image;
+      }
+      Employee.findOneAndUpdate({_id:user_id},updated_emp,{new:true},(err,doc)=>{
+        if(doc){
+          res.json({
+            status:true,
+            message:"Updated successfully",
+            result:updated_emp
+          })
+        }
+      })
+    }else{
+      res.json({
+        status:false,
+        message:"You are inactive."
+      })
+    }
+  })
+})
 
 // router.delete('/deleteEmployee',(req,res)=>{
 //   var id = req.body.id?req.body.id:"";
@@ -388,9 +484,7 @@ router.post("/getAllEmployee", async (req, res) => {
 // });
 
 router.post("/sendOtp", (req, res) => {
-  var to_phone_number = req.body.to_phone_number
-    ? req.body.to_phone_number
-    : "";
+  var to_phone_number = req.body.to_phone_number? req.body.to_phone_number: "";
   if (to_phone_number != "") {
     Employee.findOne({ phone: to_phone_number })
       .exec()

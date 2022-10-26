@@ -227,50 +227,98 @@ router.post('/getAllParty',async (req,res)=>{
     var limit = 5;
     var count =await Party.find({company_id});
     var list = [];
-    Party.find({company_id}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-        if(party_data.length>0){
-            let counInfo = 0;
-            for(let i=0;i<party_data.length;i++){
-                Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-                    Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-                        Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-                            await (async function (rowData) {
-                                var u_data = {
-                                  id:rowData._id,
-                                  state:{name:state_data.name,id:rowData.state},
-                                  city:{name:city_data.name,id:rowData.city},
-                                  district:{name:district_data.name,id:rowData.district},
-                                  firmName:rowData.firmName,
-                                  areas:rowData.address,
-                                  status:rowData.status
-                                };
-                                list.push(u_data);
-                              })(party_data[i]);
-                              counInfo++;
-                              if(counInfo==party_data.length){
-                                let c = Math.ceil(count.length/limit);
-                                if(c==0){
-                                   c+=1;
-                                }
-                                res.json({
-                                  status:true,
-                                  message:"All Parties found successfully",
-                                  result:list,
-                                  pageLength:c
-                              })
-                              }
+    var state = req.body.state?req.body.state:"";
+    if(state!=""){
+        Party.find({ $and: [{company_id},{state}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
+            if(party_data.length>0){
+                let counInfo = 0;
+                for(let i=0;i<party_data.length;i++){
+                    Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
+                        Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
+                            Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
+                                await (async function (rowData) {
+                                    var u_data = {
+                                      id:rowData._id,
+                                      state:{name:state_data.name,id:rowData.state},
+                                      city:{name:city_data.name,id:rowData.city},
+                                      district:{name:district_data.name,id:rowData.district},
+                                      firmName:rowData.firmName,
+                                      areas:rowData.address,
+                                      status:rowData.status
+                                    };
+                                    list.push(u_data);
+                                  })(party_data[i]);
+                                  counInfo++;
+                                  if(counInfo==party_data.length){
+                                    let c = Math.ceil(count.length/limit);
+                                    if(c==0){
+                                       c+=1;
+                                    }
+                                    res.json({
+                                      status:true,
+                                      message:"Parties for this state found successfully",
+                                      result:list,
+                                      pageLength:c
+                                  })
+                                  }
+                            })
                         })
                     })
+                }
+            }else{
+                res.json({
+                    status:true,
+                    message:"No party found",
+                    result:[]
                 })
             }
-        }else{
-            res.json({
-                status:true,
-                message:"No party found",
-                result:[]
-            })
-        }
-    })
+        })
+    }else{
+        Party.find({company_id}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
+            if(party_data.length>0){
+                let counInfo = 0;
+                for(let i=0;i<party_data.length;i++){
+                    Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
+                        Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
+                            Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
+                                await (async function (rowData) {
+                                    var u_data = {
+                                      id:rowData._id,
+                                      state:{name:state_data.name,id:rowData.state},
+                                      city:{name:city_data.name,id:rowData.city},
+                                      district:{name:district_data.name,id:rowData.district},
+                                      firmName:rowData.firmName,
+                                      areas:rowData.address,
+                                      status:rowData.status
+                                    };
+                                    list.push(u_data);
+                                  })(party_data[i]);
+                                  counInfo++;
+                                  if(counInfo==party_data.length){
+                                    let c = Math.ceil(count.length/limit);
+                                    if(c==0){
+                                       c+=1;
+                                    }
+                                    res.json({
+                                      status:true,
+                                      message:"All Parties found successfully",
+                                      result:list,
+                                      pageLength:c
+                                  })
+                                  }
+                            })
+                        })
+                    })
+                }
+            }else{
+                res.json({
+                    status:true,
+                    message:"No party found",
+                    result:[]
+                })
+            }
+        })
+    }
 });
 
 router.post('/getParty',(req,res)=>{
