@@ -31,10 +31,7 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
 
-router.post(
-  "/addEmployee",
-  imageUpload.fields([{ name: "Employee_image" }]),
-  (req, res) => {
+router.post("/addEmployee",imageUpload.fields([{ name: "Employee_image" }]),(req, res) => {
     console.log(req.body);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
