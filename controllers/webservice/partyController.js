@@ -2,10 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Party = mongoose.model("Party");
 const Location = mongoose.model("Location");
+const Route = mongoose.model("Route");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
+const { Router } = require("express");
 
 const imageStorage = multer.diskStorage({
   destination: "images/party_image",
@@ -343,35 +345,54 @@ router.post('/getAllParty',async (req,res)=>{
 
 router.post('/getParty',(req,res)=>{
     var id = req.body.id?req.body.id:"";
+    var list = [];
     if(id!=""){
         Party.findOne({_id:id}).exec().then(party_data=>{
             if(party_data){
                 Location.findOne({_id:party_data.state}).exec().then(state_data=>{
                     Location.findOne({_id:party_data.city}).exec().then(city_data=>{
                         Location.findOne({_id:party_data.district}).exec().then(district_data=>{
-                                var u_data = {
-                                  id:party_data._id,
-                                  state:{name:state_data.name,id:party_data.state},
-                                  city:{name:city_data.name,id:party_data.city},
-                                  district:{name:district_data.name,id:party_data.district},
-                                  firmName:party_data.firmName,
-                                  address:party_data.address,
-                                  partyType:party_data.partyType,
-                                  image:party_data.image,
-                                  pincode:party_data.pincode,
-                                  GSTNo:party_data.GSTNo,
-                                  contactPersonName:party_data.contactPersonName,
-                                  mobileNo:party_data.mobileNo,
-                                  email:party_data.email,
-                                  DOB:party_data.DOB,
-                                  DOA:party_data.DOA,
-                                  route:party_data.route,
-                                };
-                                res.json({
-                                  status:true,
-                                  message:" Party found successfully",
-                                  result:u_data,
-                              }) 
+                            console.log(party_data.route)
+                            var arr = party_data.route
+                            for(let i = 0;i<arr.length;i++){
+                                console.log(i)
+                                console.log(arr[i])
+                                Route.findOne({_id:arr[i]}).exec().then(route_data=>{
+                                    console.log("routedata",route_data)
+                                    let data = {
+                                        start_point:route_data.start_point,
+                                        end_point:route_data.end_point,
+                                        id:route_data._id
+                                    }
+                                    list.push(data);
+                                    console.log(list)
+                                    if(arr.length==i+1){
+                                        var u_data = {
+                                            id:party_data._id,
+                                            state:{name:state_data.name,id:party_data.state},
+                                            city:{name:city_data.name,id:party_data.city},
+                                            district:{name:district_data.name,id:party_data.district},
+                                            firmName:party_data.firmName,
+                                            address:party_data.address,
+                                            partyType:party_data.partyType,
+                                            image:party_data.image,
+                                            pincode:party_data.pincode,
+                                            GSTNo:party_data.GSTNo,
+                                            contactPersonName:party_data.contactPersonName,
+                                            mobileNo:party_data.mobileNo,
+                                            email:party_data.email,
+                                            DOB:party_data.DOB,
+                                            DOA:party_data.DOA,
+                                            route:list,
+                                          };
+                                          res.json({
+                                            status:true,
+                                            message:" Party found successfully",
+                                            result:u_data,
+                                        })
+                                    }
+                                })
+                            } 
                         })
                     })
                 })
