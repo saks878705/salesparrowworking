@@ -117,9 +117,9 @@ router.post("/routeListing", async (req, res) => {
                           await (async function (rowData) {
                             var u_data = {
                               id: rowData._id,
-                              state: state_data.name,
-                              city: city_data.name,
-                              area: area_data.name,
+                              state:{name:state_data.name,id:rowData.state},
+                              city:{name:city_data.name,id:rowData.city},
+                              area:{name:area_data.name,id:rowData.area},
                               start_point: rowData.start_point,
                               end_point: rowData.end_point,
                             };
@@ -164,9 +164,9 @@ router.post("/routeListing", async (req, res) => {
                           await (async function (rowData) {
                             var u_data = {
                               id: rowData._id,
-                              state: state_data.name,
-                              city: city_data.name,
-                              area: area_data.name,
+                              state:{name:state_data.name,id:rowData.state},
+                              city:{name:city_data.name,id:rowData.city},
+                              area:{name:area_data.name,id:rowData.area},
                               start_point: rowData.start_point,
                               end_point: rowData.end_point,
                             };
@@ -213,9 +213,9 @@ router.post("/routeListing", async (req, res) => {
                       await (async function (rowData) {
                         var u_data = {
                           id: rowData._id,
-                          state: state_data.name,
-                          city: city_data.name,
-                          area: area_data.name,
+                          state:{name:state_data.name,id:rowData.state},
+                          city:{name:city_data.name,id:rowData.city},
+                          area:{name:area_data.name,id:rowData.area},
                           start_point: rowData.start_point,
                           end_point: rowData.end_point,
                         };
