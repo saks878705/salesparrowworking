@@ -187,31 +187,37 @@ router.post('/getAllBeat',async (req,res)=>{
         for(let i = 0;i<beat_data.length;i++){
           Employee.findOne({_id:beat_data[i].employee_id}).exec().then(emp_data=>{
             console.log(beat_data[i].employee_id)
-            Route.findOne({_id:beat_data[i].route_id}).exec().then(async (route_data)=>{
-                await (async function (rowData) {
-                  var u_data = {
-                    id:rowData._id,
-                    employee_name:emp_data.employeeName,
-                    route:route_data._id,
-                    beatName:rowData.beatName,
-                    day:rowData.day,
-                    status:rowData.status
-                  };
-                  list.push(u_data);
-                })(beat_data[i]);
-                counInfo++;
-                if(counInfo==beat_data.length){
-                  let c = Math.ceil(count.length/limit);
-                  if(c==0){
-                     c+=1;
+            Route.findOne({_id:beat_data[i].route_id}).exec().then(route_data=>{
+              Location.findOne({_id:beat_data[i].state}).exec().then(state_data=>{
+                Location.findOne({_id:beat_data[i].city}).exec().then( async (city_data)=>{
+                  await (async function (rowData) {
+                    var u_data = {
+                      id:rowData._id,
+                      state:{name:state_data.name,id:beat_data.state},
+                      city:{name:city_data.name,id:beat_data.city},
+                      employee_name:emp_data.employeeName,
+                      route_name:{start_point:route_data.start_point,end_point:route_data.end_point},
+                      beatName:rowData.beatName,
+                      day:rowData.day,
+                      status:rowData.status
+                    };
+                    list.push(u_data);
+                  })(beat_data[i]);
+                  counInfo++;
+                  if(counInfo==beat_data.length){
+                    let c = Math.ceil(count.length/limit);
+                    if(c==0){
+                       c+=1;
+                    }
+                    res.json({
+                      status:true,
+                      message:"All Beats found successfully",
+                      result:list,
+                      pageLength:c
+                  })
                   }
-                  res.json({
-                    status:true,
-                    message:"All Beats found successfully",
-                    result:list,
-                    pageLength:c
                 })
-                }
+              })
             })
           })
         }
