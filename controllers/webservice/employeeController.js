@@ -46,7 +46,7 @@ router.post("/addEmployee",imageUpload.fields([{ name: "Employee_image" }]),(req
     var pincode = req.body.pincode ? req.body.pincode : "";
     var district = req.body.district ? req.body.district : "";
     var experience = req.body.experience ? req.body.experience : "";
-    var qualification = req.body.qualifications ? req.body.qualification : "";
+    var qualification = req.body.qualification ? req.body.qualification : "";
     if (employeeName != "") {
       if (phone != "") {
         if (email != "") {
