@@ -29,6 +29,7 @@ function get_current_date() {
 };
 
 router.post('/addParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
+    console.log(req.body)
     const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if(!token){
