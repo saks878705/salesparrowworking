@@ -283,12 +283,22 @@ router.post('/getAllParty',async (req,res)=>{
                             Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
                                 await (async function (rowData) {
                                     var u_data = {
-                                      id:rowData._id,
-                                      state:{name:state_data.name,id:rowData.state},
-                                      city:{name:city_data.name,id:rowData.city},
-                                      district:{name:district_data.name,id:rowData.district},
-                                      firmName:rowData.firmName,
-                                      areas:rowData.address,
+                                        id:rowData._id,
+                                        state:{name:state_data.name,id:rowData.state},
+                                        city:{name:city_data.name,id:rowData.city},
+                                        district:{name:district_data.name,id:rowData.district},
+                                        firmName:rowData.firmName,
+                                        address:rowData.address,
+                                        partyType:rowData.partType,
+                                        image:rowData.image,
+                                        pincode:rowData.pincode,
+                                        GSTNo:rowData.GSTNo,
+                                        contactPersonName:rowData.contactPersonName,
+                                        mobileNo:rowData.mobileNo,
+                                        email:rowData.email,
+                                        DOB:rowData.DOB,
+                                        DOA:rowData.DOA,
+                                        route:rowData.route,
                                       status:rowData.status
                                     };
                                     list.push(u_data);

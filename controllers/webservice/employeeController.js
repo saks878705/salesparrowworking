@@ -228,10 +228,10 @@ router.post("/getAllEmployee", async (req, res) => {
                     email: rowData.email,
                     address: rowData.address,
                     pincode: rowData.pincode,
-                    state: state_data.name,
+                    state: {name:state_data.name,id:state_data._id},
                     image: rowData.image,
-                    city: city_data.name,
-                    district: area_data.name,
+                    city: {name:city_data.name,id:city_data._id},
+                    district: {name:area_data.name,id:area_data._id},
                     experience: rowData.experience,
                     qualification: rowData.qualification,
                   };
