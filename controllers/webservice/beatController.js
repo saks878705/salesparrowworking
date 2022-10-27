@@ -193,8 +193,8 @@ router.post('/getAllBeat',async (req,res)=>{
                   await (async function (rowData) {
                     var u_data = {
                       id:rowData._id,
-                      state:{name:state_data.name,id:beat_data.state},
-                      city:{name:city_data.name,id:beat_data.city},
+                      state:{name:state_data.name,id:beat_data[i].state},
+                      city:{name:city_data.name,id:beat_data[i].city},
                       employee_name:emp_data.employeeName,
                       route_name:{start_point:route_data.start_point,end_point:route_data.end_point},
                       beatName:rowData.beatName,
