@@ -244,6 +244,15 @@ router.post('/getAllParty',async (req,res)=>{
                                       city:{name:city_data.name,id:rowData.city},
                                       district:{name:district_data.name,id:rowData.district},
                                       firmName:rowData.firmName,
+                                      partyType:rowData.partType,
+                                        pincode:rowData.pincode,
+                                        GSTNo:rowData.GSTNo,
+                                        contactPersonName:rowData.contactPersonName,
+                                        mobileNo:rowData.mobileNo,
+                                        email:rowData.email,
+                                        DOB:rowData.DOB,
+                                        DOA:rowData.DOA,
+                                        route:rowData.route,
                                       areas:rowData.address,
                                       status:rowData.status
                                     };
