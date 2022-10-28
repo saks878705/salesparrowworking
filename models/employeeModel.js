@@ -10,9 +10,6 @@ const employee_schema = new Schema({
         type:String
     },
     roleId:{
-        type:String
-    },
-    role:{
         type:String,
         default:"SA"
     },
