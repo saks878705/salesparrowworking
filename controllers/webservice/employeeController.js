@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Location = mongoose.model("Location");
+const Role = mongoose.model("role");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
@@ -168,6 +169,9 @@ router.patch("/editEmployee", (req, res) => {
           if (req.body.qualification) {
             updated_employee.qualification = req.body.qualification;
           }
+          if (req.body.status) {
+            updated_employee.status = req.body.status;
+          }
           updated_employee.Updated_date = get_current_date();
           Employee.findOneAndUpdate(
             { _id: id },
@@ -217,37 +221,70 @@ router.post("/getAllEmployee", async (req, res) => {
       if(emp_data.length>0){
         let counInfo = 0;
       for(let i=0;i<emp_data.length;i++){
-        Location.findOne({ _id: emp_data[0].state }).exec().then((state_data) => {
-          Location.findOne({ _id: emp_data[0].city }).exec().then((city_data) => {
-              Location.findOne({ _id: emp_data[0].district }).exec().then(async (area_data) => {
-                await (async function (rowData) {
-                  var u_data = {
-                    id:rowData._id,
-                    employeeName: rowData.employeeName,
-                    phone: rowData.phone,
-                    email: rowData.email,
-                    address: rowData.address,
-                    pincode: rowData.pincode,
-                    image: rowData.image,
-                    state: {name:state_data.name,id:state_data._id},
-                    city: {name:city_data.name,id:city_data._id},
-                    district: {name:area_data.name,id:area_data._id},
-                    experience: rowData.experience,
-                    qualification: rowData.qualification,
-                    status:rowData.status,
-                    role:rowData.roleId
-                  };
-                  list.push(u_data);
-                })(emp_data[i]);
-                counInfo++
-                if(counInfo == emp_data.length){
-                  res.json({
-                    status:true,
-                    message:"All Employees found successfully",
-                    result:list,
-                    pageLength:Math.ceil(count.length/limit)
-                  })
-                }
+        Location.findOne({ _id: emp_data[i].state }).exec().then((state_data) => {
+          Location.findOne({ _id: emp_data[i].city }).exec().then((city_data) => {
+              Location.findOne({ _id: emp_data[i].district }).exec().then( (area_data) => {
+                Role.findOne({_id:emp_data[i].roleId}).exec().then(async (role_data)=>{
+                  if(!role_data){
+                    await (async function (rowData) {
+                      var u_data = {
+                        id:rowData._id,
+                        employeeName: rowData.employeeName,
+                        phone: rowData.phone,
+                        email: rowData.email,
+                        address: rowData.address,
+                        pincode: rowData.pincode,
+                        image: rowData.image,
+                        state: {name:state_data.name,id:state_data._id},
+                        city: {name:city_data.name,id:city_data._id},
+                        district: {name:area_data.name,id:area_data._id},
+                        experience: rowData.experience,
+                        qualification: rowData.qualification,
+                        status:rowData.status,
+                        role:"SA"
+                      };
+                      list.push(u_data);
+                    })(employee_data[i]);
+                    counInfo++
+                    if(counInfo == employee_data.length){
+                      res.json({
+                        status:true,
+                        message:"All Employees found successfully",
+                        result:list,
+                        pageLength:Math.ceil(count.length/limit)
+                      })
+                    }
+                  }else{
+                    await (async function (rowData) {
+                      var u_data = {
+                        id:rowData._id,
+                        employeeName: rowData.employeeName,
+                        phone: rowData.phone,
+                        email: rowData.email,
+                        address: rowData.address,
+                        pincode: rowData.pincode,
+                        image: rowData.image,
+                        state: {name:state_data.name,id:state_data._id},
+                        city: {name:city_data.name,id:city_data._id},
+                        district: {name:area_data.name,id:area_data._id},
+                        experience: rowData.experience,
+                        qualification: rowData.qualification,
+                        status:rowData.status,
+                        role:role_data.rolename
+                      };
+                      list.push(u_data);
+                    })(employee_data[i]);
+                    counInfo++
+                    if(counInfo == employee_data.length){
+                      res.json({
+                        status:true,
+                        message:"All Employees found successfully",
+                        result:list,
+                        pageLength:Math.ceil(count.length/limit)
+                      })
+                    }
+                  }
+                })
                 });
             });
         });
@@ -269,35 +306,68 @@ router.post("/getAllEmployee", async (req, res) => {
       for(let i=0;i<emp_data.length;i++){
         Location.findOne({ _id: emp_data[i].state }).exec().then((state_data) => {
           Location.findOne({ _id: emp_data[i].city }).exec().then((city_data) => {
-              Location.findOne({ _id: emp_data[i].district }).exec().then(async (area_data) => {
-                await (async function (rowData) {
-                  var u_data = {
-                    id:rowData._id,
-                    employeeName: rowData.employeeName,
-                    phone: rowData.phone,
-                    email: rowData.email,
-                    address: rowData.address,
-                    pincode: rowData.pincode,
-                    image: rowData.image,
-                    state: {name:state_data.name,id:state_data._id},
-                    city: {name:city_data.name,id:city_data._id},
-                    district: {name:area_data.name,id:area_data._id},
-                    experience: rowData.experience,
-                    qualification: rowData.qualification,
-                    status:rowData.status,
-                    role:rowData.roleId
-                  };
-                  list.push(u_data);
-                })(emp_data[i]);
-                counInfo++
-                if(counInfo == emp_data.length){
-                  res.json({
-                    status:true,
-                    message:"All Employees found successfully",
-                    result:list,
-                    pageLength:Math.ceil(count.length/limit)
-                  })
-                }
+              Location.findOne({ _id: emp_data[i].district }).exec().then( (area_data) => {
+                Role.findOne({_id:emp_data[i].roleId}).exec().then(async (role_data)=>{
+                  if(!role_data){
+                    await (async function (rowData) {
+                      var u_data = {
+                        id:rowData._id,
+                        employeeName: rowData.employeeName,
+                        phone: rowData.phone,
+                        email: rowData.email,
+                        address: rowData.address,
+                        pincode: rowData.pincode,
+                        image: rowData.image,
+                        state: {name:state_data.name,id:state_data._id},
+                        city: {name:city_data.name,id:city_data._id},
+                        district: {name:area_data.name,id:area_data._id},
+                        experience: rowData.experience,
+                        qualification: rowData.qualification,
+                        status:rowData.status,
+                        role:"SA"
+                      };
+                      list.push(u_data);
+                    })(employee_data[i]);
+                    counInfo++
+                    if(counInfo == employee_data.length){
+                      res.json({
+                        status:true,
+                        message:"All Employees found successfully",
+                        result:list,
+                        pageLength:Math.ceil(count.length/limit)
+                      })
+                    }
+                  }else{
+                    await (async function (rowData) {
+                      var u_data = {
+                        id:rowData._id,
+                        employeeName: rowData.employeeName,
+                        phone: rowData.phone,
+                        email: rowData.email,
+                        address: rowData.address,
+                        pincode: rowData.pincode,
+                        image: rowData.image,
+                        state: {name:state_data.name,id:state_data._id},
+                        city: {name:city_data.name,id:city_data._id},
+                        district: {name:area_data.name,id:area_data._id},
+                        experience: rowData.experience,
+                        qualification: rowData.qualification,
+                        status:rowData.status,
+                        role:role_data.rolename
+                      };
+                      list.push(u_data);
+                    })(employee_data[i]);
+                    counInfo++
+                    if(counInfo == employee_data.length){
+                      res.json({
+                        status:true,
+                        message:"All Employees found successfully",
+                        result:list,
+                        pageLength:Math.ceil(count.length/limit)
+                      })
+                    }
+                  }
+                })
                 });
             });
         });
@@ -317,43 +387,70 @@ router.post("/getAllEmployee", async (req, res) => {
         if(employee_data.length>0){
           let counInfo = 0;
         for (let i = 0; i < employee_data.length; i++) {
-          Location.findOne({ _id: employee_data[i].state })
-            .exec()
-            .then((state_data) => {
-              Location.findOne({ _id: employee_data[i].city })
-                .exec()
-                .then((city_data) => {
-                  Location.findOne({ _id: employee_data[i].district })
-                    .exec()
-                    .then(async (area_data) => {
-                      await (async function (rowData) {
-                        var u_data = {
-                          id:rowData._id,
-                          employeeName: rowData.employeeName,
-                          phone: rowData.phone,
-                          email: rowData.email,
-                          address: rowData.address,
-                          pincode: rowData.pincode,
-                          image: rowData.image,
-                          state: {name:state_data.name,id:state_data._id},
-                          city: {name:city_data.name,id:city_data._id},
-                          district: {name:area_data.name,id:area_data._id},
-                          experience: rowData.experience,
-                          qualification: rowData.qualification,
-                          status:rowData.status,
-                          role:rowData.roleId
-                        };
-                        list.push(u_data);
-                      })(employee_data[i]);
-                      counInfo++
-                      if(counInfo == employee_data.length){
-                        res.json({
-                          status:true,
-                          message:"All Employees found successfully",
-                          result:list,
-                          pageLength:Math.ceil(count.length/limit)
-                        })
+          Location.findOne({ _id: employee_data[i].state }).exec().then((state_data) => {
+              Location.findOne({ _id: employee_data[i].city }).exec().then((city_data) => {
+                  Location.findOne({ _id: employee_data[i].district }).exec().then( (area_data) => {
+                    Role.findOne({_id:employee_data[i].roleId}).exec().then(async (role_data)=>{
+                      if(!role_data){
+                        await (async function (rowData) {
+                          var u_data = {
+                            id:rowData._id,
+                            employeeName: rowData.employeeName,
+                            phone: rowData.phone,
+                            email: rowData.email,
+                            address: rowData.address,
+                            pincode: rowData.pincode,
+                            image: rowData.image,
+                            state: {name:state_data.name,id:state_data._id},
+                            city: {name:city_data.name,id:city_data._id},
+                            district: {name:area_data.name,id:area_data._id},
+                            experience: rowData.experience,
+                            qualification: rowData.qualification,
+                            status:rowData.status,
+                            role:"SA"
+                          };
+                          list.push(u_data);
+                        })(employee_data[i]);
+                        counInfo++
+                        if(counInfo == employee_data.length){
+                          res.json({
+                            status:true,
+                            message:"All Employees found successfully",
+                            result:list,
+                            pageLength:Math.ceil(count.length/limit)
+                          })
+                        }
+                      }else{
+                        await (async function (rowData) {
+                          var u_data = {
+                            id:rowData._id,
+                            employeeName: rowData.employeeName,
+                            phone: rowData.phone,
+                            email: rowData.email,
+                            address: rowData.address,
+                            pincode: rowData.pincode,
+                            image: rowData.image,
+                            state: {name:state_data.name,id:state_data._id},
+                            city: {name:city_data.name,id:city_data._id},
+                            district: {name:area_data.name,id:area_data._id},
+                            experience: rowData.experience,
+                            qualification: rowData.qualification,
+                            status:rowData.status,
+                            role:role_data.rolename
+                          };
+                          list.push(u_data);
+                        })(employee_data[i]);
+                        counInfo++
+                        if(counInfo == employee_data.length){
+                          res.json({
+                            status:true,
+                            message:"All Employees found successfully",
+                            result:list,
+                            pageLength:Math.ceil(count.length/limit)
+                          })
+                        }
                       }
+                    })
                     });
                 });
             });

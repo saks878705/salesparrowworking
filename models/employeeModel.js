@@ -11,7 +11,6 @@ const employee_schema = new Schema({
     },
     roleId:{
         type:String,
-        default:"SA"
     },
     manager:{
         type:String
