@@ -352,8 +352,9 @@ router.post('/getParty',(req,res)=>{
                 Location.findOne({_id:party_data.state}).exec().then(state_data=>{
                     Location.findOne({_id:party_data.city}).exec().then(city_data=>{
                         Location.findOne({_id:party_data.district}).exec().then(district_data=>{
-                            console.log(party_data.route)
-                            var arr = party_data.route
+                            console.log(party_data.route[0])
+                            var arr = party_data.route[0].split(",");
+                            console.log(arr)
                             for(let i = 0;i<arr.length;i++){
                                 console.log(i)
                                 console.log(arr[i])

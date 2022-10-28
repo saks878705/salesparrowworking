@@ -223,7 +223,7 @@ router.post('/getAllBeat',async (req,res)=>{
         }
       }else{
         return res.json({
-          status: false,
+          status: true,
           message: "Beat not found",
           results: [],
         });
