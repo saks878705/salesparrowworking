@@ -234,6 +234,7 @@ router.post("/getAllEmployee", async (req, res) => {
                     district: {name:area_data.name,id:area_data._id},
                     experience: rowData.experience,
                     qualification: rowData.qualification,
+                    status:rowData.status
                   };
                   list.push(u_data);
                 })(emp_data[i]);
@@ -282,6 +283,7 @@ router.post("/getAllEmployee", async (req, res) => {
                     district: area_data.name,
                     experience: rowData.experience,
                     qualification: rowData.qualification,
+                    status:rowData.status
                   };
                   list.push(u_data);
                 })(emp_data[i]);
@@ -336,6 +338,7 @@ router.post("/getAllEmployee", async (req, res) => {
                           district: area_data.name,
                           experience: rowData.experience,
                           qualification: rowData.qualification,
+                          status:rowData.status
                         };
                         list.push(u_data);
                       })(employee_data[i]);
