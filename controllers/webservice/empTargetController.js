@@ -5,6 +5,7 @@ const Location = mongoose.model("Location");
 const Employee = mongoose.model("Employee");
 const Party = mongoose.model("Party");
 const router = express.Router();
+const jwt = require("jsonwebtoken")
 
 function get_current_date() {
     var today = new Date();
@@ -111,6 +112,9 @@ router.patch('/editTarget',(req,res)=>{
             }
             if(req.body.employee){
                 updated_target.employee_id = req.body.employee;
+            }
+            if(req.body.status){
+                updated_target.status = req.body.status;
             }
             updated_target.Updated_date = get_current_date();
             EmployeeTarget.findOneAndUpdate({_id:target_id},updated_target,{new:true},(err,doc)=>{
