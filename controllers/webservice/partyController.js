@@ -155,9 +155,8 @@ router.post('/editParty',(req,res)=>{
             if (req.body.firmName) {
                 updated_party.firmName = req.body.firmName;
             }
-            if (req.body.route) {
-                updated_party.route = req.body.route;
-            }
+            updated_party.route = req.body.route;
+            
             if (req.body.GSTNo) {
                 updated_party.GSTNo = req.body.GSTNo;
             }
