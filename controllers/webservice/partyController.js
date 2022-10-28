@@ -144,6 +144,7 @@ router.post('/addParty',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
 });
 
 router.patch('/editParty',(req,res)=>{
+    console.log(req.body)
     var id = req.body.id?req.body.id:"";
     Party.find({_id:id}).exec().then(party_data=>{
         if(party_data.length>0){
