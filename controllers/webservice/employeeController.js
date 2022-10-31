@@ -584,6 +584,7 @@ router.post('/profile_update',(req,res)=>{
 // });
 
 router.post("/sendOtp", (req, res) => {
+  console.log(req.body)
   var to_phone_number = req.body.to_phone_number? req.body.to_phone_number: "";
   if (to_phone_number != "") {
     Employee.findOne({ phone: to_phone_number })
