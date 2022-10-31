@@ -228,6 +228,7 @@ router.post('/getAllParty',async (req,res)=>{
     var count =await Party.find({company_id});
     var list = [];
     var state = req.body.state?req.body.state:"";
+    var partyType = req.body.partyType?req.body.partyType:"";
     if(state!="" && partyType==""){
         Party.find({ $and: [{company_id},{state}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
             if(party_data.length>0){
