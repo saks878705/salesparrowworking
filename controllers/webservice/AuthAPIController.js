@@ -342,7 +342,7 @@ router.get('/getadminprofile',(req,res)=>{
   console.log(req.headers['authorization']);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
-  if(!token){
+  if(token){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.findOne({_id:user_id}).exec().then(admin_data=>{
