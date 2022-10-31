@@ -284,7 +284,7 @@ router.post('/getAllParty',async (req,res)=>{
             }
         })
     }else if(state!="" && partyType!=""){
-        Party.find({$and:[{company_id},{partyType}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
+        Party.find({$and:[{company_id},{state},{partyType}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
             if(party_data.length>0){
                 let counInfo = 0;
                 for(let i=0;i<party_data.length;i++){
