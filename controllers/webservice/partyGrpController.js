@@ -131,6 +131,7 @@ router.post('/add_party_grp',(req,res)=>{
                             PGroup.findOne({grp_name}).exec().then((data)=>{
                                 for(let i = 0; i < partyIdArr.length; i++){
                                     Party.findOne({_id:partyIdArr[i]}).exec().then(async (party_data)=>{
+                                        console.log(party_data)
                                         var new_party_grp = new PartyGrouping({
                                             grp_id:data._id,
                                             party_id:partyIdArr[i],
@@ -208,12 +209,12 @@ router.post('/edit_party_grp',(req,res)=>{
                 PartyGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
                     for(let i = 0; i < partyIdArr.length; i++){
                         console.log(partyIdArr[i]);
-                        Party.findOne({_id:partyIdArr[i]}).exec().then(async (emp_data)=>{
-                            console.log(emp_data)
+                        Party.findOne({_id:partyIdArr[i]}).exec().then(async (party_data)=>{
+                            console.log(party_data)
                             var new_party_grp = new PartyGrouping({
                                 grp_id:id,
-                                emp_id:partyIdArr[i],
-                                employeeName:emp_data.employeeName,
+                                party_id:partyIdArr[i],
+                                partyName:party_data.firmName,
                                 company_id:company_id,
                                 Created_date:get_current_date(),
                                 Updated_date:get_current_date(),
