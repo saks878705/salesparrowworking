@@ -45,7 +45,7 @@ router.post('/add_party_grp',(req,res)=>{
                             PGroup.findOne({grp_name}).exec().then((data)=>{
                                 for(let i = 0; i < partyIdArr.length; i++){
                                     Party.findOne({_id:partyIdArr[i]}).exec().then(async (party_data)=>{
-                                        var new_emp_grp = new PartyGrouping({
+                                        var new_party_grp = new PartyGrouping({
                                             grp_id:data._id,
                                             party_id:partyIdArr[i],
                                             partyName:party_data.firmName,
@@ -54,7 +54,7 @@ router.post('/add_party_grp',(req,res)=>{
                                             Updated_date:get_current_date(),
                                             status:"Active"
                                         });
-                                        await new_emp_grp.save()
+                                        await new_party_grp.save()
                                     });
                                 }
                                 PGroup.findOne({grp_name}).exec().then((data2)=>{
@@ -63,7 +63,7 @@ router.post('/add_party_grp',(req,res)=>{
                                             status:true,
                                             message:"Employee group created succesfully",
                                             grpDetails:data,
-                                            empGrpDetails:pgdata
+                                            partyGrpDetails:pgdata
                                         });
                                     });
                                 })
@@ -114,26 +114,26 @@ router.post('/edit_party_grp',(req,res)=>{
     }
     updated_grp.Updated_date = get_current_date();
     console.log(updated_grp);
-    Group.findOneAndUpdate({_id:id},updated_grp,{new:true},(err,doc)=>{
+    PGroup.findOneAndUpdate({_id:id},updated_grp,{new:true},(err,doc)=>{
         if(doc){
-            if(req.body.empIdStr){
-                var empIdArr = req.body.empIdStr.split(",");
-                console.log(empIdArr);
-                EmployeeGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
-                    for(let i = 0; i < empIdArr.length; i++){
-                        console.log(empIdArr[i]);
-                        Employee.findOne({_id:empIdArr[i]}).exec().then(async (emp_data)=>{
+            if(req.body.partyIdStr){
+                var partyIdArr = req.body.partyIdStr.split(",");
+                console.log(partyIdArr);
+                PartyGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
+                    for(let i = 0; i < partyIdArr.length; i++){
+                        console.log(partyIdArr[i]);
+                        Party.findOne({_id:partyIdArr[i]}).exec().then(async (emp_data)=>{
                             console.log(emp_data)
-                            var new_emp_grp = new EmployeeGrouping({
+                            var new_party_grp = new PartyGrouping({
                                 grp_id:id,
-                                emp_id:empIdArr[i],
+                                emp_id:partyIdArr[i],
                                 employeeName:emp_data.employeeName,
                                 company_id:company_id,
                                 Created_date:get_current_date(),
                                 Updated_date:get_current_date(),
                                 status:"Active"
                             });
-                            await new_emp_grp.save()
+                            await new_party_grp.save()
                         })
                     }
                         res.json({
@@ -150,3 +150,40 @@ router.post('/edit_party_grp',(req,res)=>{
         }
     })
 });
+
+router.post('/getGrpWisePartyList',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    PGroup.find({_id:id}).exec().then(grp_data=>{
+        Location.find({_id:grp_data[0].state}).exec().then(state_data=>{
+            PartyGrouping.find({grp_id:id}).exec().then(party_grp_data=>{
+                var u_data = {
+                    id:grp_data[0]._id,
+                    grp_name:grp_data[0].grp_name,
+                    grp_description:grp_data[0].grp_description,
+                    state:state_data[0].name,
+                    party_data:party_grp_data
+                }
+                res.json({
+                    status:true,
+                    message:"data found successfully",
+                    result:u_data
+                })
+            })
+        })
+    })
+})
+
+
+router.delete('/deletePartyGrp',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    PartyGrouping.deleteMany({grp_id:id}).exec().then(doc=>{
+        if(doc){
+            PGroup.deleteOne({_id:id}).exec().then(doc2=>{
+                res.json({
+                    status:true,
+                    message:"group deleted successfully"
+                });
+            })
+        }
+    })
+})
