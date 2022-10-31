@@ -339,9 +339,9 @@ router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,re
 })
 
 router.get('/getadminprofile',(req,res)=>{
-  console.log(req.headers['authorization']);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
+  console.log(token)
   if(token){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
@@ -349,8 +349,33 @@ router.get('/getadminprofile',(req,res)=>{
       console.log(admin_data)
         Location.findOne({ _id: admin_data.state }).exec().then((state_data) => {
           Location.findOne({ _id: admin_data.city }).exec().then((city_data) => {
-              Location.findOne({ _id: admin_data.district }).exec().then(async (area_data) => {
-                if(area_data){
+            if(admin_data.district==""){
+              var u_data = {
+                id:admin_data._id,
+                company_name:admin_data.company_name,
+                phone:admin_data.phone,
+                password:admin_data.password,
+                email:admin_data.email,
+                city:{name:city_data.name,id:city_data._id},
+                state:{name:state_data.name,id:state_data._id},
+                pincode:admin_data.pincode,
+                GSTNo:admin_data.GSTNo,
+                companyAddress:admin_data.companyAddress,
+                companyCatagory:admin_data.companyCatagory,
+                companyDescription:admin_data.companyDescription,
+                companyType:admin_data.companyType,
+                contactPersonName:admin_data.contactPersonName,
+                district:"",
+                signatureImage:admin_data.signatureImage,
+                profileImage:admin_data.profileImage,
+              };
+              res.status(200).json({
+                status:true,
+                message:"Get Successfully",
+                result:[u_data]
+              })
+            }else{
+              Location.findOne({ _id: admin_data.district}).exec().then(async (area_data) => {
                   console.log("inside if");
                   var u_data = {
                     id:admin_data._id,
@@ -376,37 +401,12 @@ router.get('/getadminprofile',(req,res)=>{
                     message:"Get Successfully",
                     result:[u_data]
                   })
-                }else{
-                  console.log("inside else");
-                  var u_data = {
-                    id:admin_data._id,
-                    company_name:admin_data.company_name,
-                    phone:admin_data.phone,
-                    password:admin_data.password,
-                    email:admin_data.email,
-                    city:{name:city_data.name,id:city_data._id},
-                    state:{name:state_data.name,id:state_data._id},
-                    pincode:admin_data.pincode,
-                    GSTNo:admin_data.GSTNo,
-                    companyAddress:admin_data.companyAddress,
-                    companyCatagory:admin_data.companyCatagory,
-                    companyDescription:admin_data.companyDescription,
-                    companyType:admin_data.companyType,
-                    contactPersonName:admin_data.contactPersonName,
-                    district:"",
-                    signatureImage:admin_data.signatureImage,
-                    profileImage:admin_data.profileImage,
-                  };
-                  res.status(200).json({
-                    status:true,
-                    message:"Get Successfully",
-                    result:[u_data]
-                  })
-                }
-                });
+                })
+              }
             });
         });
-    });
+      });
+    
   }else{
     res.json({
       status:false,
