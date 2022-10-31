@@ -405,10 +405,35 @@ router.post('/getParty',(req,res)=>{
                 Location.findOne({_id:party_data.state}).exec().then(state_data=>{
                     Location.findOne({_id:party_data.city}).exec().then(city_data=>{
                         Location.findOne({_id:party_data.district}).exec().then(district_data=>{
-                            console.log(party_data.route[0])
-                            var arr = party_data.route[0].split(",");
+                            //console.log(party_data.route[0])
+                            var arr = party_data.route?party_data.route[0].split(","):"";
                             console.log(arr)
-                            for(let i = 0;i<arr.length;i++){
+                            if(arr==""){
+                                var u_data = {
+                                    id:party_data._id,
+                                    state:{name:state_data.name,id:party_data.state},
+                                    city:{name:city_data.name,id:party_data.city},
+                                    district:{name:district_data.name,id:party_data.district},
+                                    firmName:party_data.firmName,
+                                    address:party_data.address,
+                                    partyType:party_data.partyType,
+                                    image:party_data.image,
+                                    pincode:party_data.pincode,
+                                    GSTNo:party_data.GSTNo,
+                                    contactPersonName:party_data.contactPersonName,
+                                    mobileNo:party_data.mobileNo,
+                                    email:party_data.email,
+                                    DOB:party_data.DOB,
+                                    DOA:party_data.DOA,
+                                    route:list,
+                                  };
+                                  res.json({
+                                    status:true,
+                                    message:" Party found successfully",
+                                    result:u_data,
+                                })
+                            }else{
+                                for(let i = 0;i<arr.length;i++){
                                 console.log(i)
                                 console.log(arr[i])
                                 Route.findOne({_id:arr[i]}).exec().then(route_data=>{
@@ -446,7 +471,9 @@ router.post('/getParty',(req,res)=>{
                                         })
                                     }
                                 })
-                            } 
+                            }
+                            }
+                             
                         })
                     })
                 })
