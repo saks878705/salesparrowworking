@@ -224,7 +224,7 @@ router.post('/updateProfile',(req,res)=>{
   console.log(req.body);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
-  if(!token){
+  if(token){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.find({_id:user_id}).exec().then(user_data=>{
@@ -299,7 +299,7 @@ router.post('/profileImage',imageUpload.fields([{name:"profile_image"}]),(req,re
   console.log(req.body);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
-  if(!token){
+  if(token){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.find({_id:user_id}).exec().then(user_data=>{
@@ -420,7 +420,7 @@ router.post('/addSignature',imageUpload.fields([{name:"signature_image"}]),(req,
   console.log(req.body);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
-  if(!token){
+  if(token){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.find({_id:user_id}).exec().then(user_data=>{
@@ -463,7 +463,7 @@ router.get('/removeSignature',(req,res)=>{
   console.log(req.headers['authorization']);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
-  if(!token){
+  if(token){
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.updateOne({_id:user_id},{$set:{signatureImage:""}},(err,data)=>{
@@ -552,7 +552,7 @@ router.post('/resetPasswordAdmin',(req,res)=>{
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
   var password = req.body.password?req.body.password:"";
-  if(!token){
+  if(token){
     if(password!=""){
       const decodedToken = jwt.verify(token,"test");
       const Admin_id = decodedToken.user_id;
@@ -597,7 +597,7 @@ router.post('/changePassword',(req,res)=>{
   const token = authHeader && authHeader.split(" ")[1];
   var oldPassword = req.body.oldPassword?req.body.oldPassword:"";
   var newPassword = req.body.newPassword?req.body.newPassword:"";
-  if(!token){
+  if(token){
     if(oldPassword!=""){
       if(newPassword!=""){
         const decodedToken = jwt.verify(token,"test");
