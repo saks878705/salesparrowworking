@@ -31,4 +31,6 @@ require('./unitModel');
 require('./productCatagoryModel');
 require('./productModel');
 require('./routeModel');
+require('./pgroupModel');
+require('./partyGrouping');
 

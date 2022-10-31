@@ -244,9 +244,9 @@ router.post("/getAllEmployee", async (req, res) => {
                         role:"SA"
                       };
                       list.push(u_data);
-                    })(employee_data[i]);
+                    })(emp_data[i]);
                     counInfo++
-                    if(counInfo == employee_data.length){
+                    if(counInfo == emp_data.length){
                       res.json({
                         status:true,
                         message:"All Employees found successfully",
@@ -273,9 +273,9 @@ router.post("/getAllEmployee", async (req, res) => {
                         role:role_data.rolename
                       };
                       list.push(u_data);
-                    })(employee_data[i]);
+                    })(emp_data[i]);
                     counInfo++
-                    if(counInfo == employee_data.length){
+                    if(counInfo == emp_data.length){
                       res.json({
                         status:true,
                         message:"All Employees found successfully",
@@ -327,9 +327,9 @@ router.post("/getAllEmployee", async (req, res) => {
                         role:"SA"
                       };
                       list.push(u_data);
-                    })(employee_data[i]);
+                    })(emp_data[i]);
                     counInfo++
-                    if(counInfo == employee_data.length){
+                    if(counInfo == emp_data.length){
                       res.json({
                         status:true,
                         message:"All Employees found successfully",
@@ -356,9 +356,9 @@ router.post("/getAllEmployee", async (req, res) => {
                         role:role_data.rolename
                       };
                       list.push(u_data);
-                    })(employee_data[i]);
+                    })(emp_data[i]);
                     counInfo++
-                    if(counInfo == employee_data.length){
+                    if(counInfo == emp_data.length){
                       res.json({
                         status:true,
                         message:"All Employees found successfully",
