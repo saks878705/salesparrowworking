@@ -187,3 +187,5 @@ router.delete('/deletePartyGrp',(req,res)=>{
         }
     })
 })
+
+module.exports  = router;
