@@ -17,6 +17,92 @@ function get_current_date() {
     return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 };
 
+
+router.post('/partyGrpList',async (req,res)=>{
+    var state = req.body.state?req.body.state:"";
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(" ")[1];
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    var page = req.body.page?req.body.page:"1";
+    let count =await PGroup.find({company_id});
+    var limit = 10;
+    if(state!=""){
+        var list = [];
+        PGroup.find({$and:[{state},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+            let counInfo = 0;
+            if(group_data){
+                for(let i = 0;i<group_data.length;i++){
+                    Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
+                        await (async function(rowData){
+                            // console.log(rowData);
+                            var u_data = {
+                                id:rowData._id,
+                                grp_name:rowData.grp_name,
+                                grp_description:rowData.grp_description,
+                                state:state_data.name
+                            }
+                            list.push(u_data);
+                        })(group_data[i])
+                        counInfo++;
+                    if(counInfo==group_data.length){
+                        res.json({
+                            status:true,
+                            message:"Party groups of this state listed successfully.",
+                            result:list,
+                            pageLength:Math.ceil(count.length/limit)
+                        })
+                    }
+                    });
+                }
+            }else{
+                res.json({
+                    status:false,
+                    message:"No Party Group found in thid state for this org."
+                })
+            }
+        })
+    }else{
+        var list = [];
+        PGroup.find({company_id}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+            let counInfo = 0;
+            console.log(group_data);
+            if(group_data.length>0){
+                console.log("inside else if")
+                for(let i = 0;i<group_data.length;i++){
+                    Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
+                        await (async function(rowData){
+                            var u_data = {
+                                id:rowData._id,
+                                grp_name:rowData.grp_name,
+                                grp_description:rowData.grp_description,
+                                state:state_data.name
+                            }
+                            list.push(u_data);
+                        })(group_data[i])
+                        counInfo++;
+                    if(counInfo==group_data.length){
+                        res.json({
+                            status:true,
+                            message:"Party groups  listed successfully.",
+                            result:list,
+                            pageLength:Math.ceil(count.length/limit)
+                        })
+                    }
+                    });
+                }
+            }else{
+                console.log("no data")
+                res.json({
+                    status:false,
+                    message:"No Party Group found for this org.",
+                    result:[]
+                })
+            }
+        })
+    }
+});
+
 router.post('/add_party_grp',(req,res)=>{
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(" ")[1];
@@ -186,6 +272,6 @@ router.delete('/deletePartyGrp',(req,res)=>{
             })
         }
     })
-})
+});
 
 module.exports  = router;
