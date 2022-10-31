@@ -61,7 +61,7 @@ router.post("/addBeat", (req, res) => {
                           res.status(200).json({
                             status: true,
                             message: "New Beat is created successfully",
-                            results: data,
+                            result: data,
                           });
                         });
                       } else {
@@ -76,42 +76,42 @@ router.post("/addBeat", (req, res) => {
               return res.json({
                 status: false,
                 message: "Route id is required",
-                results: null,
+                result: null,
               });
             }
           } else {
             return res.json({
               status: false,
               message: "Day is required",
-              results: null,
+              result: null,
             });
           }
         } else {
           return res.json({
             status: false,
             message: "Employee id is required",
-            results: null,
+            result: null,
           });
         }
       } else {
         return res.json({
           status: false,
           message: "Beat Name is required",
-          results: null,
+          result: null,
         });
       }
     }else{
       return res.json({
         status: false,
         message: "City is required",
-        results: null,
+        result: null,
       });
     }
   }else{
     return res.json({
       status: false,
       message: "State is required",
-      results: null,
+      result: null,
     });
   }
     
@@ -144,7 +144,7 @@ router.post('/editBeat',(req,res)=>{
                         res.status(200).json({
                           status: true,
                           message: "Update successfully",
-                          results: updated_beat,
+                          result: updated_beat,
                         });
                       }
                     }
@@ -161,7 +161,7 @@ router.post('/editBeat',(req,res)=>{
         return res.json({
             status: false,
             message: "Id is required",
-            results: null,
+            result: null,
           }); 
     }
 });
@@ -225,7 +225,7 @@ router.post('/getAllBeat',async (req,res)=>{
         return res.json({
           status: true,
           message: "Beat not found",
-          results: [],
+          result: [],
         });
       }
     })
