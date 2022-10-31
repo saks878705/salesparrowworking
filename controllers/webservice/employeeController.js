@@ -591,10 +591,10 @@ router.post("/sendOtp", (req, res) => {
       .exec()
       .then((data) => {
         var OTP = Math.floor(1000 + Math.random() * 9000);
-        const token = jwt.sign(
-          { user_id: data._id, is_token_valide: 1 },
-          "test"
-        );
+        // const token = jwt.sign(
+        //   { user_id: data._id, is_token_valide: 1 },
+        //   "test"
+        // );
         if (data) {
           twilio.messages
             .create({
@@ -603,11 +603,13 @@ router.post("/sendOtp", (req, res) => {
               body: OTP,
             })
             .then(() => {
-              res.json({
-                status: true,
-                message: "Message has been sent",
-                token: token,
-              });
+              Employee.findOneAndUpdate({phone: to_phone_number},{$set:{otp:OTP}}).exec().then(()=>{
+                res.json({
+                  status: true,
+                  message: "Message has been sent",
+                  //token: token,
+                });
+              })
             })
             .catch((err) => {
               console.log(err);
@@ -630,6 +632,35 @@ router.post("/sendOtp", (req, res) => {
     });
   }
 });
+
+router.post('/emplogin',(req,res)=>{
+  console.log(req.body);
+  var otp = (req.body.otp) ? req.body.otp : "";
+  if(otp!=""){
+      Employee.findOne({otp:otp}).exec().then(emp_data=>{
+        if(emp_data){
+              const token = jwt.sign({ user_id: emp_data._id, is_token_valide: 1 },"test");
+              res.json({
+                status:true,
+                message:"Login Successful",
+                result:emp_data,
+                token:token
+            })
+        }else{
+          res.json({
+            status:false,
+            message:"Employee not found"
+          })
+        }
+
+      })
+  }else{
+    res.json({
+      status:false,
+      message:"OTP is required"
+    })
+  }
+})
 
 router.post(
   "/employeeProfileImage",

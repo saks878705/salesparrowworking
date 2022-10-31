@@ -6,6 +6,9 @@ const employee_schema = new Schema({
         type:String,
         require:true
     },
+    otp:{
+        type:String
+    },
     companyId:{
         type:String
     },
