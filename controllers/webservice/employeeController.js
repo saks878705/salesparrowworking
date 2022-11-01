@@ -717,7 +717,7 @@ router.post(
   }
 );
 
-router.post('/addPartyEmp',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
+router.post('/addPartyEmp',(req,res)=>{
   console.log(req.body)
   const authHeader = req.headers["authorization"];
 const token = authHeader && authHeader.split(" ")[1];
@@ -757,7 +757,6 @@ var employee_id = decodedToken.user_id;
                                     partyType:partyType,
                                     firmName:firmName,
                                     GSTNo:GSTNo,
-                                    image: base_url+req.files.Party_image[0].path,
                                     contactPersonName:contactPersonName,
                                     mobileNo:mobileNo,
                                     email:email,
