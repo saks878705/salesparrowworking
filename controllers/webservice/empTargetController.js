@@ -200,11 +200,6 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                     result:[]
                 })
             }
-            res.json({
-                status:true,
-                message:"All Employees Trgets are here",
-                result:data
-            })
         })
     }else{
         EmployeeTarget.find({company_id}).limit(limit*1).skip((page-1)*limit).exec().then(data=>{
@@ -246,11 +241,6 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                     result:[]
                 })
             }
-            res.json({
-                status:true,
-                message:"All Employees Trgets are here",
-                result:data
-            })
         })
     }
 });
