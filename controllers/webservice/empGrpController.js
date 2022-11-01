@@ -138,8 +138,9 @@ router.post('/empGrpList',async (req,res)=>{
                 }
             }else{
                 res.json({
-                    status:false,
-                    message:"No EmpGroup found in thid state for this org."
+                    status:true,
+                    message:"No EmpGroup found in thid state for this org.",
+                    result:[]
                 })
             }
         })
@@ -175,7 +176,7 @@ router.post('/empGrpList',async (req,res)=>{
             }else{
                 console.log("no data")
                 res.json({
-                    status:false,
+                    status:true,
                     message:"No EmpGroup found for this org.",
                     result:[]
                 })
