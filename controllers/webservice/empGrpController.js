@@ -112,7 +112,7 @@ router.post('/empGrpList',async (req,res)=>{
         var list = [];
         Group.find({$and:[{state},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
             let counInfo = 0;
-            if(group_data){
+            if(group_data.length>0){
                 for(let i = 0;i<group_data.length;i++){
                     Location.findOne({_id:group_data[i].state}).exec().then(async (state_data)=>{
                         await (async function(rowData){
