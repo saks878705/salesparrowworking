@@ -171,7 +171,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                                 await (async function(rowData){
                                     var u_data = {
                                         id:rowData._id,
-                                        state:state_data.name,
+                                        state:{name:state_data.name,id:state_data._id},
                                         employee_name:emp_data.employeeName,
                                         party_name:party_data.firmName,
                                         date:rowData.month,
@@ -212,7 +212,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                                 await (async function(rowData){
                                     var u_data = {
                                         id:rowData._id,
-                                        state:state_data.name,
+                                        state:{name:state_data.name,id:state_data._id},
                                         employee_name:emp_data.employeeName,
                                         party_name:party_data.firmName,
                                         date:rowData.month,
