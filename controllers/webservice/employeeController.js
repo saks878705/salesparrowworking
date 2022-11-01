@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Location = mongoose.model("Location");
 const Role = mongoose.model("role");
+const Party = mongoose.model("Party");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
@@ -573,15 +574,15 @@ router.post('/profile_update',(req,res)=>{
   })
 })
 
-// router.delete('/deleteEmployee',(req,res)=>{
-//   var id = req.body.id?req.body.id:"";
-//   Employee.deleteOne({_id:id}).exec().then(employee_data=>{
-//     res.json({
-//         status:true,
-//         message:"Employee deleted successfully",
-//     })
-// })
-// });
+router.delete('/deleteEmployee',(req,res)=>{
+  var id = req.body.id?req.body.id:"";
+  Employee.findOneAndDelete({_id:id}).exec().then(employee_data=>{
+    res.json({
+        status:true,
+        message:"Employee deleted successfully",
+    })
+})
+});
 
 router.post("/sendOtp", (req, res) => {
   console.log(req.body)
@@ -713,5 +714,193 @@ router.post(
     }
   }
 );
+
+router.post('/addPartyEmp',imageUpload.fields([{name:"Party_image"}]),(req,res)=>{
+  console.log(req.body)
+  const authHeader = req.headers["authorization"];
+const token = authHeader && authHeader.split(" ")[1];
+if(!token){
+  return res.json({
+    status:false,
+    message:"Token must be provided"
+  })
+}
+var decodedToken = jwt.verify(token, "test");
+var employee_id = decodedToken.user_id;
+  var partyType = req.body.partyType?req.body.partyType:"";
+  var firmName = req.body.firmName?req.body.firmName:"";
+  var GSTNo = req.body.GSTNo?req.body.GSTNo:"";
+  var contactPersonName = req.body.contactPersonName?req.body.contactPersonName:"";
+  var mobileNo = req.body.mobileNo?req.body.mobileNo:"";
+  var email = req.body.email?req.body.email:"";
+  var pincode = req.body.pincode?req.body.pincode:"";
+  var state = req.body.state?req.body.state:"";
+  var city = req.body.city?req.body.city:"";
+  var district = req.body.district?req.body.district:"";
+  var address = req.body.address?req.body.address:"";
+  var DOB = req.body.DOB?req.body.DOB:"";
+  var DOA = req.body.DOA?req.body.DOA:"";
+  var route = req.body.route?req.body.route:"";
+  if(partyType!=""){
+      if(firmName!=""){
+          if(mobileNo!=""){
+              if(pincode!=""){
+                  if(city!=""){
+                      if(state!=""){
+                          if(district!=""){
+                              if(address!=""){
+                                Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+                                  console.log("employee",emp_data)
+                                  var new_party = new Party({
+                                    partyType:partyType,
+                                    firmName:firmName,
+                                    GSTNo:GSTNo,
+                                    image: base_url+req.files.Party_image[0].path,
+                                    contactPersonName:contactPersonName,
+                                    mobileNo:mobileNo,
+                                    email:email,
+                                    company_id:emp_data.companyId,
+                                    employee_id:emp_data._id,
+                                    pincode:pincode,
+                                    state:state,
+                                    route:route,
+                                    city:city,
+                                    district:district,
+                                    address:address,
+                                    DOB:DOB,
+                                    DOA:DOA,
+                                    Created_date:get_current_date(),
+                                    Updated_date:get_current_date(),
+                                    status:"Active"
+                                })
+                                new_party.save().then(data=>{
+                                    res.status(200).json({
+                                        status:true,
+                                        message:"Party created successfully",
+                                        result:data
+                                    });
+                                })
+                                })
+                              }else{
+                                  res.json({
+                                      status:false,
+                                      message:"address is required"
+                                  });
+                              }
+                          }else{
+                              res.json({
+                                  status:false,
+                                  message:"district is required"
+                              });
+                          }
+                      }else{
+                          res.json({
+                              status:false,
+                              message:"state is required"
+                          });
+                      }
+                  }else{
+                      res.json({
+                          status:false,
+                          message:"City is required"
+                      });
+                  }
+              }else{
+                  res.json({
+                      status:false,
+                      message:"pincode is required"
+                  });
+              }
+          }else{
+              res.json({
+                  status:false,
+                  message:"Mobile Number is required"
+              });
+          }
+      }else{
+          res.json({
+              status:false,
+              message:"Firm Name is required"
+          });
+      }
+  }else{
+      res.json({
+          status:false,
+          message:"partyType is required"
+      });
+  }
+
+});
+
+router.post('/getAllPartyEmp',async (req,res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    return res.json({
+      status:false,
+      message:"Token must be provided"
+    })
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var employee_id = decodedToken.user_id;
+  var page = req.body.page?req.body.page:"1";
+  var limit = 5;
+  var count =await Party.find({employee_id});
+  var list = [];
+  Party.find({employee_id}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
+    if(party_data.length>0){
+        let counInfo = 0;
+        for(let i=0;i<party_data.length;i++){
+            Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
+                Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
+                    Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
+                        await (async function (rowData) {
+                            var u_data = {
+                                id:rowData._id,
+                                state:{name:state_data.name,id:rowData.state},
+                                city:{name:city_data.name,id:rowData.city},
+                                district:{name:district_data.name,id:rowData.district},
+                                firmName:rowData.firmName,
+                                address:rowData.address,
+                                partyType:rowData.partyType,
+                                image:rowData.image,
+                                pincode:rowData.pincode,
+                                GSTNo:rowData.GSTNo,
+                                contactPersonName:rowData.contactPersonName,
+                                mobileNo:rowData.mobileNo,
+                                email:rowData.email,
+                                DOB:rowData.DOB,
+                                DOA:rowData.DOA,
+                                route:rowData.route,
+                              status:rowData.status
+                            };
+                            list.push(u_data);
+                          })(party_data[i]);
+                          counInfo++;
+                          if(counInfo==party_data.length){
+                            let c = Math.ceil(count.length/limit);
+                            if(c==0){
+                               c+=1;
+                            }
+                            res.json({
+                              status:true,
+                              message:"All Parties found successfully",
+                              result:list,
+                              pageLength:c
+                          })
+                          }
+                    })
+                })
+            })
+        }
+    }else{
+        res.json({
+            status:true,
+            message:"No party found",
+            result:[]
+        })
+    }
+  })
+})
 
 module.exports = router;

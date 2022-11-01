@@ -557,7 +557,6 @@ router.delete("/deleteParty", (req, res) => {
           res.status(200).json({
             status: true,
             message: "Deleted successfully",
-            result: null,
           });
         });
     }

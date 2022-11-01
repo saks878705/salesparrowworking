@@ -267,23 +267,15 @@ router.post('/getBeat',(req,res)=>{
     })
 });
 
-// router.delete("/deleteBeat", (req,res) => {
-//     var id = req.query.id ?? "";
-//     if (id != "") {
-//       Beat.findByIdAndDelete({_id:id}).exec().then((doc) => {
-//         if(doc){
-//           res.status(200).json({
-//             status: true,
-//             message: "Deleted successfully",
-//             result: [],
-//           });
-//         }else{
-//           res.json({
-//             status: false,
-//             message: "Some error",
-//           });
-//         }
-//         });
-//     }
-//   });
+router.delete("/deleteBeat", (req,res) => {
+    var id = req.body.id ?req.body.id: "";
+    if (id != "") {
+      Beat.findOneAndDelete({_id:id}).exec().then((doc) => {
+        res.status(200).json({
+          status: true,
+          message: "Deleted successfully",
+        });
+        });
+    }
+  });
 module.exports = router;

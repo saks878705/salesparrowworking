@@ -11,6 +11,9 @@ const party_schema = new Schema({
     company_id:{
         type:String,
     },
+    employee_id:{
+        type:String,
+    },
     pincode:{
         type:Number
     },
