@@ -154,7 +154,8 @@ router.get('/getEmpTarget',(req,res)=>{
     })
 });
 
-router.get('/getAllEmpTargets',async (req,res)=>{
+router.post('/getAllEmpTargets',async (req,res)=>{
+    var state = req.body.state?req.body.state:"";
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if(!token){
@@ -169,51 +170,99 @@ router.get('/getAllEmpTargets',async (req,res)=>{
     var count = await EmployeeTarget.find({company_id});
     var limit = 10;
     var page = req.body.page?req.body.page:"1";
-    EmployeeTarget.find({company_id}).exec().then(data=>{
-        let counInfo = 0;
-        if(data.length>0){
-            for(let i=0;i<data.length;i++){
-                Location.findOne({_id:data[i].state_id}).exec().then(state_data=>{
-                    Employee.findOne({_id:data[i].employee_id}).exec().then(emp_data=>{
-                        Party.findOne({_id:data[i].party_id}).exec().then(async (party_data)=>{
-                            await (async function(rowData){
-                                var u_data = {
-                                    id:rowData._id,
-                                    state:state_data.name,
-                                    employee_name:emp_data.employeeName,
-                                    party_name:party_data.firmName,
-                                    date:rowData.month,
-                                    primary_target:rowData.primary_target,
-                                    secondary_target:rowData.secondary_target || "",
-                                };
-                                list.push(u_data);
-                            })(data[i])
-                            counInfo++;
-                            if(counInfo==data.length){
-                                res.json({
-                                    status:true,
-                                    message:"Employee target list is here",
-                                    result:list,
-                                    pageLength:Math.ceil(count.length/limit)
-                                })
-                            }
+    if(state!=""){
+        EmployeeTarget.find({$and:[{company_id},{state_id:state}]}).limit(limit*1).skip((page-1)*limit).exec().then(data=>{
+            let counInfo = 0;
+            if(data.length>0){
+                for(let i=0;i<data.length;i++){
+                    Location.findOne({_id:data[i].state_id}).exec().then(state_data=>{
+                        Employee.findOne({_id:data[i].employee_id}).exec().then(emp_data=>{
+                            Party.findOne({_id:data[i].party_id}).exec().then(async (party_data)=>{
+                                await (async function(rowData){
+                                    var u_data = {
+                                        id:rowData._id,
+                                        state:state_data.name,
+                                        employee_name:emp_data.employeeName,
+                                        party_name:party_data.firmName,
+                                        date:rowData.month,
+                                        primary_target:rowData.primary_target,
+                                        secondary_target:rowData.secondary_target || "",
+                                    };
+                                    list.push(u_data);
+                                })(data[i])
+                                counInfo++;
+                                if(counInfo==data.length){
+                                    res.json({
+                                        status:true,
+                                        message:"Employee target list is here",
+                                        result:list,
+                                        pageLength:Math.ceil(count.length/limit)
+                                    })
+                                }
+                            })
                         })
                     })
+                }
+            }else{
+                res.json({
+                    status:false,
+                    message:"No employee targets are found",
+                    result:[]
                 })
             }
-        }else{
             res.json({
-                status:false,
-                message:"No employee targets are found",
-                result:[]
+                status:true,
+                message:"All Employees Trgets are here",
+                result:data
             })
-        }
-        res.json({
-            status:true,
-            message:"All Employees Trgets are here",
-            result:data
         })
-    })
+    }else{
+        EmployeeTarget.find({company_id}).limit(limit*1).skip((page-1)*limit).exec().then(data=>{
+            let counInfo = 0;
+            if(data.length>0){
+                for(let i=0;i<data.length;i++){
+                    Location.findOne({_id:data[i].state_id}).exec().then(state_data=>{
+                        Employee.findOne({_id:data[i].employee_id}).exec().then(emp_data=>{
+                            Party.findOne({_id:data[i].party_id}).exec().then(async (party_data)=>{
+                                await (async function(rowData){
+                                    var u_data = {
+                                        id:rowData._id,
+                                        state:state_data.name,
+                                        employee_name:emp_data.employeeName,
+                                        party_name:party_data.firmName,
+                                        date:rowData.month,
+                                        primary_target:rowData.primary_target,
+                                        secondary_target:rowData.secondary_target || "",
+                                    };
+                                    list.push(u_data);
+                                })(data[i])
+                                counInfo++;
+                                if(counInfo==data.length){
+                                    res.json({
+                                        status:true,
+                                        message:"Employee target list is here",
+                                        result:list,
+                                        pageLength:Math.ceil(count.length/limit)
+                                    })
+                                }
+                            })
+                        })
+                    })
+                }
+            }else{
+                res.json({
+                    status:false,
+                    message:"No employee targets are found",
+                    result:[]
+                })
+            }
+            res.json({
+                status:true,
+                message:"All Employees Trgets are here",
+                result:data
+            })
+        })
+    }
 });
 
 
