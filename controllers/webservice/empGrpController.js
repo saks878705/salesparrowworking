@@ -121,7 +121,7 @@ router.post('/empGrpList',async (req,res)=>{
                                 id:rowData._id,
                                 grp_name:rowData.grp_name,
                                 grp_description:rowData.grp_description,
-                                state:state_data.name
+                                state:{name:state_data.name,id:state_data._id}
                             }
                             list.push(u_data);
                         })(group_data[i])
@@ -158,7 +158,7 @@ router.post('/empGrpList',async (req,res)=>{
                                 id:rowData._id,
                                 grp_name:rowData.grp_name,
                                 grp_description:rowData.grp_description,
-                                state:state_data.name
+                                state:{name:state_data.name,id:state_data._id}
                             }
                             list.push(u_data);
                         })(group_data[i])
