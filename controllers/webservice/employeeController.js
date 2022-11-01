@@ -592,7 +592,8 @@ router.post("/sendOtp", (req, res) => {
     Employee.findOne({ phone: to_phone_number })
       .exec()
       .then((data) => {
-        var OTP = Math.floor(1000 + Math.random() * 9000);
+        //var OTP = Math.floor(1000 + Math.random() * 9000);
+        var OTP = "1234"
         // const token = jwt.sign(
         //   { user_id: data._id, is_token_valide: 1 },
         //   "test"
