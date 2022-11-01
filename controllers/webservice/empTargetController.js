@@ -116,6 +116,9 @@ router.patch('/editTarget',(req,res)=>{
             if(req.body.status){
                 updated_target.status = req.body.status;
             }
+            if(req.body.is_delete){
+                updated_target.is_delete = req.body.is_delete;
+            }
             updated_target.Updated_date = get_current_date();
             EmployeeTarget.findOneAndUpdate({_id:target_id},updated_target,{new:true},(err,doc)=>{
                 if (doc) {
@@ -129,19 +132,6 @@ router.patch('/editTarget',(req,res)=>{
         })
     }
 });
-
-// router.get('/getStateWiseEmployee',(req,res)=>{
-//     var state_id = req.body.state_is?req.body.state_id:"";
-//     Location.find({_id:state_id}).exec().then(location_data=>{
-//         Employee.find({state:location_data[0].name}).exec().then(employee_data=>{
-//             res.json({
-//                 status:true,
-//                 message:"These sre the employees active in this state",
-//                 result:employee_data
-//             })
-//         })
-//     })
-// });
 
 router.get('/getEmpTarget',(req,res)=>{
     var target_id = req.body.target_id?req.body.target_id:"";
@@ -264,6 +254,16 @@ router.post('/getAllEmpTargets',async (req,res)=>{
         })
     }
 });
+
+router.delete('/deleteEmpTarget',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    EmployeeTarget.findOneAndDelete({_id:id}).exec().then(()=>{
+        res.json({
+            status:true,
+            message:"Employee deleted successfully",
+        })
+    })
+})
 
 
 
