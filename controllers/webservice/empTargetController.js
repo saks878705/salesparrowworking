@@ -195,7 +195,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                 }
             }else{
                 res.json({
-                    status:false,
+                    status:true,
                     message:"No employee targets are found",
                     result:[]
                 })
@@ -241,7 +241,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                 }
             }else{
                 res.json({
-                    status:false,
+                    status:true,
                     message:"No employee targets are found",
                     result:[]
                 })
