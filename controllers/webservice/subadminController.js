@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
 const subAdmin = mongoose.model("subAdminInfo");
+const Location = mongoose.model("Location");
 const nodemailer = require("nodemailer");
 const sgmail = require("@sendgrid/mail");
 
@@ -210,6 +211,7 @@ router.get('/getAllSubAdmins',async (req,res)=>{
     var company_id = decodedToken.user_id;
     var list = [];
     var limit = 10;
+    var page = req.body.page?req.body.page:"1"
     var count = await subAdmin.find({company_id})
     subAdmin.find({company_id}).limit(limit*1).skip((page-1)*limit).exec().then(subadmin_data=>{
       if(subadmin_data.length>0){
