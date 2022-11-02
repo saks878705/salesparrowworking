@@ -249,15 +249,10 @@ router.get('/getAllSubAdmins',async (req,res)=>{
             });
         });
     }
-        res.json({
-            status:true,
-            message:"admins found successfully",
-            result:subadmin_data
-        })
       }else{
         res.json({
           status:true,
-          message:"admins not found",
+          message:"subadmins not found",
           result:[]
       })
       }
