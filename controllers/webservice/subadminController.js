@@ -3,6 +3,8 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const base_url = "http://salesparrow.herokuapp.com/";
+const multer = require("multer");
 const subAdmin = mongoose.model("subAdminInfo");
 const nodemailer = require("nodemailer");
 const sgmail = require("@sendgrid/mail");
@@ -17,7 +19,18 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
 
-router.post("/addSubAdmin", (req, res) => {
+const imageStorage = multer.diskStorage({
+  destination: "images/subAdmin_image",
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + "_" + Date.now());
+  },
+});
+
+const imageUpload = multer({
+  storage: imageStorage,
+});
+
+router.post("/addSubAdmin",imageUpload.fields([{name:"subAdmin_image"}]), (req, res) => {
   console.log(req.body);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
@@ -54,6 +67,7 @@ router.post("/addSubAdmin", (req, res) => {
                       state: state,
                       city: city,
                       pincode: pincode,
+                      image:base_url + req.files.subAdmin_image[0].path,
                       district: district,
                       email: email,
                       company_id:company_id,
@@ -186,13 +200,20 @@ router.post("/editSubAdmin", (req, res) => {
 router.get('/getAllSubAdmins',async (req,res)=>{
   const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(" ")[1];
+    if(!token){
+      return res.json({
+        status:false,
+        message:"Token must be provided"
+      })
+    }
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     var list = [];
     var limit = 10;
     var count = await subAdmin.find({company_id})
     subAdmin.find({company_id}).limit(limit*1).skip((page-1)*limit).exec().then(subadmin_data=>{
-      let counInfo = 0;
+      if(subadmin_data.length>0){
+        let counInfo = 0;
       for(let i=0;i<subadmin_data.length;i++){
         Location.findOne({ _id: subadmin_data[i].state }).exec().then((state_data) => {
           Location.findOne({ _id: subadmin_data[i].city }).exec().then((city_data) => {
@@ -200,17 +221,16 @@ router.get('/getAllSubAdmins',async (req,res)=>{
                 await (async function (rowData) {
                   var u_data = {
                     id:rowData._id,
-                    employeeName: rowData.employeeName,
+                    name: rowData.name,
                     phone: rowData.phone,
                     email: rowData.email,
                     address: rowData.address,
                     pincode: rowData.pincode,
+                    password: rowData.password,
                     state: state_data.name,
                     image: rowData.image,
                     city: city_data.name,
                     district: area_data.name,
-                    experience: rowData.experience,
-                    qualification: rowData.qualification,
                   };
                   list.push(u_data);
                 })(subadmin_data[i]);
@@ -232,6 +252,13 @@ router.get('/getAllSubAdmins',async (req,res)=>{
             message:"admins found successfully",
             result:subadmin_data
         })
+      }else{
+        res.json({
+          status:true,
+          message:"admins not found",
+          result:[]
+      })
+      }
     })
 });
 
