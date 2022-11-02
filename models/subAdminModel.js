@@ -25,6 +25,10 @@ var subAdminSchema = new Schema({
         type:String,
         default:""
     },
+    district:{
+        type:String,
+        default:""
+    },
     city:{
         type:String,
         default:""

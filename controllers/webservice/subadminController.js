@@ -18,14 +18,25 @@ function get_current_date() {
 }
 
 router.post("/addSubAdmin", (req, res) => {
+  console.log(req.body);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    return res.json({
+      status:false,
+      message:"Token must be provided"
+    })
+  }
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
   var name = req.body.name ? req.body.name : "";
   var role = req.body.role ? req.body.role : "";
+  var state = req.body.state ? req.body.state : "";
+  var city = req.body.city ? req.body.city : "";
+  var district = req.body.district ? req.body.district : "";
   var phone = req.body.phone ? req.body.phone : "";
   var password = req.body.password ? req.body.password : "";
+  var pincode = req.body.pincode ? req.body.pincode : "";
   var email = req.body.email ? req.body.email : "";
   var address = req.body.address ? req.body.address : "";
   if (name != "") {
@@ -33,15 +44,17 @@ router.post("/addSubAdmin", (req, res) => {
       if (password != "") {
         if (email != "") {
           if (address != "") {
-            subAdmin.find({ email: email })
-              .exec()
-              .then((email_info) => {
+            subAdmin.find({ email: email }).exec().then((email_info) => {
                 if (email_info.length < 1) {
                   bcrypt.hash(password, 10, function (err, hash) {
                     var new_subadmin = new subAdmin({
                       name: name,
                       phone: phone,
                       password: hash,
+                      state: state,
+                      city: city,
+                      pincode: pincode,
+                      district: district,
                       email: email,
                       company_id:company_id,
                       role:role,
@@ -103,7 +116,7 @@ router.post("/addSubAdmin", (req, res) => {
   }
 });
 
-router.patch("/editSubAdmin", (req, res) => {
+router.post("/editSubAdmin", (req, res) => {
   var id = req.body.id ? req.body.id : "";
     if (id != "") {
       subAdmin.find({ _id: id }).exec().then(async (admin_info) => {
