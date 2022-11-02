@@ -483,30 +483,32 @@ router.get('/getEmployee',(req,res)=>{
       Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
         Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
             Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
-              var u_data = {
-                employeeName:employee_data.employeeName,
-                roleId:employee_data.roleId,
-                companyId:employee_data.companyId,
-                manager:employee_data.manager,
-                phone:employee_data.phone,
-                email:employee_data.email,
-                address:employee_data.address,
-                pincode:employee_data.pincode,
-                state:state_data.name,
-                image:employee_data.image,
-                city:city_data.name,
-                district:area_data.name,
-                experience:employee_data.experience,
-                qualification:employee_data.qualification,
-                userExpenses:employee_data.userExperience,
-                transportWays:employee_data.transportWays,
-                status:employee_data.status,
-              }
-              res.json({
-                status:true,
-                message:"Employee found successfully",
-                result:u_data
-            })
+              Role.findOne({_id:employee_data.roleId}).exec().then(role_data=>{
+                var u_data = {
+                  employeeName:employee_data.employeeName,
+                  roleId:{name:role_data.rolename,id:role_data._id},
+                  companyId:employee_data.companyId,
+                  manager:employee_data.manager,
+                  phone:employee_data.phone,
+                  email:employee_data.email,
+                  address:employee_data.address,
+                  pincode:employee_data.pincode,
+                  state:state_data.name,
+                  image:employee_data.image,
+                  city:city_data.name,
+                  district:area_data.name,
+                  experience:employee_data.experience,
+                  qualification:employee_data.qualification,
+                  userExpenses:employee_data.userExperience,
+                  transportWays:employee_data.transportWays,
+                  status:employee_data.status,
+                }
+                res.json({
+                  status:true,
+                  message:"Employee found successfully",
+                  result:u_data
+              })
+              })
             })
           })
         })
@@ -1005,5 +1007,52 @@ router.post("/addBeatEmp", (req, res) => {
     
 });
 
+router.post('/getEmp',(req,res)=>{
+  var id = req.body.id?req.body.id:"";
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    res.json({
+      status:false,
+      message:"Token is required"
+    })
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var user_id = decodedToken.user_id;
+    Employee.findOne({$and:[{_id:id},{companyId:user_id}]}).exec().then(employee_data=>{
+      Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
+        Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
+            Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
+              Role.findOne({_id:employee_data.roleId}).exec().then(role_data=>{
+                var u_data = {
+                  employeeName:employee_data.employeeName,
+                  roleId:{name:role_data.rolename,id:role_data._id},
+                  companyId:employee_data.companyId,
+                  manager:employee_data.manager,
+                  phone:employee_data.phone,
+                  email:employee_data.email,
+                  address:employee_data.address,
+                  pincode:employee_data.pincode,
+                  state:state_data.name,
+                  image:employee_data.image,
+                  city:city_data.name,
+                  district:area_data.name,
+                  experience:employee_data.experience,
+                  qualification:employee_data.qualification,
+                  userExpenses:employee_data.userExpenses,
+                  transportWays:employee_data.transportWays,
+                  status:employee_data.status,
+                }
+                res.json({
+                  status:true,
+                  message:"Employee found successfully",
+                  result:u_data
+              })
+              })
+            })
+          })
+        })
+    })
+});
 
 module.exports = router;
