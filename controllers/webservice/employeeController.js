@@ -1023,10 +1023,10 @@ router.post('/getEmp',(req,res)=>{
       Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
         Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
             Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
-              Role.findOne({_id:employee_data.roleId}).exec().then(role_data=>{
+              if(!employee_data.roleId){
                 var u_data = {
                   employeeName:employee_data.employeeName,
-                  roleId:{name:role_data.rolename,id:role_data._id},
+                  roleId:"",
                   companyId:employee_data.companyId,
                   manager:employee_data.manager,
                   phone:employee_data.phone,
@@ -1048,7 +1048,34 @@ router.post('/getEmp',(req,res)=>{
                   message:"Employee found successfully",
                   result:u_data
               })
-              })
+              }else{
+                Role.findOne({_id:employee_data.roleId}).exec().then(role_data=>{
+                  var u_data = {
+                    employeeName:employee_data.employeeName,
+                    roleId:{name:role_data.rolename,id:role_data._id},
+                    companyId:employee_data.companyId,
+                    manager:employee_data.manager,
+                    phone:employee_data.phone,
+                    email:employee_data.email,
+                    address:employee_data.address,
+                    pincode:employee_data.pincode,
+                    state:state_data.name,
+                    image:employee_data.image,
+                    city:city_data.name,
+                    district:area_data.name,
+                    experience:employee_data.experience,
+                    qualification:employee_data.qualification,
+                    userExpenses:employee_data.userExpenses,
+                    transportWays:employee_data.transportWays,
+                    status:employee_data.status,
+                  }
+                  res.json({
+                    status:true,
+                    message:"Employee found successfully",
+                    result:u_data
+                })
+                })
+              }
             })
           })
         })
