@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const Role = mongoose.model("role");
 const Employee = mongoose.model("Employee");
+const jwt = require("jsonwebtoken");
 
 function get_current_date() {
   var today = new Date();
@@ -64,6 +65,16 @@ router.get("/getAllRoles", (req, res) => {
 
 router.post("/reportingTo", (req, res) => {
   var role_id = req.body.role_id ? req.body.role_id : "";
+  const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if(!token){
+        res.json({
+            status:false,
+            message:"Please give token"
+        })
+    }
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
   if (role_id != "") {
     Role.findOne({ _id: role_id }).exec().then(async (role_data) => {
         if (!role_data) {
@@ -78,11 +89,11 @@ router.post("/reportingTo", (req, res) => {
         var role_new_data = await Role.find({});
         var role_id_array = [];
         role_new_data.forEach((r_data) => {
-          if (r_data.hierarchy_level > hierarchy_level) {
+          if (r_data.hierarchy_level < hierarchy_level) {
             role_id_array.push(r_data._id);
           }
         });
-        Employee.find({roleId:{$in:role_id_array}}).exec().then((emp_data) => {
+        Employee.find({$and:[{roleId:{$in:role_id_array}},{companyId:company_id}]}).exec().then((emp_data) => {
             if (emp_data.length < 1) {
               res.json({
                 status: true,
