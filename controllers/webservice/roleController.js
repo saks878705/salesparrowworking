@@ -52,9 +52,7 @@ router.post("/addRole", (req, res) => {
 });
 
 router.get("/getAllRoles", (req, res) => {
-  Role.find()
-    .exec()
-    .then((role_data) => {
+  Role.find().exec().then((role_data) => {
       res.status(200).json({
         status: true,
         message: "Roles fetched succesfully",
