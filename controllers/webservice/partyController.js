@@ -534,7 +534,7 @@ router.post('/getParty',(req,res)=>{
                 })
             }else{
                 res.json({
-                    status:false,
+                    status:true,
                     message:"Party data not found",
                     result:[]
                 })

@@ -487,4 +487,105 @@ const imageStorage = multer.diskStorage({
     })
   })
 
+  router.post("/addBeatEmp", (req, res) => {
+    console.log(req.body)
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if(!token){
+      return res.json({
+        status:false,
+        message:"Token must be provided"
+      })
+    }
+    var decodedToken = jwt.verify(token, "test");
+    var employee_id = decodedToken.user_id;
+    var beatName = req.body.beatName ? req.body.beatName : "";
+    var state = req.body.state ? req.body.state : "";
+    var city = req.body.city ? req.body.city : "";
+    var day = req.body.day ? req.body.day : "";
+    var route_id = req.body.route_id ? req.body.route_id : "";
+    if(state!=""){
+      if(city!=""){
+        if (beatName != "") {
+          if (employee_id != "") {
+            if (day != "") {
+              if (route_id != "") {
+                Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+                  Beat.find({ beatName: beatName })
+                      .exec()
+                      .then((beat_info) => {
+                        if (beat_info.length < 1) {
+                          var new_beat = new Beat({
+                            beatName: beatName,
+                            employee_id:emp_data._id,
+                            day: day,
+                            state: state,
+                            city: city,
+                            company_id:emp_data.companyId,
+                            route_id: route_id,
+                            Created_date: get_current_date(),
+                            Updated_date: get_current_date(),
+                            status: "Active",
+                          });
+                          new_beat.save().then((data) => {
+                            res.status(200).json({
+                              status: true,
+                              message: "New Beat is created successfully",
+                              result: data,
+                            });
+                          });
+                        } else {
+                          res.status(401).json({
+                            status: true,
+                            message: "Beat already exists",
+                            result: null,
+                          });
+                        }
+                      });
+                })
+              } else {
+                return res.json({
+                  status: false,
+                  message: "Route id is required",
+                  result: null,
+                });
+              }
+            } else {
+              return res.json({
+                status: false,
+                message: "Day is required",
+                result: null,
+              });
+            }
+          } else {
+            return res.json({
+              status: false,
+              message: "Employee id is required",
+              result: null,
+            });
+          }
+        } else {
+          return res.json({
+            status: false,
+            message: "Beat Name is required",
+            result: null,
+          });
+        }
+      }else{
+        return res.json({
+          status: false,
+          message: "City is required",
+          result: null,
+        });
+      }
+    }else{
+      return res.json({
+        status: false,
+        message: "State is required",
+        result: null,
+      });
+    }
+      
+  });
+
 module.exports = router;
