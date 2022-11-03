@@ -46,6 +46,8 @@ app.use("/auth_api", require("./controllers/webservice/productController"));
 app.use("/auth_api", require("./controllers/webservice/routeController"));
 app.use("/auth_api", require("./controllers/webservice/partyGrpController"));
 
+app.use("/app_api", require("./controller/appservices/empController"));
+
 app.listen(PORT, () => {
   console.log(`Express server started at port : ${PORT}`);
 });

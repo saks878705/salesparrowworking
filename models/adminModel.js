@@ -38,6 +38,10 @@ var AdminSchema = new Schema({
         type:String,
         default:""
     },
+    companyShortCode:{
+        type:String,
+
+    },
     companyCatagory:{
         type:String,
         default:""

@@ -8,6 +8,8 @@ const Admin     = mongoose.model('AdminInfo');
 const Location     = mongoose.model('Location');
 const sgmail = require("@sendgrid/mail");
 const nodemailer = require("nodemailer");
+const multer = require("multer");
+const path = require('path');
 
 
 function get_current_date(){
@@ -19,8 +21,6 @@ function get_current_date(){
   return today = yyyy + '-' + mm + '-' + dd + ' ' + time; 
 }
 
-const multer = require("multer");
-const path = require('path');
 
 const imageStorage = multer.diskStorage({
   destination: 'images/admin_img', 
@@ -85,8 +85,11 @@ router.post('/register',(req,res)=>{
                   Admin.find({ email: email }).exec().then((email_info) => {
                     if (email_info.length < 1) {
                       bcrypt.hash(password, 10, function (err, hash) {
+                        let csc = (Math.random() + 1).toString(36).substring(7);
+                        console.log("random", csc);
                         var new_admin = new Admin({
                           company_name: companyName,
+                          companyShortCode:csc,
                           phone: phone,
                           password: hash,
                           email: email,
@@ -354,6 +357,7 @@ router.get('/getadminprofile',(req,res)=>{
                 id:admin_data._id,
                 company_name:admin_data.company_name,
                 phone:admin_data.phone,
+                companyShortCode:admin_data.companyShortCode,
                 password:admin_data.password,
                 email:admin_data.email,
                 city:{name:city_data.name,id:city_data._id},
