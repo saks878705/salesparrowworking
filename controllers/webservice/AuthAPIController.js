@@ -349,6 +349,12 @@ router.get('/getadminprofile',(req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     Admin.findOne({_id:user_id}).exec().then(admin_data=>{
+      if(!admin_data){
+        res.json({
+          status:false,
+          message:"Please check the token"
+        })
+      }
       console.log(admin_data)
         Location.findOne({ _id: admin_data.state }).exec().then((state_data) => {
           Location.findOne({ _id: admin_data.city }).exec().then((city_data) => {
