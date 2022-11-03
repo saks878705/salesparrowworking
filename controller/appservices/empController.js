@@ -930,7 +930,7 @@ router.post("/addRoute", (req, res) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     var decodedToken = jwt.verify(token, "test");
-    var company_id = decodedToken.user_id;
+    var employee_id = decodedToken.user_id;
     var state = req.body.state ? req.body.state : "";
     var city = req.body.city ? req.body.city : "";
     // var area = req.body.area ? req.body.area : "";
@@ -938,15 +938,12 @@ router.post("/addRoute", (req, res) => {
     var limit = 10;
     if (state != "" && city =="") {
           var list = [];
-          Route.find({ $and: [{ company_id }, { state }] })
-            .exec()
-            .then((route_data) => {
+          Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+            Route.find({ $and: [{ company_id:emp_data.companyId }, { state }] }).exec().then((route_data) => {
               if(route_data.length>0){
                 let counInfo = 0;
               for (let i = 0; i < route_data.length; i++) {
-                Location.findOne({ _id: route_data[i].state })
-                  .exec()
-                  .then((state_data) => {
+                Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
                     Location.findOne({ _id: route_data[i].city })
                       .exec()
                       .then((city_data) => {
@@ -986,9 +983,11 @@ router.post("/addRoute", (req, res) => {
                 })
               }
             });
+          })
     } else if(state!="" && city!=""){
       var list = [];
-          Route.find({ $and: [{ company_id }, { state } , {city}] }).exec().then((route_data) => {
+      Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+          Route.find({ $and: [{ company_id:emp_data.companyId  }, { state } , {city}] }).exec().then((route_data) => {
               if(route_data.length>0){
                 let counInfo = 0;
               for (let i = 0; i < route_data.length; i++) {
@@ -1034,9 +1033,11 @@ router.post("/addRoute", (req, res) => {
                 })
               }
             });
+        });
     }else {
       var list = [];
-      Route.find({ company_id })
+      Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+      Route.find({ company_id:emp_data.companyId })
         .exec()
         .then((route_data) => {
           if(route_data.length>0){
@@ -1075,6 +1076,7 @@ router.post("/addRoute", (req, res) => {
                       });
                   });
               });
+            
           }
           }else{
             res.json({
@@ -1084,6 +1086,7 @@ router.post("/addRoute", (req, res) => {
             })
           }
         });
+    });
     }
   });
   
@@ -1132,16 +1135,16 @@ router.post("/addRoute", (req, res) => {
     }
   });
   
-  router.delete("/deleteRoute", (req, res) => {
-    var id = req.body.id ? req.body.id : "";
-    Route.deleteOne({ _id: id })
-      .exec()
-      .then(() => {
-        res.json({
-          status: true,
-          message: "Deleted successfully",
-        });
-      });
-  });
+//   router.delete("/deleteRoute", (req, res) => {
+//     var id = req.body.id ? req.body.id : "";
+//     Route.deleteOne({ _id: id })
+//       .exec()
+//       .then(() => {
+//         res.json({
+//           status: true,
+//           message: "Deleted successfully",
+//         });
+//       });
+//   });
 
 module.exports = router;

@@ -15,29 +15,30 @@ function get_current_date() {
 
 router.post('/addRole',(req,res)=>{
     var rolename = req.body.rolename?req.body.rolename:"";
+    var hierarchy_level = req.body.hierarchy_level?req.body.hierarchy_level:"";
+    var status = req.body.status?req.body.status:"";
     if(rolename!=""){
-        Role.findOne({rolename:rolename}).exec().then(role_data=>{
-            if(role_data ){
-                res.json({
-                    status:false,
-                    message:"Role already exists.Please define a different role."
+        if(hierarchy_level!=""){
+            var new_role = new Role({
+                rolename:rolename,
+                hierarchy_level:hierarchy_level,
+                Created_date:get_current_date(),
+                Updated_date:get_current_date(),
+                status:status
+            })
+            new_role.save().then((data)=>{
+                res.status(200).json({
+                    status:true,
+                    message:"Role created successfully",
+                    details:data
                 })
-            }else{
-                var new_role = new Role({
-                    rolename:rolename,
-                    Created_date:get_current_date(),
-                    Updated_date:get_current_date(),
-                    status:"Active"
-                })
-                new_role.save().then((data)=>{
-                    res.status(200).json({
-                        status:true,
-                        message:"Role created successfully",
-                        details:data
-                    })
-                });
-            }
-        })
+            });
+        }else{
+            res.json({
+                status:false,
+                message:"please provide the hierarchy_level"
+            })
+        }
     }else{
         res.json({
             status:false,
