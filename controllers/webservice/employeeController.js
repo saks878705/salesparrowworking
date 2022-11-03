@@ -215,7 +215,7 @@ router.post("/getAllEmployee", async (req, res) => {
   var state = req.body.state ? req.body.state : "";
   var city = req.body.city ? req.body.city : "";
   var limit = 10;
-  let count = await Employee.find();
+  let count = await Employee.find({ companyId: user_id });
   if (state != "" && city=="") {
     console.log("inside if")
     var list = [];

@@ -8,6 +8,9 @@ const employee_target_schema = new Schema({
     company_id:{
         type:String
     },
+    target_status:{
+        type:String
+    },
     employee_id:{
         type:String
     },

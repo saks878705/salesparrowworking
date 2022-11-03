@@ -6,6 +6,7 @@ const Role = mongoose.model("role");
 const Party = mongoose.model("Party");
 const Admin = mongoose.model("AdminInfo");
 const Beat = mongoose.model("Beat");
+const Route = mongoose.model("Route");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
@@ -355,7 +356,7 @@ const imageStorage = multer.diskStorage({
                                       DOA:DOA,
                                       Created_date:get_current_date(),
                                       Updated_date:get_current_date(),
-                                      status:"Active"
+                                      status:"UnApproved"
                                   })
                                   new_party.save().then(data=>{
                                       res.status(200).json({
@@ -428,7 +429,7 @@ const imageStorage = multer.diskStorage({
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     var page = req.body.page?req.body.page:"1";
-    var limit = 5;
+    var limit = 10;
     var count =await Party.find({employee_id});
     var list = [];
     Party.find({employee_id}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
@@ -487,6 +488,103 @@ const imageStorage = multer.diskStorage({
     })
   })
 
+  router.post('/getParty',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    var list = [];
+    if(id!=""){
+        Party.findOne({_id:id}).exec().then(party_data=>{
+            if(party_data){
+                Location.findOne({_id:party_data.state}).exec().then(state_data=>{
+                    Location.findOne({_id:party_data.city}).exec().then(city_data=>{
+                        Location.findOne({_id:party_data.district}).exec().then(district_data=>{
+                            //console.log(party_data.route[0])
+                            var arr = party_data.route?party_data.route[0].split(","):"";
+                            console.log(arr)
+                            if(arr==""){
+                                var u_data = {
+                                    id:party_data._id,
+                                    state:{name:state_data.name,id:party_data.state},
+                                    city:{name:city_data.name,id:party_data.city},
+                                    district:{name:district_data.name,id:party_data.district},
+                                    firmName:party_data.firmName,
+                                    address:party_data.address,
+                                    partyType:party_data.partyType,
+                                    image:party_data.image,
+                                    pincode:party_data.pincode,
+                                    GSTNo:party_data.GSTNo,
+                                    contactPersonName:party_data.contactPersonName,
+                                    mobileNo:party_data.mobileNo,
+                                    email:party_data.email,
+                                    DOB:party_data.DOB,
+                                    DOA:party_data.DOA,
+                                    route:list,
+                                  };
+                                  res.json({
+                                    status:true,
+                                    message:" Party found successfully",
+                                    result:u_data,
+                                })
+                            }else{
+                                for(let i = 0;i<arr.length;i++){
+                                console.log(i)
+                                console.log(arr[i])
+                                Route.findOne({_id:arr[i]}).exec().then(route_data=>{
+                                    console.log("routedata",route_data)
+                                    let data = {
+                                        start_point:route_data.start_point,
+                                        end_point:route_data.end_point,
+                                        id:route_data._id
+                                    }
+                                    list.push(data);
+                                    console.log(list)
+                                    if(arr.length==i+1){
+                                        var u_data = {
+                                            id:party_data._id,
+                                            state:{name:state_data.name,id:party_data.state},
+                                            city:{name:city_data.name,id:party_data.city},
+                                            district:{name:district_data.name,id:party_data.district},
+                                            firmName:party_data.firmName,
+                                            address:party_data.address,
+                                            partyType:party_data.partyType,
+                                            image:party_data.image,
+                                            pincode:party_data.pincode,
+                                            GSTNo:party_data.GSTNo,
+                                            contactPersonName:party_data.contactPersonName,
+                                            mobileNo:party_data.mobileNo,
+                                            email:party_data.email,
+                                            DOB:party_data.DOB,
+                                            DOA:party_data.DOA,
+                                            route:list,
+                                          };
+                                          res.json({
+                                            status:true,
+                                            message:" Party found successfully",
+                                            result:u_data,
+                                        })
+                                    }
+                                })
+                            }
+                            }
+                             
+                        })
+                    })
+                })
+            }else{
+                res.json({
+                    status:true,
+                    message:"Party data not found",
+                    result:[]
+                })
+            }
+        })
+    }else{
+        res.json({
+            status:false,
+            message:"Id is required"
+        })
+    }
+});
+
   router.post("/addBeatEmp", (req, res) => {
     console.log(req.body)
     const authHeader = req.headers["authorization"];
@@ -525,7 +623,7 @@ const imageStorage = multer.diskStorage({
                             route_id: route_id,
                             Created_date: get_current_date(),
                             Updated_date: get_current_date(),
-                            status: "Active",
+                            status: "UnApproved",
                           });
                           new_beat.save().then((data) => {
                             res.status(200).json({
@@ -587,5 +685,162 @@ const imageStorage = multer.diskStorage({
     }
       
   });
+
+  router.post('/getAllBeat',async (req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if(!token){
+      return res.json({
+        status:false,
+        message:"Token must be provided"
+      })
+    }
+    var page = req.body.page?req.body.page:"1";
+    var limit = 10;
+    var count =await Beat.find({company_id});
+    var list = [];
+      var decodedToken = jwt.verify(token, "test");
+      var employee_id = decodedToken.user_id;
+      Beat.find({employee_id}).limit( limit * 1).skip((page -1) * limit).sort({Created_date:-1}).exec().then(beat_data=>{
+        let counInfo = 0;
+        if(beat_data.length>0){
+          for(let i = 0;i<beat_data.length;i++){
+            Employee.findOne({_id:beat_data[i].employee_id}).exec().then(emp_data=>{
+                if(!emp_data){
+                    res.json({
+                        status:true,
+                        message:"No employee found"
+                    })
+                }
+              console.log(beat_data[i].employee_id)
+              Route.findOne({_id:beat_data[i].route_id}).exec().then(route_data=>{
+                Location.findOne({_id:beat_data[i].state}).exec().then(state_data=>{
+                  Location.findOne({_id:beat_data[i].city}).exec().then( async (city_data)=>{
+                    await (async function (rowData) {
+                      var u_data = {
+                        id:rowData._id,
+                        state:{name:state_data.name,id:beat_data[i].state},
+                        city:{name:city_data.name,id:beat_data[i].city},
+                        employee_name:emp_data.employeeName,
+                        route_name:{start_point:route_data.start_point,end_point:route_data.end_point},
+                        beatName:rowData.beatName,
+                        day:rowData.day,
+                        status:rowData.status
+                      };
+                      list.push(u_data);
+                    })(beat_data[i]);
+                    counInfo++;
+                    if(counInfo==beat_data.length){
+                      let c = Math.ceil(count.length/limit);
+                      if(c==0){
+                         c+=1;
+                      }
+                      res.json({
+                        status:true,
+                        message:"All Beats found successfully",
+                        result:list,
+                        pageLength:c
+                    })
+                    }
+                  })
+                })
+              })
+            })
+          }
+        }else{
+          return res.json({
+            status: true,
+            message: "Beat not found",
+            result: [],
+          });
+        }
+      })
+  });
+
+  router.post('/getBeat',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    Beat.findOne({_id:id}).exec().then(beat_data=>{
+      if(beat_data){
+        Location.findOne({_id:beat_data.state}).exec().then(state_data=>{
+          Location.findOne({_id:beat_data.city}).exec().then(city_data=>{
+            Employee.findOne({_id:beat_data.employee_id}).exec().then(emp_data=>{
+              Route.findOne({_id:beat_data.route_id}).exec().then(route_data=>{
+                var u_data = {
+                  id:beat_data._id,
+                  state:{name:state_data.name,id:beat_data.state},
+                  city:{name:city_data.name,id:beat_data.city},
+                  employee_name:emp_data.employeeName,
+                  route_name:{start_point:route_data.start_point,end_point:route_data.end_point},
+                  day:beat_data.day,
+                  beatName:beat_data.beatName,
+                  status:beat_data.status
+                }
+                res.json({
+                  status:true,
+                  message:"data fetched",
+                  result:[u_data]
+                })
+              })
+            })
+          })
+        })
+      }else{
+        res.json({
+          status:false,
+          message:"Beat not found",
+          result:[]
+      })
+      }
+    })
+});
+
+router.post('/editBeat',(req,res)=>{
+    var id = req.body.id?req.body.id:"";
+    if(id!=""){
+        Beat.find({_id:id}).exec().then(beat_data=>{
+            if(beat_data.length>0){
+                var updated_beat = {};
+                if (req.body.beatName) {
+                    updated_beat.beatName = req.body.beatName;
+                  }
+                  if (req.body.day) {
+                    updated_beat.day = req.body.day;
+                  }
+                  if (req.body.state) {
+                    updated_beat.state = req.body.state;
+                  }
+                  if (req.body.city) {
+                    updated_beat.city = req.body.city;
+                  }
+                  if (req.body.route_id) {
+                    updated_beat.route_id = req.body.route_id;
+                  }
+                  updated_beat.Updated_date = get_current_date();
+                  Beat.findOneAndUpdate({ _id: id },updated_beat,{ new: true },(err, doc) => {
+                      if (doc) {
+                        res.status(200).json({
+                          status: true,
+                          message: "Update successfully",
+                          result: updated_beat,
+                        });
+                      }
+                    }
+                  );
+                } else {
+                  res.json({
+                    status: false,
+                    message: "Beat not found.",
+                    result: null,
+                  });
+                }
+              });
+    }else{
+        return res.json({
+            status: false,
+            message: "Id is required",
+            result: null,
+          }); 
+    }
+});
 
 module.exports = router;

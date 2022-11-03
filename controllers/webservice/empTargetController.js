@@ -30,6 +30,7 @@ router.post('/addEmpTarget',(req,res)=>{
     var company_id = decodedToken.user_id;
     var state = req.body.state?req.body.state:"";
     var employee = req.body.employee?req.body.employee:"";
+    var target_status = req.body.target_status?req.body.target_status:"";
     var date = req.body.date?req.body.date:"";
     var party = req.body.party?req.body.party:"";
     var primTarget = req.body.primTarget?req.body.primTarget:"";
@@ -44,6 +45,7 @@ router.post('/addEmpTarget',(req,res)=>{
                             employee_id:employee,
                             party_id:party,
                             company_id:company_id,
+                            target_status:target_status,
                             month:date,
                             primary_target:primTarget,
                             Secondary_target:secTarget,
@@ -100,6 +102,9 @@ router.patch('/editTarget',(req,res)=>{
             }
             if(req.body.party){
                 updated_target.party_id = req.body.party;
+            }
+            if(req.body.target_status){
+                updated_target.target_status = req.body.target_status;
             }
             if(req.body.primTarget){
                 updated_target.primary_target = req.body.primTarget;
@@ -173,6 +178,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                                         id:rowData._id,
                                         state:{name:state_data.name,id:state_data._id},
                                         employee_name:emp_data.employeeName,
+                                        target_status:rowData.target_status,
                                         party_name:party_data.firmName,
                                         date:rowData.month,
                                         primary_target:rowData.primary_target,
@@ -215,6 +221,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                                         state:{name:state_data.name,id:state_data._id},
                                         employee_name:emp_data.employeeName,
                                         party_name:party_data.firmName,
+                                        target_status:rowData.target_status,
                                         date:rowData.month,
                                         primary_target:rowData.primary_target,
                                         Secondary_target:rowData.Secondary_target || "",
