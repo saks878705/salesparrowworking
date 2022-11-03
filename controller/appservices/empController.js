@@ -4,6 +4,7 @@ const Employee = mongoose.model("Employee");
 const Location = mongoose.model("Location");
 const Role = mongoose.model("role");
 const Party = mongoose.model("Party");
+const Admin = mongoose.model("AdminInfo");
 const Beat = mongoose.model("Beat");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
@@ -33,6 +34,72 @@ const imageStorage = multer.diskStorage({
       today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     return (today = yyyy + "-" + mm + "-" + dd + " " + time);
   }
+
+  router.post("/addEmployee",imageUpload.fields([{ name: "Employee_image" }]),(req, res) => {
+    console.log(req.body);
+    var employeeName = req.body.employeeName ? req.body.employeeName : "";
+    var companyShortCode = req.body.companyShortCode ? req.body.companyShortCode : "";
+    var phone = req.body.phone ? req.body.phone : "";
+    var state = req.body.state ? req.body.state : "";
+    var city = req.body.city ? req.body.city : "";
+    var pincode = req.body.pincode ? req.body.pincode : "";
+    var district = req.body.district ? req.body.district : "";
+    if (employeeName != "") {
+      if (phone != "") {
+          if (companyShortCode != "") {
+            Admin.findOne({companyShortCode}).exec().then((admin_info) => {
+                if (admin_info.length > 0) {
+                  var new_employee = new Employee({
+                    employeeName: employeeName,
+                    phone: phone,
+                    city: city,
+                    companyId: admin_info._id,
+                    image: base_url + req.files.Employee_image[0].path,
+                    state: state,
+                    district: district,
+                    pincode: pincode,
+                    Created_date: get_current_date(),
+                    Updated_date: get_current_date(),
+                    status: "UnApproved",
+                  });
+                  new_employee.save().then((data) => {
+                    res.status(200).json({
+                      status: true,
+                      message: "New Employee is created successfully",
+                      results: data,
+                    });
+                  });
+                } else {
+                  res.json({
+                    status: false,
+                    message: "Company short code is wrong",
+                    result: null,
+                  });
+                }
+              });
+          } else {
+            return res.json({
+              status: false,
+              message: "companyShortCode is required",
+              results: null,
+            });
+          }
+      } else {
+        return res.json({
+          status: false,
+          message: "Phone is required",
+          results: null,
+        });
+      }
+    } else {
+      return res.json({
+        status: false,
+        message: "EmployeeName is required",
+        results: null,
+      });
+    }
+  }
+);
 
   router.post("/sendOtp", (req, res) => {
     console.log(req.body)
