@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const Role = mongoose.model("role");
+const Employee = mongoose.model("Employee");
 
 function get_current_date() {
   var today = new Date();
@@ -13,48 +14,96 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
 
-router.post('/addRole',(req,res)=>{
-    var rolename = req.body.rolename?req.body.rolename:"";
-    var hierarchy_level = req.body.hierarchy_level?req.body.hierarchy_level:"";
-    var status = req.body.status?req.body.status:"";
-    if(rolename!=""){
-        if(hierarchy_level!=""){
-            var new_role = new Role({
-                rolename:rolename,
-                hierarchy_level:hierarchy_level,
-                Created_date:get_current_date(),
-                Updated_date:get_current_date(),
-                status:status
-            })
-            new_role.save().then((data)=>{
-                res.status(200).json({
-                    status:true,
-                    message:"Role created successfully",
-                    details:data
-                })
-            });
-        }else{
-            res.json({
-                status:false,
-                message:"please provide the hierarchy_level"
-            })
-        }
-    }else{
-        res.json({
-            status:false,
-            message:"please provide the role"
-        })
+router.post("/addRole", (req, res) => {
+  var rolename = req.body.rolename ? req.body.rolename : "";
+  var hierarchy_level = req.body.hierarchy_level
+    ? req.body.hierarchy_level
+    : "";
+  var status = req.body.status ? req.body.status : "";
+  if (rolename != "") {
+    if (hierarchy_level != "") {
+      var new_role = new Role({
+        rolename: rolename,
+        hierarchy_level: hierarchy_level,
+        Created_date: get_current_date(),
+        Updated_date: get_current_date(),
+        status: status,
+      });
+      new_role.save().then((data) => {
+        res.status(200).json({
+          status: true,
+          message: "Role created successfully",
+          details: data,
+        });
+      });
+    } else {
+      res.json({
+        status: false,
+        message: "please provide the hierarchy_level",
+      });
     }
+  } else {
+    res.json({
+      status: false,
+      message: "please provide the role",
+    });
+  }
 });
 
-router.get('/getAllRoles',(req,res)=>{
-    Role.find().exec().then(role_data=>{
-        res.status(200).json({
-            status:true,
-            message:"Roles fetched succesfully",
-            result:role_data
-        })
-    })
+router.get("/getAllRoles", (req, res) => {
+  Role.find()
+    .exec()
+    .then((role_data) => {
+      res.status(200).json({
+        status: true,
+        message: "Roles fetched succesfully",
+        result: role_data,
+      });
+    });
+});
+
+router.post("/reportingTo", (req, res) => {
+  var role_id = req.body.role_id ? req.body.role_id : "";
+  if (role_id != "") {
+    Role.findOne({ _id: role_id }).exec().then(async (role_data) => {
+        if (!role_data) {
+          return res.json({
+            status: true,
+            message: "No Role found",
+            result: [],
+          });
+        }
+        var hierarchy_level = parseInt(role_data.hierarchy_level);
+        
+        var role_new_data = await Role.find({});
+        var role_id_array = [];
+        role_new_data.forEach((r_data) => {
+          if (r_data.hierarchy_level > hierarchy_level) {
+            role_id_array.push(r_data._id);
+          }
+        });
+        Employee.find({roleId:{$in:role_id_array}}).exec().then((emp_data) => {
+            if (emp_data.length < 1) {
+              res.json({
+                status: true,
+                message: "No Employee found",
+                result: [],
+              });
+            } else {
+              res.json({
+                status: true,
+                message: "Employees found",
+                result: emp_data,
+              });
+            }
+          });
+      });
+  } else {
+    res.json({
+      status: false,
+      message: "Please give the role_id",
+    });
+  }
 });
 
 module.exports = router;
