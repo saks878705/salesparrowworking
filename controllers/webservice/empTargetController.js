@@ -181,6 +181,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                                         target_status:rowData.target_status,
                                         party_name:party_data.firmName,
                                         date:rowData.month,
+                                        status:rowData.status,
                                         primary_target:rowData.primary_target,
                                         Secondary_target:rowData.Secondary_target || "",
                                     };
@@ -223,6 +224,7 @@ router.post('/getAllEmpTargets',async (req,res)=>{
                                         party_name:party_data.firmName,
                                         target_status:rowData.target_status,
                                         date:rowData.month,
+                                        status:rowData.status,
                                         primary_target:rowData.primary_target,
                                         Secondary_target:rowData.Secondary_target || "",
                                     };
