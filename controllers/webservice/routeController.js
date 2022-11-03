@@ -21,6 +21,7 @@ router.post("/addRoute", (req, res) => {
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
   var state = req.body.state ? req.body.state : "";
+  var distance = req.body.distance ? req.body.distance : "";
   var city = req.body.city ? req.body.city : "";
   var area = req.body.area ? req.body.area : "";
   var start_point = req.body.start_point ? req.body.start_point : "";
@@ -35,6 +36,7 @@ router.post("/addRoute", (req, res) => {
                 state: state,
                 city: city,
                 area: area,
+                distance: distance,
                 start_point: start_point,
                 company_id: company_id,
                 end_point: end_point,
@@ -121,6 +123,7 @@ router.post("/routeListing", async (req, res) => {
                               city:{name:city_data.name,id:rowData.city},
                               area:{name:area_data.name,id:rowData.area},
                               start_point: rowData.start_point,
+                              distance: rowData.distance,
                               end_point: rowData.end_point,
                             };
                             list.push(u_data);
@@ -168,6 +171,7 @@ router.post("/routeListing", async (req, res) => {
                               city:{name:city_data.name,id:rowData.city},
                               area:{name:area_data.name,id:rowData.area},
                               start_point: rowData.start_point,
+                              distance: rowData.distance,
                               end_point: rowData.end_point,
                             };
                             list.push(u_data);
@@ -217,6 +221,7 @@ router.post("/routeListing", async (req, res) => {
                           city:{name:city_data.name,id:rowData.city},
                           area:{name:area_data.name,id:rowData.area},
                           start_point: rowData.start_point,
+                          distance: rowData.distance,
                           end_point: rowData.end_point,
                         };
                         list.push(u_data);
@@ -257,6 +262,9 @@ router.post("/edit_route", (req, res) => {
     }
     if (req.body.area) {
       updated_route.area = req.body.area;
+    }
+    if (req.body.distance) {
+      updated_route.distance = req.body.distance;
     }
     if (req.body.start_point) {
       updated_route.start_point = req.body.start_point;

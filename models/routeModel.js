@@ -20,6 +20,9 @@ const route_schema = new Schema({
     end_point:{
         type:String,
     },
+    distance:{
+        type:String,
+    },
     Created_date: {
         type: String,
         default: ""
