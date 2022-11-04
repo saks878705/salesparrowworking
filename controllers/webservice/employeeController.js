@@ -544,6 +544,13 @@ router.post('/getEmp',(req,res)=>{
   var decodedToken = jwt.verify(token, "test");
   var user_id = decodedToken.user_id;
     Employee.findOne({$and:[{_id:id},{companyId:user_id}]}).exec().then(employee_data=>{
+      console.log(employee_data);
+      if(!employee_data){
+        return res.json({
+          status:true,
+          message:"No employee found"
+        })
+      }
       Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
         Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
             Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
@@ -579,7 +586,7 @@ router.post('/getEmp',(req,res)=>{
                       employeeName:employee_data.employeeName,
                       roleId:{name:role_data.rolename,id:role_data._id},
                       companyId:employee_data.companyId,
-                      manager:role_data.roleName,
+                      manager:role_data.rolename,
                       phone:employee_data.phone,
                       email:employee_data.email,
                       address:employee_data.address,
