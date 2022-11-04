@@ -582,30 +582,32 @@ router.post('/getEmp',(req,res)=>{
                 })
                 }else{
                   Role.findOne({_id:employee_data.roleId}).exec().then(role_data=>{
-                    var u_data = {
-                      employeeName:employee_data.employeeName,
-                      roleId:{name:role_data.rolename,id:role_data._id},
-                      companyId:employee_data.companyId,
-                      manager:role_data.rolename,
-                      phone:employee_data.phone,
-                      email:employee_data.email,
-                      address:employee_data.address,
-                      pincode:employee_data.pincode,
-                      state:state_data.name,
-                      image:employee_data.image,
-                      city:city_data.name,
-                      district:area_data.name,
-                      experience:employee_data.experience,
-                      qualification:employee_data.qualification,
-                      userExpenses:employee_data.userExpenses,
-                      transportWays:employee_data.transportWays,
-                      status:employee_data.status,
-                    }
-                    res.json({
-                      status:true,
-                      message:"Employee found successfully",
-                      result:u_data
-                  })
+                    Employee.findOne({_id:employee_data.manager}).exec().then(manager_data=>{
+                      var u_data = {
+                        employeeName:employee_data.employeeName,
+                        roleId:{name:role_data.rolename,id:role_data._id},
+                        companyId:employee_data.companyId,
+                        manager:manager_data.employeeName,
+                        phone:employee_data.phone,
+                        email:employee_data.email,
+                        address:employee_data.address,
+                        pincode:employee_data.pincode,
+                        state:state_data.name,
+                        image:employee_data.image,
+                        city:city_data.name,
+                        district:area_data.name,
+                        experience:employee_data.experience,
+                        qualification:employee_data.qualification,
+                        userExpenses:employee_data.userExpenses,
+                        transportWays:employee_data.transportWays,
+                        status:employee_data.status,
+                      }
+                      res.json({
+                        status:true,
+                        message:"Employee found successfully",
+                        result:u_data
+                    })
+                    })
                   })
                 }
               })
