@@ -929,6 +929,12 @@ router.post("/addRoute", (req, res) => {
   router.post("/routeListing", async (req, res) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
+    if(!token){
+      res.json({
+          status:false,
+          message:"Please give token"
+      })
+  }
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     var state = req.body.state ? req.body.state : "";
