@@ -33,4 +33,5 @@ require('./productModel');
 require('./routeModel');
 require('./pgroupModel');
 require('./partyGrouping');
+require('./subscriptionModel');
 
