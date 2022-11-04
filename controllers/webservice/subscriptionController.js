@@ -18,7 +18,7 @@ router.post('/addSubscription', async (req, res) => {
 });
 router.get('/listAllSubs', async (req, res) => {
   const allSubs = await SubscriptionPlan.find({});
-  res.status(200).json({ Error: false, allSubscriptions });
+  res.status(200).json({ Error: false, allSubscriptions :allSubs});
 });
 router.delete('/delSubs/:subId', async (req, res) => {
   const _id = req.params.subId;
