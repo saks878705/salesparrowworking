@@ -40,8 +40,8 @@ router.post("/addPurchasePlan", (req, res) => {
         var updated_purchase = {};
         let start_date_dms = new Date()
          let end_date_dms = getEndDate(ems.duration)
-         let newDms = {...dms, start_date_dms , end_date_dms}
-        if (req.body.dms) {
+         if (req.body.dms) {
+            let newDms = {...dms, start_date_dms , end_date_dms}
           updated_purchase.dms = newDms;
         }
         Purchase.findOneAndUpdate(
