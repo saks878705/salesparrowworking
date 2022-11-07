@@ -195,7 +195,7 @@ const imageStorage = multer.diskStorage({
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
       Employee.findOne({_id:employee_id}).exec().then(employee_data=>{
-        if(employee_data.status=="Approved"){
+        if(employee_data.status=="Approved" || employee_data.status=="Active"){
             Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
                 Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
                     Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
