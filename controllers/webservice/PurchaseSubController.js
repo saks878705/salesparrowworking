@@ -123,4 +123,23 @@ router.get("/getPurchasePlan", (req, res) => {
     });
 });
 
+router.delete('/deletePurchase',(req,res)=>{
+    const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) {
+    res.json({
+      status: false,
+      message: "Token is required",
+    });
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var company_id = decodedToken.user_id;
+  Purchase.deleteMany({company_id}).exec().then(()=>{
+    res.json({
+        status:true,
+        message:"deleted"
+    })
+  })
+})
+
 module.exports = router;

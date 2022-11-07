@@ -16,7 +16,7 @@ const PurchaseSubscriptionPlanSchema = new mongoose.Schema({
     },
     totalPrice: { type: Number },
     duration: { type: Number, default: 12 },
-    minUsers: {
+    users: {
       type: Number,
       default: 30,
     },
@@ -25,7 +25,7 @@ const PurchaseSubscriptionPlanSchema = new mongoose.Schema({
       end_date_ems: { type: String },
   },
   dms: {
-    minUsers: { type: Number },
+    users: { type: Number },
     duration: { type: Number },
     price: { type: Number },
     totalPrice: { type: Number },
