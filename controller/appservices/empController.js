@@ -283,7 +283,7 @@ const imageStorage = multer.diskStorage({
         if(req.body.image){
           updated_emp.image = req.body.image;
         }
-        Employee.findOneAndUpdate({_id:user_id},updated_emp,{new:true},(err,doc)=>{
+        Employee.findOneAndUpdate({_id:employee_id},updated_emp,{new:true},(err,doc)=>{
           if(doc){
             res.json({
               status:true,
@@ -300,6 +300,58 @@ const imageStorage = multer.diskStorage({
       }
     })
   })
+
+  router.post("/employeeProfileImage",imageUpload.fields([{ name: "Employee_image" }]),(req, res) => {
+      console.log(req.body);
+      const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if(!token){
+      res.json({
+        status:false,
+        message:"Token is required"
+      })
+    }
+    var decodedToken = jwt.verify(token, "test");
+    var employee_id = decodedToken.user_id;
+      if (id != "") {
+        Employee.find({ _id: employee_id }).exec().then((user_data) => {
+            if (user_data) {
+              updated_employee = {};
+              if (req.files.Employee_image) {
+                updated_employee.image =
+                  base_url + req.files.Employee_image[0].path;
+              }
+              Employee.findOneAndUpdate({ _id: employee_id },updated_employee,{ new: true },(err, doc) => {
+                  if (doc) {
+                    res.status(200).json({
+                      status: true,
+                      message: "Updated Successfully",
+                      result: updated_employee,
+                    });
+                  } else {
+                    res.json({
+                      status: false,
+                      message: "Error",
+                      result: err,
+                    });
+                  }
+                }
+              );
+            } else {
+              res.json({
+                status: false,
+                message: "Id must be correct.",
+              });
+            }
+          });
+      } else {
+        res.json({
+          status: false,
+          message: "Id is required.",
+        });
+      }
+    }
+  );
   
   router.post('/addPartyEmp',(req,res)=>{
     console.log(req.body)

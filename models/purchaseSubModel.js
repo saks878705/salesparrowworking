@@ -21,17 +21,17 @@ const PurchaseSubscriptionPlanSchema = new mongoose.Schema({
       default: 30,
     },
     modules: [{ type: String }],
+    start_date_ems: { type: String },
+      end_date_ems: { type: String },
   },
-  start_date_ems: { type: String },
-    end_date_ems: { type: String },
   dms: {
     minUsers: { type: Number },
     duration: { type: Number },
     price: { type: Number },
     totalPrice: { type: Number },
-},
     start_date_dms: { type: String },
     end_date_dms: { type: String },
+},
 });
 
 module.exports = mongoose.model('Purchase', PurchaseSubscriptionPlanSchema);
