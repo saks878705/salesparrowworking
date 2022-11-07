@@ -32,6 +32,7 @@ router.post("/addPurchasePlan", (req, res) => {
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
   var ems = req.body.ems ? req.body.ems : "";
+  var dms = req.body.dms ? req.body.dms : "";
   var type = req.body.type ? req.body.type : "";
   Purchase.findOne({ company_id })
     .exec()
@@ -43,6 +44,15 @@ router.post("/addPurchasePlan", (req, res) => {
          if (req.body.dms) {
             let newDms = {...dms, start_date_dms , end_date_dms}
           updated_purchase.dms = newDms;
+        }
+         if (req.body.ems) {
+            let start_date_ems = new Date()
+         let end_date_ems = getEndDate(ems.duration)
+         let newEms = {...ems, start_date_ems , end_date_ems}
+          updated_purchase.ems = newEms;
+        }
+        if(req.body.type){
+            updated_purchase.type = req.body.type
         }
         Purchase.findOneAndUpdate(
           { company_id },

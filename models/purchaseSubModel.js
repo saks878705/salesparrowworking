@@ -32,6 +32,9 @@ const PurchaseSubscriptionPlanSchema = new mongoose.Schema({
     start_date_dms: { type: String },
     end_date_dms: { type: String },
 },
+status:{
+    type:String
+}
 });
 
 module.exports = mongoose.model('Purchase', PurchaseSubscriptionPlanSchema);
