@@ -14,16 +14,16 @@ router.post('/addSubscription', async (req, res) => {
   const savedDoc = await newSub.save();
   res
     .status(201)
-    .json({ Error: false, message: 'Added', subscription: savedDoc });
+    .json({ status: true, message: 'Added', result: savedDoc });
 });
 router.get('/listAllSubs', async (req, res) => {
   const allSubs = await SubscriptionPlan.find({});
-  res.status(200).json({ Error: false, allSubscriptions :allSubs});
+  res.status(200).json({ status: true,message:"All plans found successfully", result :allSubs});
 });
 router.delete('/delSubs/:subId', async (req, res) => {
   const _id = req.params.subId;
   await SubscriptionPlan.findOneAndDelete({ _id });
-  res.status(200).json({ Error: false, message: 'Deleted' });
+  res.status(200).json({ status: true, message: 'Deleted' });
 });
 
 module.exports = router;
