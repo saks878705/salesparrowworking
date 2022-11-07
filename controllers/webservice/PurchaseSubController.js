@@ -4,15 +4,6 @@ const Purchase = mongoose.model("Purchase");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
-function get_current_date() {
-  var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
-  var yyyy = today.getFullYear();
-  var time =
-    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  return (today = yyyy + "-" + mm + "-" + dd + " ");
-}
 
 const getEndDate = (months) => {
   let date = new Date();
