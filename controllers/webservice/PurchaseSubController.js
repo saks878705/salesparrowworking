@@ -38,10 +38,11 @@ router.post("/addPurchasePlan", (req, res) => {
     .then((purchase_data) => {
       if (purchase_data) {
         var updated_purchase = {};
+        let start_date_dms = new Date()
+         let end_date_dms = getEndDate(ems.duration)
+         let newDms = {...dms, start_date_dms , end_date_dms}
         if (req.body.dms) {
-          updated_purchase.dms = req.body.dms;
-          updated_purchase.start_date_dms = new Date();
-          updated_purchase.end_date_dms = getEndDate(ems.duration);
+          updated_purchase.dms = newDms;
         }
         Purchase.findOneAndUpdate(
           { company_id },
@@ -65,10 +66,7 @@ router.post("/addPurchasePlan", (req, res) => {
       } else {
          let start_date_ems = new Date()
          let end_date_ems = getEndDate(ems.duration)
-
          let newEms = {...ems, start_date_ems , end_date_ems}
-         console.log(newEms);
-
         var new_purchase = new Purchase({
           type: type,
           ems: newEms,
@@ -103,6 +101,7 @@ router.get("/getPurchasePlan", (req, res) => {
         res.json({
           status: true,
           message: "No plan found",
+          result:[]
         });
       } else {
         res.json({
