@@ -237,40 +237,42 @@ router.post('/getAllParty',async (req,res)=>{
                     Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
                         Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
                             Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-                                await (async function (rowData) {
-                                    var u_data = {
-                                      id:rowData._id,
-                                      state:{name:state_data.name,id:rowData.state},
-                                      city:{name:city_data.name,id:rowData.city},
-                                      district:{name:district_data.name,id:rowData.district},
-                                      firmName:rowData.firmName,
-                                      partyType:rowData.partyType,
-                                        pincode:rowData.pincode,
-                                        GSTNo:rowData.GSTNo,
-                                        contactPersonName:rowData.contactPersonName,
-                                        mobileNo:rowData.mobileNo,
-                                        email:rowData.email,
-                                        DOB:rowData.DOB,
-                                        DOA:rowData.DOA,
-                                        route:rowData.route,
-                                      areas:rowData.address,
-                                      status:rowData.status
-                                    };
-                                    list.push(u_data);
-                                  })(party_data[i]);
-                                  counInfo++;
-                                  if(counInfo==party_data.length){
-                                    let c = Math.ceil(count.length/limit);
-                                    if(c==0){
-                                       c+=1;
-                                    }
-                                    res.json({
-                                      status:true,
-                                      message:"Parties for this state found successfully",
-                                      result:list,
-                                      pageLength:c
-                                  })
-                                  }
+                                Route.findOne({_id:party_data[i].route}).exec().then(route_data=>{
+                                    await (async function (rowData) {
+                                        var u_data = {
+                                          id:rowData._id,
+                                          state:{name:state_data.name,id:rowData.state},
+                                          city:{name:city_data.name,id:rowData.city},
+                                          district:{name:district_data.name,id:rowData.district},
+                                          firmName:rowData.firmName,
+                                          partyType:rowData.partyType,
+                                            pincode:rowData.pincode,
+                                            GSTNo:rowData.GSTNo,
+                                            contactPersonName:rowData.contactPersonName,
+                                            mobileNo:rowData.mobileNo,
+                                            email:rowData.email,
+                                            DOB:rowData.DOB,
+                                            DOA:rowData.DOA,
+                                            route:{id:route_data._id,start_point:route_data.start_point,end_point:route_data.end_point},
+                                          areas:rowData.address,
+                                          status:rowData.status
+                                        };
+                                        list.push(u_data);
+                                      })(party_data[i]);
+                                      counInfo++;
+                                      if(counInfo==party_data.length){
+                                        let c = Math.ceil(count.length/limit);
+                                        if(c==0){
+                                           c+=1;
+                                        }
+                                        res.json({
+                                          status:true,
+                                          message:"Parties for this state found successfully",
+                                          result:list,
+                                          pageLength:c
+                                      })
+                                      }
+                                })
                             })
                         })
                     })
@@ -547,6 +549,48 @@ router.post('/getParty',(req,res)=>{
         })
     }
 });
+
+router.post("/partyProfileImage",imageUpload.fields([{ name: "party_image" }]),(req, res) => {
+      console.log(req.body);
+      const id = req.body.id ? req.body.id : "";
+      if (id != "") {
+        Party.findOne({ _id: id }).exec().then((user_data) => {
+            if (user_data) {
+              updated_party = {};
+              if (req.files.party_image) {
+                updated_party.image =base_url + req.files.party_image[0].path;
+              }
+              Party.findOneAndUpdate({ _id: id },updated_party,{ new: true },(err, doc) => {
+                  if (doc) {
+                    res.status(200).json({
+                      status: true,
+                      message: "Updated Successfully",
+                      result: updated_party,
+                    });
+                  } else {
+                    res.json({
+                      status: false,
+                      message: "Error",
+                      result: err,
+                    });
+                  }
+                }
+              );
+            } else {
+              res.json({
+                status: false,
+                message: "Id must be correct.",
+              });
+            }
+          });
+      } else {
+        res.json({
+          status: false,
+          message: "Id is required.",
+        });
+      }
+    }
+  );
 
 router.delete("/deleteParty", (req, res) => {
     var id = req.body.id ?req.body.id: "";
