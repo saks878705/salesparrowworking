@@ -252,6 +252,7 @@ router.post('/getAllParty',async (req,res)=>{
                                           partyType:rowData.partyType,
                                             pincode:rowData.pincode,
                                             GSTNo:rowData.GSTNo,
+                                            image:rowData.image,
                                             contactPersonName:rowData.contactPersonName,
                                             mobileNo:rowData.mobileNo,
                                             email:rowData.email,
@@ -283,13 +284,11 @@ router.post('/getAllParty',async (req,res)=>{
                                         console.log(arr[i])
                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
                                             console.log("routedata",route_data)
-                                            let data = {
-                                                start_point:route_data.start_point,
-                                                end_point:route_data.end_point,
-                                                id:route_data._id
-                                            }
+                                            let data = `${route_data.start_point}-${route_data.end_point}`
                                             list2.push(data);
                                             console.log(list2)
+                                            let newData = list2.join(", ")
+                                            console.log(newData);
                                             await (async function (rowData) {
                                                 var u_data = {
                                                   id:rowData._id,
@@ -299,13 +298,14 @@ router.post('/getAllParty',async (req,res)=>{
                                                   firmName:rowData.firmName,
                                                   partyType:rowData.partyType,
                                                     pincode:rowData.pincode,
+                                                    image:rowData.image,
                                                     GSTNo:rowData.GSTNo,
                                                     contactPersonName:rowData.contactPersonName,
                                                     mobileNo:rowData.mobileNo,
                                                     email:rowData.email,
                                                     DOB:rowData.DOB,
                                                     DOA:rowData.DOA,
-                                                    route:list2,
+                                                    route:newData,
                                                   areas:rowData.address,
                                                   status:rowData.status
                                                 };
@@ -362,6 +362,7 @@ router.post('/getAllParty',async (req,res)=>{
                                             GSTNo:rowData.GSTNo,
                                             contactPersonName:rowData.contactPersonName,
                                             mobileNo:rowData.mobileNo,
+                                            image:rowData.image,
                                             email:rowData.email,
                                             DOB:rowData.DOB,
                                             DOA:rowData.DOA,
@@ -391,13 +392,11 @@ router.post('/getAllParty',async (req,res)=>{
                                         console.log(arr[i])
                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
                                             console.log("routedata",route_data)
-                                            let data = {
-                                                start_point:route_data.start_point,
-                                                end_point:route_data.end_point,
-                                                id:route_data._id
-                                            }
+                                            let data = `${route_data.start_point}-${route_data.end_point}`
                                             list2.push(data);
                                             console.log(list2)
+                                            let newData = list2.join(", ")
+                                            console.log(newData);
                                             await (async function (rowData) {
                                                 var u_data = {
                                                   id:rowData._id,
@@ -408,12 +407,13 @@ router.post('/getAllParty',async (req,res)=>{
                                                   partyType:rowData.partyType,
                                                     pincode:rowData.pincode,
                                                     GSTNo:rowData.GSTNo,
+                                                    image:rowData.image,
                                                     contactPersonName:rowData.contactPersonName,
                                                     mobileNo:rowData.mobileNo,
                                                     email:rowData.email,
                                                     DOB:rowData.DOB,
                                                     DOA:rowData.DOA,
-                                                    route:list2,
+                                                    route:newData,
                                                   areas:rowData.address,
                                                   status:rowData.status
                                                 };
@@ -468,6 +468,7 @@ router.post('/getAllParty',async (req,res)=>{
                                           partyType:rowData.partyType,
                                             pincode:rowData.pincode,
                                             GSTNo:rowData.GSTNo,
+                                            image:rowData.image,
                                             contactPersonName:rowData.contactPersonName,
                                             mobileNo:rowData.mobileNo,
                                             email:rowData.email,
@@ -499,13 +500,11 @@ router.post('/getAllParty',async (req,res)=>{
                                         console.log(arr[i])
                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
                                             console.log("routedata",route_data)
-                                            let data = {
-                                                start_point:route_data.start_point,
-                                                end_point:route_data.end_point,
-                                                id:route_data._id
-                                            }
+                                            let data = `${route_data.start_point}-${route_data.end_point}`
                                             list2.push(data);
                                             console.log(list2)
+                                            let newData = list2.join(", ")
+                                            console.log(newData);
                                             await (async function (rowData) {
                                                 var u_data = {
                                                   id:rowData._id,
@@ -515,13 +514,14 @@ router.post('/getAllParty',async (req,res)=>{
                                                   firmName:rowData.firmName,
                                                   partyType:rowData.partyType,
                                                     pincode:rowData.pincode,
+                                                    image:rowData.image,
                                                     GSTNo:rowData.GSTNo,
                                                     contactPersonName:rowData.contactPersonName,
                                                     mobileNo:rowData.mobileNo,
                                                     email:rowData.email,
                                                     DOB:rowData.DOB,
                                                     DOA:rowData.DOA,
-                                                    route:list2,
+                                                    route:newData,
                                                   areas:rowData.address,
                                                   status:rowData.status
                                                 };
@@ -576,6 +576,7 @@ router.post('/getAllParty',async (req,res)=>{
                                           partyType:rowData.partyType,
                                             pincode:rowData.pincode,
                                             GSTNo:rowData.GSTNo,
+                                            image:rowData.image,
                                             contactPersonName:rowData.contactPersonName,
                                             mobileNo:rowData.mobileNo,
                                             email:rowData.email,
@@ -607,13 +608,11 @@ router.post('/getAllParty',async (req,res)=>{
                                         console.log(arr[i])
                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
                                             console.log("routedata",route_data)
-                                            let data = {
-                                                start_point:route_data.start_point,
-                                                end_point:route_data.end_point,
-                                                id:route_data._id
-                                            }
+                                            let data = `${route_data.start_point}-${route_data.end_point}`;
                                             list2.push(data);
                                             console.log(list2)
+                                            let newData = list2.join(", ")
+                                            console.log(newData);
                                             await (async function (rowData) {
                                                 var u_data = {
                                                   id:rowData._id,
@@ -626,10 +625,11 @@ router.post('/getAllParty',async (req,res)=>{
                                                     GSTNo:rowData.GSTNo,
                                                     contactPersonName:rowData.contactPersonName,
                                                     mobileNo:rowData.mobileNo,
+                                                    image:rowData.image,
                                                     email:rowData.email,
                                                     DOB:rowData.DOB,
                                                     DOA:rowData.DOA,
-                                                    route:list2,
+                                                    route:newData,
                                                   areas:rowData.address,
                                                   status:rowData.status
                                                 };
@@ -819,15 +819,59 @@ router.delete("/deleteParty", (req, res) => {
     }
   });
 
-router.post('/bulkImport',(req,res)=>{
-    var workbook =  XLSX.readFile(req.files.x[0].path);
+router.post('/bulkImport',imageUpload.fields([{name:"party_excel"}]),(req,res)=>{
+    const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    return res.json({
+      status:false,
+      message:"Token must be provided"
+    })
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var company_id = decodedToken.user_id;
+    var workbook =  XLSX.readFile(req.files.party_excel[0].path);
     var sheet_namelist = workbook.SheetNames;
     var x=0;
+    var list = [];
+    let countInfo = 0;
     sheet_namelist.forEach(element => {
      var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
      for(let i = 0; i < xlData.length; i++) {
-       console.log(xlData[i])
-     }
+       console.log(xlData[i]);
+       var new_party = new Party({
+        partyType:xlData[i].Part_Type,
+        firmName:xlData[i].Firm_Name,
+        GSTNo:xlData[i].GST_No,
+        image: xlData[i].Profile_Image,
+        contactPersonName:xlData[i].Contact_Person_Name,
+        mobileNo:xlData[i].Phone_Number,
+        email:xlData[i].Email,
+        company_id:company_id,
+        pincode:xlData[i].Pincode,
+        state:xlData[i].State,
+        route:xlData[i].Route,
+        city:xlData[i].City,
+        district:xlData[i].District,
+        address:xlData[i].Address,
+        DOB:xlData[i].DOB,
+        DOA:xlData[i].DOA,
+        Created_date:get_current_date(),
+        Updated_date:get_current_date(),
+        status:xlData[i].Status
+    });
+    new_party.save();
+    list.push(new_party)
+    countInfo++;
+    if(countInfo==xlData.length){
+        res.status(200).json({
+            status:true,
+            message:"Data imported successfully",
+            result:list
+        });
+    }
+    
+    }
 
      x++;
    });
