@@ -25,7 +25,8 @@
     "nodemailer-sendgrid-transport": "^0.2.0",
     "puppeteer": "^18.0.5",
     "twilio": "^3.82.1",
-    "wbm": "^1.1.16"
+    "wbm": "^1.1.16",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.19"

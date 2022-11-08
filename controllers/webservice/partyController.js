@@ -7,6 +7,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
+const XLSX = require('xlsx');
 const { Router } = require("express");
 
 const imageStorage = multer.diskStorage({
@@ -236,8 +237,8 @@ router.post('/getAllParty',async (req,res)=>{
                 for(let i=0;i<party_data.length;i++){
                     Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
                         Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-                            Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-                                Route.findOne({_id:party_data[i].route}).exec().then(route_data=>{
+                            Location.findOne({_id:party_data[i].district}).exec().then( (district_data)=>{
+                                Route.findOne({_id:party_data[i].route}).exec().then(async (route_data)=>{
                                     await (async function (rowData) {
                                         var u_data = {
                                           id:rowData._id,
@@ -606,4 +607,17 @@ router.delete("/deleteParty", (req, res) => {
     }
   });
 
+router.post('/bulkImport',(req,res)=>{
+    var workbook =  XLSX.readFile(req.file[0].path);
+    var sheet_namelist = workbook.SheetNames;
+    var x=0;
+    sheet_namelist.forEach(element => {
+     var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
+     for(let i = 0; i < xlData.length; i++) {
+       console.log(xlData[i])
+     }
+
+     x++;
+   });
+})
 module.exports = router;
