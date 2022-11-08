@@ -313,8 +313,7 @@ const imageStorage = multer.diskStorage({
     }
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
-      if (id != "") {
-        Employee.find({ _id: employee_id }).exec().then((user_data) => {
+        Employee.findOne({ _id: employee_id }).exec().then((user_data) => {
             if (user_data) {
               updated_employee = {};
               if (req.files.Employee_image) {
@@ -344,12 +343,6 @@ const imageStorage = multer.diskStorage({
               });
             }
           });
-      } else {
-        res.json({
-          status: false,
-          message: "Id is required.",
-        });
-      }
     }
   );
   
