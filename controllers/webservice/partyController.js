@@ -227,17 +227,18 @@ router.post('/getAllParty',async (req,res)=>{
     var limit = 5;
     var count =await Party.find({company_id});
     var list = [];
+    var list2 = [];
     var state = req.body.state?req.body.state:"";
     var partyType = req.body.partyType?req.body.partyType:"";
-    if(state!="" && partyType==""){
-        Party.find({ $and: [{company_id},{state}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
+        Party.find({ $and: [{company_id},{state},{partyType}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
             if(party_data.length>0){
                 let counInfo = 0;
                 for(let i=0;i<party_data.length;i++){
                     Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
                         Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
                             Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-                                Route.findOne({_id:party_data[i].route}).exec().then(route_data=>{
+                                var arr = party_data.route?party_data.route[0].split(","):"";
+                                if(arr==""){
                                     await (async function (rowData) {
                                         var u_data = {
                                           id:rowData._id,
@@ -253,7 +254,7 @@ router.post('/getAllParty',async (req,res)=>{
                                             email:rowData.email,
                                             DOB:rowData.DOB,
                                             DOA:rowData.DOA,
-                                            route:{id:route_data._id,start_point:route_data.start_point,end_point:route_data.end_point},
+                                            route:list2,
                                           areas:rowData.address,
                                           status:rowData.status
                                         };
@@ -272,62 +273,58 @@ router.post('/getAllParty',async (req,res)=>{
                                           pageLength:c
                                       })
                                       }
-                                })
-                            })
-                        })
-                    })
-                }
-            }else{
-                res.json({
-                    status:true,
-                    message:"No party found",
-                    result:[]
-                })
-            }
-        })
-    }else if(state!="" && partyType!=""){
-        Party.find({$and:[{company_id},{state},{partyType}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-            if(party_data.length>0){
-                let counInfo = 0;
-                for(let i=0;i<party_data.length;i++){
-                    Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-                        Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-                            Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-                                await (async function (rowData) {
-                                    var u_data = {
-                                        id:rowData._id,
-                                        state:{name:state_data.name,id:rowData.state},
-                                        city:{name:city_data.name,id:rowData.city},
-                                        district:{name:district_data.name,id:rowData.district},
-                                        firmName:rowData.firmName,
-                                        address:rowData.address,
-                                        partyType:rowData.partyType,
-                                        image:rowData.image,
-                                        pincode:rowData.pincode,
-                                        GSTNo:rowData.GSTNo,
-                                        contactPersonName:rowData.contactPersonName,
-                                        mobileNo:rowData.mobileNo,
-                                        email:rowData.email,
-                                        DOB:rowData.DOB,
-                                        DOA:rowData.DOA,
-                                        route:rowData.route,
-                                      status:rowData.status
-                                    };
-                                    list.push(u_data);
-                                  })(party_data[i]);
-                                  counInfo++;
-                                  if(counInfo==party_data.length){
-                                    let c = Math.ceil(count.length/limit);
-                                    if(c==0){
-                                       c+=1;
+                                }else{
+                                    for(let i = 0;i<arr.length;i++){
+                                        console.log(i)
+                                        console.log(arr[i])
+                                        Route.findOne({_id:arr[i]}).exec().then(route_data=>{
+                                            console.log("routedata",route_data)
+                                            let data = {
+                                                start_point:route_data.start_point,
+                                                end_point:route_data.end_point,
+                                                id:route_data._id
+                                            }
+                                            list2.push(data);
+                                            console.log(list2)
+                                            if(arr.length==i+1){
+                                                await (async function (rowData) {
+                                                    var u_data = {
+                                                      id:rowData._id,
+                                                      state:{name:state_data.name,id:rowData.state},
+                                                      city:{name:city_data.name,id:rowData.city},
+                                                      district:{name:district_data.name,id:rowData.district},
+                                                      firmName:rowData.firmName,
+                                                      partyType:rowData.partyType,
+                                                        pincode:rowData.pincode,
+                                                        GSTNo:rowData.GSTNo,
+                                                        contactPersonName:rowData.contactPersonName,
+                                                        mobileNo:rowData.mobileNo,
+                                                        email:rowData.email,
+                                                        DOB:rowData.DOB,
+                                                        DOA:rowData.DOA,
+                                                        route:list2,
+                                                      areas:rowData.address,
+                                                      status:rowData.status
+                                                    };
+                                                    list.push(u_data);
+                                                  })(party_data[i]);
+                                                  counInfo++;
+                                                  if(counInfo==party_data.length){
+                                                    let c = Math.ceil(count.length/limit);
+                                                    if(c==0){
+                                                       c+=1;
+                                                    }
+                                                    res.json({
+                                                      status:true,
+                                                      message:"Parties for this state found successfully",
+                                                      result:list,
+                                                      pageLength:c
+                                                  })
+                                                  }
+                                            }
+                                        })
                                     }
-                                    res.json({
-                                      status:true,
-                                      message:"All Parties found successfully",
-                                      result:list,
-                                      pageLength:c
-                                  })
-                                  }
+                                }
                             })
                         })
                     })
@@ -340,118 +337,8 @@ router.post('/getAllParty',async (req,res)=>{
                 })
             }
         })
-    }else if(state=="" && partyType!=""){
-        Party.find({$and:[{company_id},{partyType}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-            if(party_data.length>0){
-                let counInfo = 0;
-                for(let i=0;i<party_data.length;i++){
-                    Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-                        Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-                            Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-                                await (async function (rowData) {
-                                    var u_data = {
-                                        id:rowData._id,
-                                        state:{name:state_data.name,id:rowData.state},
-                                        city:{name:city_data.name,id:rowData.city},
-                                        district:{name:district_data.name,id:rowData.district},
-                                        firmName:rowData.firmName,
-                                        address:rowData.address,
-                                        partyType:rowData.partyType,
-                                        image:rowData.image,
-                                        pincode:rowData.pincode,
-                                        GSTNo:rowData.GSTNo,
-                                        contactPersonName:rowData.contactPersonName,
-                                        mobileNo:rowData.mobileNo,
-                                        email:rowData.email,
-                                        DOB:rowData.DOB,
-                                        DOA:rowData.DOA,
-                                        route:rowData.route,
-                                      status:rowData.status
-                                    };
-                                    list.push(u_data);
-                                  })(party_data[i]);
-                                  counInfo++;
-                                  if(counInfo==party_data.length){
-                                    let c = Math.ceil(count.length/limit);
-                                    if(c==0){
-                                       c+=1;
-                                    }
-                                    res.json({
-                                      status:true,
-                                      message:"All Parties found successfully",
-                                      result:list,
-                                      pageLength:c
-                                  })
-                                  }
-                            })
-                        })
-                    })
-                }
-            }else{
-                res.json({
-                    status:true,
-                    message:"No party found",
-                    result:[]
-                })
-            }
-        })
-    }else{
-        Party.find({company_id}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-            if(party_data.length>0){
-                let counInfo = 0;
-                for(let i=0;i<party_data.length;i++){
-                    Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-                        Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-                            Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-                                await (async function (rowData) {
-                                    var u_data = {
-                                        id:rowData._id,
-                                        state:{name:state_data.name,id:rowData.state},
-                                        city:{name:city_data.name,id:rowData.city},
-                                        district:{name:district_data.name,id:rowData.district},
-                                        firmName:rowData.firmName,
-                                        address:rowData.address,
-                                        partyType:rowData.partyType,
-                                        image:rowData.image,
-                                        pincode:rowData.pincode,
-                                        GSTNo:rowData.GSTNo,
-                                        contactPersonName:rowData.contactPersonName,
-                                        mobileNo:rowData.mobileNo,
-                                        email:rowData.email,
-                                        DOB:rowData.DOB,
-                                        DOA:rowData.DOA,
-                                        route:rowData.route,
-                                      status:rowData.status
-                                    };
-                                    list.push(u_data);
-                                  })(party_data[i]);
-                                  counInfo++;
-                                  if(counInfo==party_data.length){
-                                    let c = Math.ceil(count.length/limit);
-                                    if(c==0){
-                                       c+=1;
-                                    }
-                                    res.json({
-                                      status:true,
-                                      message:"All Parties found successfully",
-                                      result:list,
-                                      pageLength:c
-                                  })
-                                  }
-                            })
-                        })
-                    })
-                }
-            }else{
-                res.json({
-                    status:true,
-                    message:"No party found",
-                    result:[]
-                })
-            }
-        })
-    }
-});
+   });
+
 
 router.post('/getParty',(req,res)=>{
     var id = req.body.id?req.body.id:"";

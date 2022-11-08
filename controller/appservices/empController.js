@@ -251,7 +251,7 @@ const imageStorage = multer.diskStorage({
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
-      if(emp_data.status=="Active"){
+      if(emp_data.status=="Active" || emp_data.status=="Approved"){
         var updated_emp = {}
         if(req.body.phone){
           updated_emp.phone = req.body.phone;
