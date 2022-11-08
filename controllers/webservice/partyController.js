@@ -608,7 +608,7 @@ router.delete("/deleteParty", (req, res) => {
   });
 
 router.post('/bulkImport',(req,res)=>{
-    var workbook =  XLSX.readFile(req.file[0].path);
+    var workbook =  XLSX.readFile(req.files[0].path);
     var sheet_namelist = workbook.SheetNames;
     var x=0;
     sheet_namelist.forEach(element => {
