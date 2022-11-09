@@ -12,6 +12,9 @@ const employee_schema = new Schema({
     companyId:{
         type:String
     },
+    headquarter:{
+        type:String
+    },
     roleId:{
         type:String,
     },

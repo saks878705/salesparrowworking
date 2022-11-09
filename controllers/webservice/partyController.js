@@ -870,9 +870,7 @@ router.post('/bulkImport',imageUpload.fields([{name:"party_excel"}]),(req,res)=>
             result:list
         });
     }
-    
-    }
-
+  }
      x++;
    });
 })
