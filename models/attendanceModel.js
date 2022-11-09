@@ -1,15 +1,31 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const beat_change_schema = new Schema({
+const attendance_schema = new Schema({
     emp_id:{
+        type:String
+    },
+    distributor_id:{
         type:String
     },
     beat_id:{
         type:String
     },
-    reason:{
+    activity:{
         type:String
+    },
+    check_in:{
+        type:String
+    },
+    selfie:{
+        type:String
+    },
+    check_out:{
+        type:String,
+        default: ""
+    },
+    location:{
+        type:Array,
     },
     Created_date: {
         type: String,
@@ -29,4 +45,4 @@ const beat_change_schema = new Schema({
     }
 })
 
-module.exports = mongoose.model('beatChange',beat_change_schema)
+module.exports = mongoose.model('Attendance',attendance_schema)

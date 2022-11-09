@@ -36,4 +36,5 @@ require('./partyGrouping');
 require('./subscriptionModel');
 require('./purchaseSubModel');
 require('./changeBeatModel');
+require('./attendanceModel');
 
