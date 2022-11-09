@@ -484,7 +484,7 @@ router.post("/getAllEmployee", async (req, res) => {
             Location.findOne({ _id: employee_data[i].state })
               .exec()
               .then((state_data) => {
-                Location.findOne({ _id: emp_data[i].headquarter })
+                Location.findOne({ _id: employee_data[i].headquarter })
                   .exec()
                   .then((headquarter_data) => {
                 Location.findOne({ _id: employee_data[i].city })

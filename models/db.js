@@ -35,4 +35,5 @@ require('./pgroupModel');
 require('./partyGrouping');
 require('./subscriptionModel');
 require('./purchaseSubModel');
+require('./changeBeatModel');
 

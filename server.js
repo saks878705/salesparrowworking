@@ -49,6 +49,7 @@ app.use("/auth_api", require("./controllers/webservice/subscriptionController"))
 app.use("/auth_api", require("./controllers/webservice/PurchaseSubController"));
 
 app.use("/app_api", require("./controller/appservices/empController"));
+app.use("/app_api", require("./controller/appservices/changeBeatController"));
 
 app.listen(PORT, () => {
   console.log(`Express server started at port : ${PORT}`);
