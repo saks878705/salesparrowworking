@@ -288,7 +288,7 @@ router.post('/getAllParty',async (req,res)=>{
                                               start_point:route_data.start_point,
                                               end_point:route_data.end_point,
                                               id:route_data._id
-                                          }
+                                              }
                                             list2.push(data);
                                             console.log(list2)
                                             await (async function (rowData) {
