@@ -242,18 +242,25 @@ router.post('/getGrpWiseEmpList',(req,res)=>{
     Group.find({_id:id}).exec().then(grp_data=>{
         Location.find({_id:grp_data[0].state}).exec().then(state_data=>{
             EmployeeGrouping.find({grp_id:id}).exec().then(empgrp_data=>{
-                var u_data = {
-                    id:grp_data[0]._id,
-                    grp_name:grp_data[0].grp_name,
-                    grp_description:grp_data[0].grp_description,
-                    state:state_data[0].name,
-                    emp_data:empgrp_data
+                if(empgrp_data.length<1){
+                    res.json({
+                        status:true,
+                        result:[]
+                    })
+                }else{
+                    var u_data = {
+                        id:grp_data[0]._id,
+                        grp_name:grp_data[0].grp_name,
+                        grp_description:grp_data[0].grp_description,
+                        state:state_data[0].name,
+                        emp_data:empgrp_data
+                    }
+                    res.json({
+                        status:true,
+                        message:"data found successfully",
+                        result:u_data
+                    })
                 }
-                res.json({
-                    status:true,
-                    message:"data found successfully",
-                    result:u_data
-                })
             })
         })
     })

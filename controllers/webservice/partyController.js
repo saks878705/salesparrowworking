@@ -291,8 +291,6 @@ router.post('/getAllParty',async (req,res)=>{
                                           }
                                             list2.push(data);
                                             console.log(list2)
-                                        })
-                                      }
                                             await (async function (rowData) {
                                                 var u_data = {
                                                   id:rowData._id,
@@ -315,6 +313,7 @@ router.post('/getAllParty',async (req,res)=>{
                                                 };
                                                 list.push(u_data);
                                               })(party_data[i]);
+                                              counInfo++;
                                               if(counInfo==party_data.length){
                                                 let c = Math.ceil(count.length/limit);
                                                 if(c==0){
@@ -327,7 +326,8 @@ router.post('/getAllParty',async (req,res)=>{
                                                   pageLength:c
                                               })
                                               }
-                                    counInfo++;
+                                            })
+                                          }
                                 }
                             })
                         })
@@ -618,7 +618,7 @@ router.post('/getAllParty',async (req,res)=>{
                                               start_point:route_data.start_point,
                                               end_point:route_data.end_point,
                                               id:route_data._id
-                                          }
+                                              }
                                             list2.push(data);
                                             console.log(list2)
                                             await (async function (rowData) {
