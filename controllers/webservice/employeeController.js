@@ -42,7 +42,8 @@ router.post(
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     var employeeName = req.body.employeeName ? req.body.employeeName : "";
-    var headquarter = req.body.headquarter ? req.body.headquarter : "";
+    var headquarterState = req.body.headquarterState ? req.body.headquarterState : "";
+    var headquarterCity = req.body.headquarterCity ? req.body.headquarterCity : "";
     var phone = req.body.phone ? req.body.phone : "";
     var email = req.body.email ? req.body.email : "";
     var address = req.body.address ? req.body.address : "";
@@ -65,7 +66,8 @@ router.post(
                     phone: phone,
                     email: email,
                     address: address,
-                    headquarter:headquarter,
+                    headquarterState:headquarterState,
+                    headquarterCity:headquarterCity,
                     city: city,
                     companyId: user_id,
                     image: base_url + req.files.Employee_image[0].path,
@@ -138,8 +140,11 @@ router.patch("/editEmployee", (req, res) => {
           if (req.body.userExpenses) {
             updated_employee.userExpenses = req.body.userExpenses;
           }
-          if (req.body.headquarter) {
-            updated_employee.headquarter = req.body.headquarter;
+          if (req.body.headquarterState) {
+            updated_employee.headquarterState = req.body.headquarterState;
+          }
+          if (req.body.headquarterCity) {
+            updated_employee.headquarterCity = req.body.headquarterCity;
           }
           if (req.body.transportWays) {
             updated_employee.transportWays = req.body.transportWays;
@@ -234,9 +239,12 @@ router.post("/getAllEmployee", async (req, res) => {
             Location.findOne({ _id: emp_data[i].state })
               .exec()
               .then((state_data) => {
-                Location.findOne({ _id: emp_data[i].headquarter })
+                Location.findOne({ _id: emp_data[i].headquarterState })
                   .exec()
-                  .then((headquarter_data) => {
+                  .then((headquarter_state_data) => {
+                    Location.findOne({ _id: emp_data[i].headquarterCity })
+                  .exec()
+                  .then((headquarter_city_data) => {
                 Location.findOne({ _id: emp_data[i].city })
                   .exec()
                   .then((city_data) => {
@@ -260,9 +268,13 @@ router.post("/getAllEmployee", async (req, res) => {
                                     name: state_data.name,
                                     id: state_data._id,
                                   },
-                                  headquarter: {
-                                    name: headquarter_data.name,
-                                    id: headquarter_data._id,
+                                  headquarterState: {
+                                    name: headquarter_state_data.name,
+                                    id: headquarter_state_data._id,
+                                  },
+                                  headquarterCity: {
+                                    name: headquarter_city_data.name,
+                                    id: headquarter_city_data._id,
                                   },
                                   city: {
                                     name: city_data.name,
@@ -302,9 +314,13 @@ router.post("/getAllEmployee", async (req, res) => {
                                     name: state_data.name,
                                     id: state_data._id,
                                   },
-                                  headquarter: {
-                                    name: headquarter_data.name,
-                                    id: headquarter_data._id,
+                                  headquarterState: {
+                                    name: headquarter_state_data.name,
+                                    id: headquarter_state_data._id,
+                                  },
+                                  headquarterCity: {
+                                    name: headquarter_city_data.name,
+                                    id: headquarter_city_data._id,
                                   },
                                   city: {
                                     name: city_data.name,
@@ -336,6 +352,7 @@ router.post("/getAllEmployee", async (req, res) => {
                   });
               });
             });
+          })
           }
         } else {
           res.json({
@@ -359,9 +376,12 @@ router.post("/getAllEmployee", async (req, res) => {
             Location.findOne({ _id: emp_data[i].state })
               .exec()
               .then((state_data) => {
-                Location.findOne({ _id: emp_data[i].headquarter })
+                Location.findOne({ _id: emp_data[i].headquarterState })
                   .exec()
-                  .then((headquarter_data) => {
+                  .then((headquarter_state_data) => {
+                    Location.findOne({ _id: emp_data[i].headquarterCity })
+                  .exec()
+                  .then((headquarter_city_data) => {
                 Location.findOne({ _id: emp_data[i].city })
                   .exec()
                   .then((city_data) => {
@@ -389,9 +409,13 @@ router.post("/getAllEmployee", async (req, res) => {
                                     name: city_data.name,
                                     id: city_data._id,
                                   },
-                                  headquarter: {
-                                    name: headquarter_data.name,
-                                    id: headquarter_data._id,
+                                  headquarterState: {
+                                    name: headquarter_state_data.name,
+                                    id: headquarter_state_data._id,
+                                  },
+                                  headquarterCity: {
+                                    name: headquarter_city_data.name,
+                                    id: headquarter_city_data._id,
                                   },
                                   district: {
                                     name: area_data.name,
@@ -427,9 +451,13 @@ router.post("/getAllEmployee", async (req, res) => {
                                     name: state_data.name,
                                     id: state_data._id,
                                   },
-                                  headquarter: {
-                                    name: headquarter_data.name,
-                                    id: headquarter_data._id,
+                                  headquarterState: {
+                                    name: headquarter_state_data.name,
+                                    id: headquarter_state_data._id,
+                                  },
+                                  headquarterCity: {
+                                    name: headquarter_city_data.name,
+                                    id: headquarter_city_data._id,
                                   },
                                   city: {
                                     name: city_data.name,
@@ -461,6 +489,7 @@ router.post("/getAllEmployee", async (req, res) => {
                   });
               });
             });
+          });
           }
         } else {
           res.json({
@@ -484,9 +513,12 @@ router.post("/getAllEmployee", async (req, res) => {
             Location.findOne({ _id: employee_data[i].state })
               .exec()
               .then((state_data) => {
-                Location.findOne({ _id: employee_data[i].headquarter })
+                Location.findOne({ _id: employee_data[i].headquarterState })
                   .exec()
-                  .then((headquarter_data) => {
+                  .then((headquarter_state_data) => {
+                    Location.findOne({ _id: employee_data[i].headquarterCity })
+                  .exec()
+                  .then((headquarter_city_data) => {
                 Location.findOne({ _id: employee_data[i].city })
                   .exec()
                   .then((city_data) => {
@@ -510,9 +542,13 @@ router.post("/getAllEmployee", async (req, res) => {
                                     name: state_data.name,
                                     id: state_data._id,
                                   },
-                                  headquarter: {
-                                    name: headquarter_data.name,
-                                    id: headquarter_data._id,
+                                  headquarterState: {
+                                    name: headquarter_state_data.name,
+                                    id: headquarter_state_data._id,
+                                  },
+                                  headquarterCity: {
+                                    name: headquarter_city_data.name,
+                                    id: headquarter_city_data._id,
                                   },
                                   city: {
                                     name: city_data.name,
@@ -556,9 +592,13 @@ router.post("/getAllEmployee", async (req, res) => {
                                     name: city_data.name,
                                     id: city_data._id,
                                   },
-                                  headquarter: {
-                                    name: headquarter_data.name,
-                                    id: headquarter_data._id,
+                                  headquarterState: {
+                                    name: headquarter_state_data.name,
+                                    id: headquarter_state_data._id,
+                                  },
+                                  headquarterCity: {
+                                    name: headquarter_city_data.name,
+                                    id: headquarter_city_data._id,
                                   },
                                   district: {
                                     name: area_data.name,
@@ -586,6 +626,7 @@ router.post("/getAllEmployee", async (req, res) => {
                   });
               });
             });
+          });
           }
         } else {
           res.json({
@@ -687,9 +728,12 @@ router.post("/getEmp", (req, res) => {
       Location.findOne({ _id: employee_data.state })
         .exec()
         .then((state_data) => {
-          Location.findOne({ _id: employee_data.headquarter })
+          Location.findOne({ _id: employee_data.headquarterState })
             .exec()
-            .then((headquarter_data) => {
+            .then((headquarter_state_data) => {
+              Location.findOne({ _id: employee_data.headquarterCity })
+                .exec()
+                .then((headquarter_city_data) => {
           Location.findOne({ _id: employee_data.city })
             .exec()
             .then((city_data) => {
@@ -710,7 +754,8 @@ router.post("/getEmp", (req, res) => {
                           address: employee_data.address,
                           pincode: employee_data.pincode,
                           state: state_data.name,
-                          headquarter: headquarter_data.name,
+                          headquarterState: headquarter_state_data.name,
+                          headquarterCity: headquarter_city_data.name,
                           image: employee_data.image,
                           city: city_data.name,
                           district: area_data.name,
@@ -768,6 +813,7 @@ router.post("/getEmp", (req, res) => {
             });
         });
       });
+    });
     });
 });
 
