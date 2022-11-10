@@ -200,12 +200,9 @@ const imageStorage = multer.diskStorage({
             Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
                 Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
                     Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
-                      Role.findOne({_id:employee_data.roleId}).exec().then(role_data=>{
                         var u_data = {
                           employeeName:employee_data.employeeName,
-                          roleId:{name:role_data.rolename,id:role_data._id},
                           companyId:employee_data.companyId,
-                          manager:employee_data.manager,
                           phone:employee_data.phone,
                           email:employee_data.email,
                           address:employee_data.address,
@@ -224,7 +221,6 @@ const imageStorage = multer.diskStorage({
                           status:true,
                           message:"Employee found successfully",
                           result:u_data
-                      })
                       })
                     })
                   })
