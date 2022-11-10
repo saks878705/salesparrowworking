@@ -224,14 +224,16 @@ router.post('/editGrp',(req,res)=>{
                     }
                         res.json({
                             status:true,
-                            message:"Updated successfully"
+                            message:"Updated successfully",
+                            result:updated_grp
                         })
                 })
             }else if(req.body.empIdStr==""){
                 EmployeeGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
                     res.json({
                         status:true,
-                        message:"Updated successfully"
+                        message:"Updated successfully",
+                        result:[]
                     })
                 })
             }
