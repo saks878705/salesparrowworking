@@ -190,6 +190,12 @@ router.post('/edit_party_grp',(req,res)=>{
     var id = req.body.id?req.body.id:"";
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(" ")[1];
+    if(!token){
+        return res.json({
+          status:false,
+          message:"Token must be provided"
+        })
+      }
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     var updated_grp = {};
@@ -203,7 +209,7 @@ router.post('/edit_party_grp',(req,res)=>{
     console.log(updated_grp);
     PGroup.findOneAndUpdate({_id:id},updated_grp,{new:true},(err,doc)=>{
         if(doc){
-            if(req.body.partyIdStr){
+            if(req.body.partyIdStr ){
                 var partyIdArr = req.body.partyIdStr.split(",");
                 console.log(partyIdArr);
                 PartyGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
@@ -228,6 +234,13 @@ router.post('/edit_party_grp',(req,res)=>{
                             message:"Updated successfully"
                         })
                 })
+            }else if(req.body.partyIdStr ==""){
+                PartyGrouping.deleteMany({ grp_id: id }).exec().then(async (err, doc) => {
+                    res.json({
+                      status: true,
+                      message: "Updated successfully",
+                    });
+                  });
             }
         }else{
             res.json({
