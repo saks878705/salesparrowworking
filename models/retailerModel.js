@@ -38,17 +38,11 @@ const retailer_schema = new Schema({
     mobileNo:{
         type:Number
     },
-    email:{
-        type:String
-    },
     DOB:{
         type:String
     },
     DOA:{
         type:String
-    },
-    route:{
-        type:Array
     },
     Created_date: {
         type: String,

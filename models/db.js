@@ -37,5 +37,5 @@ require('./subscriptionModel');
 require('./purchaseSubModel');
 require('./changeBeatModel');
 require('./attendanceModel');
-require('./retailerModel');
+// require('./retailerModel');
 
