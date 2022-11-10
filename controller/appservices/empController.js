@@ -49,7 +49,8 @@ const imageStorage = multer.diskStorage({
       if (phone != "") {
           if (companyShortCode != "") {
             Admin.findOne({companyShortCode}).exec().then((admin_info) => {
-                if (admin_info.length > 0) {
+              console.log(admin_info)
+                if (admin_info) {
                   var new_employee = new Employee({
                     employeeName: employeeName,
                     phone: phone,
