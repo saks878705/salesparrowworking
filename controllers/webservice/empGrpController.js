@@ -202,7 +202,7 @@ router.post('/editGrp',(req,res)=>{
     console.log(updated_grp);
     Group.findOneAndUpdate({_id:id},updated_grp,{new:true},(err,doc)=>{
         if(doc){
-            if(req.body.empIdStr || req.body.empIdStr==""){
+            if(req.body.empIdStr){
                 var empIdArr = req.body.empIdStr.split(",");
                 console.log(empIdArr);
                 EmployeeGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
@@ -226,6 +226,13 @@ router.post('/editGrp',(req,res)=>{
                             status:true,
                             message:"Updated successfully"
                         })
+                })
+            }else if(req.body.empIdStr==""){
+                EmployeeGrouping.deleteMany({grp_id:id}).exec().then(async (err,doc)=>{
+                    res.json({
+                        status:true,
+                        message:"Updated successfully"
+                    })
                 })
             }
         }else{
