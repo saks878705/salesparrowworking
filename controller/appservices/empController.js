@@ -117,7 +117,7 @@ const imageStorage = multer.diskStorage({
           if(data.status=="InActive" || data.status=="UnApproved"){
             return res.json({
               status:false,
-              message:`You are ${data.status}.Please contact company.`,
+              message:`You are ${data.status}. Please contact company.`,
             })
           }
           //var OTP = Math.floor(1000 + Math.random() * 9000);
@@ -170,6 +170,12 @@ const imageStorage = multer.diskStorage({
     if(otp!=""){
         Employee.findOne({otp:otp}).exec().then(emp_data=>{
           if(emp_data){
+            if(emp_data.status=="InActive" || emp_data.status=="UnApproved"){
+              return res.json({
+                status:false,
+                message:`You are ${emp_data.status}. Please contact company.`
+              })
+            }
                 const token = jwt.sign({ user_id: emp_data._id, is_token_valide: 1 },"test");
                 res.json({
                   status:true,
