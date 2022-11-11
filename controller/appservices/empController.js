@@ -990,7 +990,7 @@ router.post("/addRoute", (req, res) => {
       }
   });
   
-  router.post("/routeListing", async (req, res) => {
+router.post("/routeListing",  (req, res) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if(!token){
@@ -1004,130 +1004,46 @@ router.post("/addRoute", (req, res) => {
     var state = req.body.state ? req.body.state : "";
     var city = req.body.city ? req.body.city : "";
     // var area = req.body.area ? req.body.area : "";
-    var count = await Route.find({ company_id });
     var limit = 10;
-    if (state != "" && city =="") {
-          var list = [];
-          Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
-            Route.find({ $and: [{ company_id:emp_data.companyId }, { state }] }).exec().then((route_data) => {
-              if(route_data.length>0){
-                let counInfo = 0;
-              for (let i = 0; i < route_data.length; i++) {
-                Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
-                    Location.findOne({ _id: route_data[i].city })
-                      .exec()
-                      .then((city_data) => {
-                        Location.findOne({ _id: route_data[i].area })
-                          .exec()
-                          .then(async (area_data) => {
-                            await (async function (rowData) {
-                              var u_data = {
-                                id: rowData._id,
-                                state:{name:state_data.name,id:rowData.state},
-                                city:{name:city_data.name,id:rowData.city},
-                                area:{name:area_data.name,id:rowData.area},
-                                start_point: rowData.start_point,
-                                distance: rowData.distance,
-                                end_point: rowData.end_point,
-                              };
-                              list.push(u_data);
-                            })(route_data[i]);
-                            counInfo++;
-                            if (counInfo == route_data.length) {
-                              res.json({
-                                status: true,
-                                message: "All Routes found successfully",
-                                result: list,
-                                pageLength: Math.ceil(count.length / limit),
-                              });
-                            }
-                          });
-                      });
-                  });
-              }
-              }else{
-                res.json({
-                  status:false,
-                  message:"No route found for this state",
-                  result:[]
-                })
-              }
-            });
-          })
-    } else if(state!="" && city!=""){
-      var list = [];
-      Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
-          Route.find({ $and: [{ company_id:emp_data.companyId  }, { state } , {city}] }).exec().then((route_data) => {
-              if(route_data.length>0){
-                let counInfo = 0;
-              for (let i = 0; i < route_data.length; i++) {
-                Location.findOne({ _id: route_data[i].state })
-                  .exec()
-                  .then((state_data) => {
-                    Location.findOne({ _id: route_data[i].city })
-                      .exec()
-                      .then((city_data) => {
-                        Location.findOne({ _id: route_data[i].area })
-                          .exec()
-                          .then(async (area_data) => {
-                            await (async function (rowData) {
-                              var u_data = {
-                                id: rowData._id,
-                                state:{name:state_data.name,id:rowData.state},
-                                city:{name:city_data.name,id:rowData.city},
-                                area:{name:area_data.name,id:rowData.area},
-                                start_point: rowData.start_point,
-                                distance: rowData.distance,
-                                end_point: rowData.end_point,
-                              };
-                              list.push(u_data);
-                            })(route_data[i]);
-                            counInfo++;
-                            if (counInfo == route_data.length) {
-                              res.json({
-                                status: true,
-                                message: "All Routes found successfully",
-                                result: list,
-                                pageLength: Math.ceil(count.length / limit),
-                              });
-                            }
-                          });
-                      });
-                  });
-              }
-              }else{
-                res.json({
-                  status:false,
-                  message:"No route found for this state",
-                  result:[]
-                })
-              }
-            });
-        });
-    }else {
-      var list = [];
-      Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
-      Route.find({ company_id:emp_data.companyId })
-        .exec()
-        .then((route_data) => {
-          if(route_data.length>0){
-            let counInfo = 0;
+    var list = [];
+    Employee.findOne({ _id: employee_id }).exec().then(async (emp_data) => {
+      if(!emp_data){
+        return res.json({
+          status:true,
+          message:"No employee found . Please check the token"
+        })
+      }
+      var count = await Route.find({ company_id: emp_data.companyId });
+      let arr = [];
+      if (state != "" && city == "") {
+        arr.push({ company_id: emp_data.companyId }, { state });
+      } else if (state != "" && city != "") {
+        arr.push({ company_id: emp_data.companyId },{ state },{ city });
+      } else {
+        arr.push({ company_id: emp_data.companyId });
+      }         
+      Route.find({$and: arr,}).exec().then((route_data) => {
+        if (route_data.length > 0) {
+          let counInfo = 0;
           for (let i = 0; i < route_data.length; i++) {
-            Location.findOne({ _id: route_data[i].state })
-              .exec()
-              .then((state_data) => {
-                Location.findOne({ _id: route_data[i].city })
-                  .exec()
-                  .then((city_data) => {
-                    Location.findOne({ _id: route_data[i].area })
-                      .exec()
-                      .then(async (area_data) => {
+            Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
+                Location.findOne({ _id: route_data[i].city }).exec().then((city_data) => {
+                    Location.findOne({ _id: route_data[i].area }).exec().then(async (area_data) => {
                         await (async function (rowData) {
                           var u_data = {
                             id: rowData._id,
-                            state:{name:state_data.name,id:rowData.state},
-                            city:{name:city_data.name,id:rowData.city},
-                            area:{name:area_data.name,id:rowData.area},
+                            state: {
+                              name: state_data.name,
+                              id: rowData.state,
+                            },
+                            city: {
+                              name: city_data.name,
+                              id: rowData.city,
+                            },
+                            area: {
+                              name: area_data.name,
+                              id: rowData.area,
+                            },
                             start_point: rowData.start_point,
                             distance: rowData.distance,
                             end_point: rowData.end_point,
@@ -1140,25 +1056,25 @@ router.post("/addRoute", (req, res) => {
                             status: true,
                             message: "All Routes found successfully",
                             result: list,
-                            pageLength: Math.ceil(count.length / limit),
+                            pageLength: Math.ceil(
+                              count.length / limit
+                            ),
                           });
                         }
                       });
                   });
               });
-            
           }
-          }else{
-            res.json({
-              status:false,
-              message:"No route found ",
-              result:[]
-            })
-          }
-        });
-    });
-    }
-  });
+        } else {
+          res.json({
+            status: false,
+            message: "No route found for this state",
+            result: [],
+          });
+        }
+      });
+  });        
+});
   
   router.post("/edit_route", (req, res) => {
     var id = req.body.id ? req.body.id : "";
