@@ -42,6 +42,8 @@ const imageStorage = multer.diskStorage({
     var companyShortCode = req.body.companyShortCode ? req.body.companyShortCode : "";
     var phone = req.body.phone ? req.body.phone : "";
     var state = req.body.state ? req.body.state : "";
+    var headquarterState = req.body.headquarterState ? req.body.headquarterState : "";
+    var headquarterCity = req.body.headquarterCity ? req.body.headquarterCity : "";
     var city = req.body.city ? req.body.city : "";
     var pincode = req.body.pincode ? req.body.pincode : "";
     var district = req.body.district ? req.body.district : "";
@@ -55,6 +57,8 @@ const imageStorage = multer.diskStorage({
                     employeeName: employeeName,
                     phone: phone,
                     city: city,
+                    headquarterState:headquarterState,
+                    headquarterCity:headquarterCity,
                     companyId: admin_info._id,
                     image: base_url + req.files.Employee_image[0].path,
                     state: state,
@@ -200,27 +204,33 @@ const imageStorage = multer.diskStorage({
             Location.findOne({ _id: employee_data.state }).exec().then((state_data) => {
                 Location.findOne({ _id: employee_data.city }).exec().then((city_data) => {
                     Location.findOne({ _id: employee_data.district }).exec().then(async (area_data) => {
-                        var u_data = {
-                          employeeName:employee_data.employeeName,
-                          companyId:employee_data.companyId,
-                          phone:employee_data.phone,
-                          email:employee_data.email,
-                          address:employee_data.address,
-                          pincode:employee_data.pincode,
-                          state:state_data.name,
-                          image:employee_data.image,
-                          city:city_data.name,
-                          district:area_data.name,
-                          experience:employee_data.experience,
-                          qualification:employee_data.qualification,
-                          userExpenses:employee_data.userExperience,
-                          transportWays:employee_data.transportWays,
-                          status:employee_data.status,
-                        }
-                        res.json({
-                          status:true,
-                          message:"Employee found successfully",
-                          result:u_data
+                      Location.findOne({ _id: employee_data.headquarterState }).exec().then(async (headquarter_state_data) => {
+                        Location.findOne({ _id: employee_data.headquarterCity }).exec().then(async (headquarter_city_data) => {
+                          var u_data = {
+                            employeeName:employee_data.employeeName,
+                            companyId:employee_data.companyId,
+                            phone:employee_data.phone,
+                            email:employee_data.email,
+                            address:employee_data.address,
+                            headquarterState:headquarter_state_data.headquarterState,
+                            headquarterCity:headquarter_city_data.headquarterCity,
+                            pincode:employee_data.pincode,
+                            state:state_data.name,
+                            image:employee_data.image,
+                            city:city_data.name,
+                            district:area_data.name,
+                            experience:employee_data.experience,
+                            qualification:employee_data.qualification,
+                            userExpenses:employee_data.userExperience,
+                            transportWays:employee_data.transportWays,
+                            status:employee_data.status,
+                          }
+                          res.json({
+                            status:true,
+                            message:"Employee found successfully",
+                            result:u_data
+                        })
+                        })
                       })
                     })
                   })
