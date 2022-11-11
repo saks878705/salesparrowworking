@@ -114,6 +114,12 @@ const imageStorage = multer.diskStorage({
       Employee.findOne({ phone: to_phone_number })
         .exec()
         .then((data) => {
+          if(data.status=="InActive" || data.status=="UnApproved"){
+            return res.json({
+              status:false,
+              message:`You are ${data.status}.Please contact company.`,
+            })
+          }
           //var OTP = Math.floor(1000 + Math.random() * 9000);
           var OTP = "1234"
           // const token = jwt.sign(
