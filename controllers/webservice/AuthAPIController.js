@@ -395,6 +395,7 @@ router.get('/getadminprofile',(req,res)=>{
                     password:admin_data.password,
                     email:admin_data.email,
                     city:{name:city_data.name,id:city_data._id},
+                    companyShortCode:admin_data.companyShortCode,
                     state:{name:state_data.name,id:state_data._id},
                     pincode:admin_data.pincode,
                     GSTNo:admin_data.GSTNo,
