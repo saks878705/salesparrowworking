@@ -269,12 +269,12 @@ router.post("/getAllEmployee", async (req, res) => {
                                     id: state_data._id,
                                   },
                                   headquarterState: {
-                                    name: headquarter_state_data.name,
-                                    id: headquarter_state_data._id,
+                                    name: headquarter_state_data ? headquarter_state_data.name : "",
+                                    id: headquarter_state_data ? headquarter_state_data._id : "",
                                   },
                                   headquarterCity: {
-                                    name: headquarter_city_data.name,
-                                    id: headquarter_city_data._id,
+                                    name: headquarter_city_data ? headquarter_city_data.name : "",
+                                    id: headquarter_city_data ? headquarter_city_data._id : "",
                                   },
                                   city: {
                                     name: city_data.name,
@@ -315,12 +315,12 @@ router.post("/getAllEmployee", async (req, res) => {
                                     id: state_data._id,
                                   },
                                   headquarterState: {
-                                    name: headquarter_state_data.name,
-                                    id: headquarter_state_data._id,
+                                    name: headquarter_state_data ? headquarter_state_data.name : "",
+                                    id: headquarter_state_data ? headquarter_state_data._id : "",
                                   },
                                   headquarterCity: {
-                                    name: headquarter_city_data.name,
-                                    id: headquarter_city_data._id,
+                                    name: headquarter_city_data ? headquarter_city_data.name : "",
+                                    id: headquarter_city_data ? headquarter_city_data._id : "",
                                   },
                                   city: {
                                     name: city_data.name,
@@ -410,12 +410,12 @@ router.post("/getAllEmployee", async (req, res) => {
                                     id: city_data._id,
                                   },
                                   headquarterState: {
-                                    name: headquarter_state_data.name,
-                                    id: headquarter_state_data._id,
+                                    name: headquarter_state_data ? headquarter_state_data.name : "",
+                                    id: headquarter_state_data ? headquarter_state_data._id : "",
                                   },
                                   headquarterCity: {
-                                    name: headquarter_city_data.name,
-                                    id: headquarter_city_data._id,
+                                    name: headquarter_city_data ? headquarter_city_data.name : "",
+                                    id: headquarter_city_data ? headquarter_city_data._id : "",
                                   },
                                   district: {
                                     name: area_data.name,
@@ -452,12 +452,12 @@ router.post("/getAllEmployee", async (req, res) => {
                                     id: state_data._id,
                                   },
                                   headquarterState: {
-                                    name: headquarter_state_data.name,
-                                    id: headquarter_state_data._id,
+                                    name: headquarter_state_data ? headquarter_state_data.name : "",
+                                    id: headquarter_state_data ? headquarter_state_data._id : "",
                                   },
                                   headquarterCity: {
-                                    name: headquarter_city_data.name,
-                                    id: headquarter_city_data._id,
+                                    name: headquarter_city_data ? headquarter_city_data.name : "",
+                                    id: headquarter_city_data ? headquarter_city_data._id : "",
                                   },
                                   city: {
                                     name: city_data.name,
@@ -543,12 +543,12 @@ router.post("/getAllEmployee", async (req, res) => {
                                     id: state_data._id,
                                   },
                                   headquarterState: {
-                                    name: headquarter_state_data.name,
-                                    id: headquarter_state_data._id,
+                                    name: headquarter_state_data ? headquarter_state_data.name : "",
+                                    id: headquarter_state_data ? headquarter_state_data._id : "",
                                   },
                                   headquarterCity: {
-                                    name: headquarter_city_data.name,
-                                    id: headquarter_city_data._id,
+                                    name: headquarter_city_data ? headquarter_city_data.name : "",
+                                    id: headquarter_city_data ? headquarter_city_data._id : "",
                                   },
                                   city: {
                                     name: city_data.name,
@@ -593,12 +593,12 @@ router.post("/getAllEmployee", async (req, res) => {
                                     id: city_data._id,
                                   },
                                   headquarterState: {
-                                    name: headquarter_state_data.name,
-                                    id: headquarter_state_data._id,
+                                    name: headquarter_state_data ? headquarter_state_data.name : "",
+                                    id: headquarter_state_data ? headquarter_state_data._id : "",
                                   },
                                   headquarterCity: {
-                                    name: headquarter_city_data.name,
-                                    id: headquarter_city_data._id,
+                                    name: headquarter_city_data ? headquarter_city_data.name : "",
+                                    id: headquarter_city_data ? headquarter_city_data._id : "",
                                   },
                                   district: {
                                     name: area_data.name,
