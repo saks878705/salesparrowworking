@@ -4,6 +4,7 @@ const Retailer = mongoose.model("Retailer");
 const Employee = mongoose.model("Employee");
 const Beat = mongoose.model("Beat");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 
 function get_current_date() {
     var today = new Date();
