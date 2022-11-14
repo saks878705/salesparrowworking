@@ -24,7 +24,7 @@ const retailer_schema = new Schema({
         type:String
     },
     GSTNo:{
-        type:Number
+        type:String
     },
     customerName:{
         type:String
