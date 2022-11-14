@@ -930,6 +930,78 @@ router.post("/getAllBeat", async (req, res) => {
     });
 });
 
+router.post("/beatListing", async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) {
+    return res.json({
+      status: false,
+      message: "Token must be provided",
+    });
+  }
+  var list = [];
+  var decodedToken = jwt.verify(token, "test");
+  var employee_id = decodedToken.user_id;
+  Beat.find({ employee_id }).sort({ Created_date: -1 }).exec().then((beat_data) => {
+      let counInfo = 0;
+      if (beat_data.length > 0) {
+        for (let i = 0; i < beat_data.length; i++) {
+          Employee.findOne({ _id: beat_data[i].employee_id }).exec().then((emp_data) => {
+              if (!emp_data) {
+                res.json({
+                  status: true,
+                  message: "No employee found",
+                });
+              }
+              console.log(beat_data[i].employee_id);
+              Route.findOne({ _id: beat_data[i].route_id }).exec().then((route_data) => {
+                  Location.findOne({ _id: beat_data[i].state }).exec().then((state_data) => {
+                      Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
+                          await (async function (rowData) {
+                            var u_data = {
+                              id: rowData._id,
+                              state: {
+                                name: state_data.name,
+                                id: beat_data[i].state,
+                              },
+                              city: {
+                                name: city_data.name,
+                                id: beat_data[i].city,
+                              },
+                              employee_name: emp_data.employeeName,
+                              route_name: {
+                                start_point: route_data.start_point,
+                                end_point: route_data.end_point,
+                              },
+                              beatName: rowData.beatName,
+                              day: rowData.day,
+                              status: rowData.status,
+                            };
+                            list.push(u_data);
+                          })(beat_data[i]);
+                          counInfo++;
+                          if (counInfo == beat_data.length) {
+                            res.json({
+                              status: true,
+                              message: "All Beats found successfully",
+                              result: list,
+                            });
+                          }
+                        });
+                    });
+                });
+            });
+        }
+      } else {
+        return res.json({
+          status: true,
+          message: "Beat not found",
+          result: [],
+        });
+      }
+    });
+});
+
 router.post("/getBeat", (req, res) => {
   var id = req.body.id ? req.body.id : "";
   Beat.findOne({ _id: id })
