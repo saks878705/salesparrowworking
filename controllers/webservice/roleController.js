@@ -16,6 +16,16 @@ function get_current_date() {
 }
 
 router.post("/addRole", (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    return res.json({
+      status:false,
+      message:"Token must be provided"
+    })
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var company_id = decodedToken.user_id;
   var rolename = req.body.rolename ? req.body.rolename : "";
   var hierarchy_level = req.body.hierarchy_level
     ? req.body.hierarchy_level
@@ -26,6 +36,7 @@ router.post("/addRole", (req, res) => {
       var new_role = new Role({
         rolename: rolename,
         hierarchy_level: hierarchy_level,
+        company_id:company_id,
         Created_date: get_current_date(),
         Updated_date: get_current_date(),
         status: status,
@@ -52,12 +63,30 @@ router.post("/addRole", (req, res) => {
 });
 
 router.get("/getAllRoles", (req, res) => {
-  Role.find().exec().then((role_data) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if(!token){
+    return res.json({
+      status:false,
+      message:"Token must be provided"
+    })
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var company_id = decodedToken.user_id;
+  Role.find({company_id}).exec().then((role_data) => {
+    if(role_data.length<1){
+      return res.json({
+        status:true,
+        message:"No roles found",
+        result:[]
+      })
+    }else{
       res.status(200).json({
         status: true,
         message: "Roles fetched succesfully",
         result: role_data,
       });
+    }
     });
 });
 
@@ -84,7 +113,7 @@ router.post("/reportingTo", (req, res) => {
         }
         var hierarchy_level = parseInt(role_data.hierarchy_level);
         
-        var role_new_data = await Role.find({});
+        var role_new_data = await Role.find({company_id});
         var role_id_array = [];
         role_new_data.forEach((r_data) => {
           if (r_data.hierarchy_level < hierarchy_level) {

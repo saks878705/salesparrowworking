@@ -364,11 +364,8 @@ router.post("/getAllEmployee", async (req, res) => {
   });
 });
 
-router.post(
-  "/employeeProfileImage",
-  imageUpload.fields([{ name: "Employee_image" }]),
-  (req, res) => {
-    console.log(req.body);
+router.post("/employeeProfileImage",imageUpload.fields([{ name: "Employee_image" }]),(req, res) => {
+    console.log(req.files);
     const id = req.body.id ? req.body.id : "";
     if (id != "") {
       Employee.find({ _id: id })

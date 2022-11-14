@@ -712,6 +712,10 @@ router.post('/getAllParty',async (req,res)=>{
     {
       obj1=[{company_id},{state}]
     }
+    else if(company_id!="" && state=="" && partyType!="")
+    {
+      obj1=[{company_id},{partyType}]
+    }
     else if(company_id!="" && state!="" && partyType!=""){
       obj1=[{company_id},{state},{partyType}]
 

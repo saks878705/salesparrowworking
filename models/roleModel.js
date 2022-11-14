@@ -6,6 +6,9 @@ const roleSchema = new Schema({
         type:String,
         default:""
     },
+    company_id:{
+        type:String,
+    },
     hierarchy_level:{
         type:Number,
         default: "0"
