@@ -27,14 +27,6 @@ router.post('/addRetailer',(req,res)=>{
     }
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
-    Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
-        if(emp_data.status=="InActive" || emp_data.status=="UnApproved"){
-            return res.json({
-                status:false,
-                message:"You are Inactive. Please contact company."
-                }) 
-        }
-    })
    let beat_id= req.body.beat_id?req.body.beat_id:""
    let customer_type= req.body.customer_type?req.body.customer_type:""
    let pincode= req.body.pincode?req.body.pincode:""
@@ -55,25 +47,42 @@ router.post('/addRetailer',(req,res)=>{
                     if(mobileNo!=""){
                         if(DOB!=""){
                             if(DOA!=""){
-                                let new_retailer = new Retailer({
-                                    beat_id:beat_id,
-                                    customer_type:customer_type,
-                                    company_id:emp_data.companyId,
-                                    employee_id:emp_data._id,
-                                    pincode:pincode,
-                                    address:address,
-                                    firmName:firmName,
-                                    GSTNo:GSTNo,
-                                    customerName:customerName,
-                                    area:area,
-                                    location:location,
-                                    mobileNo:mobileNo,
-                                    DOB:DOB,
-                                    DOA:DOA,
-                                    Created_date:get_current_date(),
-                                    Updated_date:get_current_date(),
-                                    status:"Active"
+                                Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+                                    if(emp_data.status=="InActive" || emp_data.status=="UnApproved"){
+                                        return res.json({
+                                            status:false,
+                                            message:"You are Inactive. Please contact company."
+                                            }) 
+                                    }else{
+                                        let new_retailer = new Retailer({
+                                            beat_id:beat_id,
+                                            customer_type:customer_type,
+                                            company_id:emp_data.companyId,
+                                            employee_id:emp_data._id,
+                                            pincode:pincode,
+                                            address:address,
+                                            firmName:firmName,
+                                            GSTNo:GSTNo,
+                                            customerName:customerName,
+                                            area:area,
+                                            location:location,
+                                            mobileNo:mobileNo,
+                                            DOB:DOB,
+                                            DOA:DOA,
+                                            Created_date:get_current_date(),
+                                            Updated_date:get_current_date(),
+                                            status:"Active"
+                                        });
+                                        new_retailer.save().then(data=>{
+                                            res.json({
+                                                status:true,
+                                                message:"Retailer created successfully",
+                                                result:data
+                                            })
+                                        })
+                                    }
                                 })
+                                
                             }else{
                                  res.json({
                                      status:false,
