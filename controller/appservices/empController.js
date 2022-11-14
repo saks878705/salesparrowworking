@@ -865,18 +865,11 @@ router.post("/getAllBeat", async (req, res) => {
   var list = [];
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
-  Beat.find({ employee_id })
-    .limit(limit * 1)
-    .skip((page - 1) * limit)
-    .sort({ Created_date: -1 })
-    .exec()
-    .then((beat_data) => {
+  Beat.find({ employee_id }).limit(limit * 1).skip((page - 1) * limit).sort({ Created_date: -1 }).exec().then((beat_data) => {
       let counInfo = 0;
       if (beat_data.length > 0) {
         for (let i = 0; i < beat_data.length; i++) {
-          Employee.findOne({ _id: beat_data[i].employee_id })
-            .exec()
-            .then((emp_data) => {
+          Employee.findOne({ _id: beat_data[i].employee_id }).exec().then((emp_data) => {
               if (!emp_data) {
                 res.json({
                   status: true,
@@ -884,15 +877,9 @@ router.post("/getAllBeat", async (req, res) => {
                 });
               }
               console.log(beat_data[i].employee_id);
-              Route.findOne({ _id: beat_data[i].route_id })
-                .exec()
-                .then((route_data) => {
-                  Location.findOne({ _id: beat_data[i].state })
-                    .exec()
-                    .then((state_data) => {
-                      Location.findOne({ _id: beat_data[i].city })
-                        .exec()
-                        .then(async (city_data) => {
+              Route.findOne({ _id: beat_data[i].route_id }).exec().then((route_data) => {
+                  Location.findOne({ _id: beat_data[i].state }).exec().then((state_data) => {
+                      Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
                           await (async function (rowData) {
                             var u_data = {
                               id: rowData._id,
