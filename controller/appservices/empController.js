@@ -960,8 +960,8 @@ router.post("/beatListing", async (req, res) => {
                               },
                               employee_name: emp_data.employeeName,
                               route_name: {
-                                start_point: route_data.start_point,
-                                end_point: route_data.end_point,
+                                start_point: route_data.start_point || "",
+                                end_point: route_data.end_point || "",
                               },
                               beatName: rowData.beatName,
                               day: rowData.day,
@@ -1313,9 +1313,7 @@ router.post("/routeListing", (req, res) => {
           if (route_data.length > 0) {
             let counInfo = 0;
             for (let i = 0; i < route_data.length; i++) {
-              Location.findOne({ _id: route_data[i].state })
-                .exec()
-                .then((state_data) => {
+              Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
                   Location.findOne({ _id: route_data[i].city })
                     .exec()
                     .then((city_data) => {
