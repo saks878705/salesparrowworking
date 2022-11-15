@@ -31,10 +31,7 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
 
-router.post(
-  "/addParty",
-  imageUpload.fields([{ name: "Party_image" }]),
-  (req, res) => {
+router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),(req, res) => {
     console.log(req.body);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -92,11 +89,29 @@ router.post(
                       status: "Active",
                     });
                     new_party.save().then((data) => {
-                      res.status(200).json({
-                        status: true,
-                        message: "Party created successfully",
-                        result: data,
-                      });
+                      var arr = route?route[0].split(","): "";
+                      if(arr==""){
+                        res.status(200).json({
+                          status: true,
+                          message: "Party created successfully",
+                          result: data,
+                        });
+                      }else{
+                        let count = 0;
+                        for(let i = 0;i<arr.length;i++){
+                          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:data._id}}).exec().then(route_data=>{
+                            count++;
+                            if(count==arr.length){
+                              res.status(200).json({
+                                status: true,
+                                message: "Party created successfully",
+                                result: data,
+                              });
+                            }
+                          })
+                        }
+                      }
+                      
                     });
                   } else {
                     res.json({
@@ -151,6 +166,7 @@ router.post(
 
 router.post("/editParty", (req, res) => {
   console.log(req.body);
+  var route = req.body.route?req.body.route:""
   var id = req.body.id ? req.body.id : "";
   Party.find({ _id: id })
     .exec()
@@ -202,17 +218,31 @@ router.post("/editParty", (req, res) => {
           updated_party.status = req.body.status;
         }
         updated_party.Updated_date = get_current_date();
-        Party.findOneAndUpdate(
-          { _id: id },
-          updated_party,
-          { new: true },
-          (err, doc) => {
+        Party.findOneAndUpdate({ _id: id },updated_party,{ new: true },(err, doc) => {
             if (doc) {
-              res.status(200).json({
-                status: true,
-                message: "Update successfully",
-                results: updated_party,
-              });
+              var arr = route?route[0].split(","): "";
+                      if(arr==""){
+                        res.status(200).json({
+                          status: true,
+                          message: "Update successfully",
+                          results: updated_party,
+                        });
+                      }else{
+                        let count = 0;
+                        for(let i = 0;i<arr.length;i++){
+                          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:data._id}}).exec().then(route_data=>{
+                            count++;
+                            if(count==arr.length){
+                              res.status(200).json({
+                                status: true,
+                                message: "Update successfully",
+                                results: updated_party,
+                              });
+                            }
+                          })
+                        }
+                      }
+              
             }
           }
         );
@@ -224,478 +254,6 @@ router.post("/editParty", (req, res) => {
       }
     });
 });
-
-// router.post('/getAllParty',async (req,res)=>{
-//   try{
-//     const authHeader = req.headers["authorization"];
-//     const token = authHeader && authHeader.split(" ")[1];
-//     if(!token){
-//       return res.json({
-//         status:false,
-//         message:"Token must be provided"
-//       })
-//     }
-//     var decodedToken = jwt.verify(token, "test");
-//     var company_id = decodedToken.user_id;
-//     var page = req.body.page?req.body.page:"1";
-//     var limit = 5;
-//     var count =await Party.find({company_id});
-//     var list = [];
-//     var list2 = [];
-//     var state = req.body.state?req.body.state:"";
-//     var partyType = req.body.partyType?req.body.partyType:"";
-//     if(state!="" && partyType==""){
-//         Party.find({ $and: [{company_id},{state}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-//             if(party_data.length>0){
-//                 let counInfo = 0;
-//                 for(let i=0;i<party_data.length;i++){
-//                     Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-//                         Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-//                             Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-//                                 var arr = party_data[i].route?party_data[i].route[0].split(","):"";
-//                                 console.log(arr.length)
-//                                 if(arr==""){
-//                                     await (async function (rowData) {
-//                                         var u_data = {
-//                                           id:rowData._id,
-//                                           state:{name:state_data.name,id:rowData.state},
-//                                           city:{name:city_data.name,id:rowData.city},
-//                                           district:{name:district_data.name,id:rowData.district},
-//                                           firmName:rowData.firmName,
-//                                           partyType:rowData.partyType,
-//                                             pincode:rowData.pincode,
-//                                             GSTNo:rowData.GSTNo,
-//                                             image:rowData.image,
-//                                             contactPersonName:rowData.contactPersonName,
-//                                             mobileNo:rowData.mobileNo,
-//                                             email:rowData.email,
-//                                             DOB:rowData.DOB,
-//                                             DOA:rowData.DOA,
-//                                             route:list2,
-//                                           areas:rowData.address,
-//                                           status:rowData.status
-//                                         };
-//                                         list.push(u_data);
-//                                       })(party_data[i]);
-//                                       counInfo++;
-//                                       if(counInfo==party_data.length){
-//                                         let c = Math.ceil(count.length/limit);
-//                                         if(c==0){
-//                                            c+=1;
-//                                         }
-//                                         res.json({
-//                                           status:true,
-//                                           message:"Parties for this state found successfully",
-//                                           result:list,
-//                                           pageLength:c
-//                                       })
-//                                       }
-//                                 }else{
-//                                     console.log("inside else")
-//                                     for(let i = 0;i<arr.length;i++){
-//                                         console.log(i)
-//                                         console.log(arr[i])
-//                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
-//                                             console.log("routedata",route_data)
-//                                             let data = {
-//                                               start_point:route_data.start_point,
-//                                               end_point:route_data.end_point,
-//                                               id:route_data._id
-//                                               }
-//                                             list2.push(data);
-//                                             console.log(list2)
-//                                             await (async function (rowData) {
-//                                                 var u_data = {
-//                                                   id:rowData._id,
-//                                                   state:{name:state_data.name,id:rowData.state},
-//                                                   city:{name:city_data.name,id:rowData.city},
-//                                                   district:{name:district_data.name,id:rowData.district},
-//                                                   firmName:rowData.firmName,
-//                                                   partyType:rowData.partyType,
-//                                                     pincode:rowData.pincode,
-//                                                     image:rowData.image,
-//                                                     GSTNo:rowData.GSTNo,
-//                                                     contactPersonName:rowData.contactPersonName,
-//                                                     mobileNo:rowData.mobileNo,
-//                                                     email:rowData.email,
-//                                                     DOB:rowData.DOB,
-//                                                     DOA:rowData.DOA,
-//                                                     route:list2,
-//                                                   areas:rowData.address,
-//                                                   status:rowData.status
-//                                                 };
-//                                                 list.push(u_data);
-//                                               })(party_data[i]);
-//                                               counInfo++;
-//                                               if(counInfo==party_data.length){
-//                                                 let c = Math.ceil(count.length/limit);
-//                                                 if(c==0){
-//                                                    c+=1;
-//                                                 }
-//                                                 res.json({
-//                                                   status:true,
-//                                                   message:"Parties for this state found successfully",
-//                                                   result:list,
-//                                                   pageLength:c
-//                                               })
-//                                               }
-//                                             })
-//                                           }
-//                                 }
-//                             })
-//                         })
-//                     })
-//                 }
-//             }else{
-//                 res.json({
-//                     status:true,
-//                     message:"No party found",
-//                     result:[]
-//                 })
-//             }
-//         })
-//     }else if(state!="" && partyType!=""){
-//         Party.find({$and:[{company_id},{state},{partyType}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-//             if(party_data.length>0){
-//                 let counInfo = 0;
-//                 for(let i=0;i<party_data.length;i++){
-//                     Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-//                         Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-//                             Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-//                                 var arr = party_data[i].route?party_data[i].route[0].split(","):"";
-//                                 console.log(arr.length)
-//                                 if(arr==""){
-//                                     await (async function (rowData) {
-//                                         var u_data = {
-//                                           id:rowData._id,
-//                                           state:{name:state_data.name,id:rowData.state},
-//                                           city:{name:city_data.name,id:rowData.city},
-//                                           district:{name:district_data.name,id:rowData.district},
-//                                           firmName:rowData.firmName,
-//                                           partyType:rowData.partyType,
-//                                             pincode:rowData.pincode,
-//                                             GSTNo:rowData.GSTNo,
-//                                             contactPersonName:rowData.contactPersonName,
-//                                             mobileNo:rowData.mobileNo,
-//                                             image:rowData.image,
-//                                             email:rowData.email,
-//                                             DOB:rowData.DOB,
-//                                             DOA:rowData.DOA,
-//                                             route:list2,
-//                                           areas:rowData.address,
-//                                           status:rowData.status
-//                                         };
-//                                         list.push(u_data);
-//                                       })(party_data[i]);
-//                                       counInfo++;
-//                                       if(counInfo==party_data.length){
-//                                         let c = Math.ceil(count.length/limit);
-//                                         if(c==0){
-//                                            c+=1;
-//                                         }
-//                                         res.json({
-//                                           status:true,
-//                                           message:"Parties for this state found successfully",
-//                                           result:list,
-//                                           pageLength:c
-//                                       })
-//                                       }
-//                                 }else{
-//                                     console.log("inside else")
-//                                     for(let i = 0;i<arr.length;i++){
-//                                         console.log(i)
-//                                         console.log(arr[i])
-//                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
-//                                             console.log("routedata",route_data)
-//                                             let data = {
-//                                               start_point:route_data.start_point,
-//                                               end_point:route_data.end_point,
-//                                               id:route_data._id
-//                                           }
-//                                             list2.push(data);
-//                                             console.log(list2)
-//                                             await (async function (rowData) {
-//                                                 var u_data = {
-//                                                   id:rowData._id,
-//                                                   state:{name:state_data.name,id:rowData.state},
-//                                                   city:{name:city_data.name,id:rowData.city},
-//                                                   district:{name:district_data.name,id:rowData.district},
-//                                                   firmName:rowData.firmName,
-//                                                   partyType:rowData.partyType,
-//                                                     pincode:rowData.pincode,
-//                                                     GSTNo:rowData.GSTNo,
-//                                                     image:rowData.image,
-//                                                     contactPersonName:rowData.contactPersonName,
-//                                                     mobileNo:rowData.mobileNo,
-//                                                     email:rowData.email,
-//                                                     DOB:rowData.DOB,
-//                                                     DOA:rowData.DOA,
-//                                                     route:list2,
-//                                                   areas:rowData.address,
-//                                                   status:rowData.status
-//                                                 };
-//                                                 list.push(u_data);
-//                                               })(party_data[i]);
-//                                               counInfo++;
-//                                               if(counInfo==party_data.length){
-//                                                 let c = Math.ceil(count.length/limit);
-//                                                 if(c==0){
-//                                                    c+=1;
-//                                                 }
-//                                                 res.json({
-//                                                   status:true,
-//                                                   message:"Parties for this state found successfully",
-//                                                   result:list,
-//                                                   pageLength:c
-//                                               })
-//                                               }
-//                                             })
-//                                     }
-//                                 }
-//                             })
-//                         })
-//                     })
-//                 }
-//             }else{
-//                 res.json({
-//                     status:true,
-//                     message:"No party found",
-//                     result:[]
-//                 })
-//             }
-//         })
-//     }else if(state=="" && partyType!=""){
-//         Party.find({$and:[{company_id},{partyType}]}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-//             if(party_data.length>0){
-//                 let counInfo = 0;
-//                 for(let i=0;i<party_data.length;i++){
-//                     Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-//                         Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-//                             Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-//                                 var arr = party_data[i].route?party_data[i].route[0].split(","):"";
-//                                 console.log(arr.length)
-//                                 if(arr==""){
-//                                     await (async function (rowData) {
-//                                         var u_data = {
-//                                           id:rowData._id,
-//                                           state:{name:state_data.name,id:rowData.state},
-//                                           city:{name:city_data.name,id:rowData.city},
-//                                           district:{name:district_data.name,id:rowData.district},
-//                                           firmName:rowData.firmName,
-//                                           partyType:rowData.partyType,
-//                                             pincode:rowData.pincode,
-//                                             GSTNo:rowData.GSTNo,
-//                                             image:rowData.image,
-//                                             contactPersonName:rowData.contactPersonName,
-//                                             mobileNo:rowData.mobileNo,
-//                                             email:rowData.email,
-//                                             DOB:rowData.DOB,
-//                                             DOA:rowData.DOA,
-//                                             route:list2,
-//                                           areas:rowData.address,
-//                                           status:rowData.status
-//                                         };
-//                                         list.push(u_data);
-//                                       })(party_data[i]);
-//                                       counInfo++;
-//                                       if(counInfo==party_data.length){
-//                                         let c = Math.ceil(count.length/limit);
-//                                         if(c==0){
-//                                            c+=1;
-//                                         }
-//                                         res.json({
-//                                           status:true,
-//                                           message:"Parties for this state found successfully",
-//                                           result:list,
-//                                           pageLength:c
-//                                       })
-//                                       }
-//                                 }else{
-//                                     console.log("inside else")
-//                                     for(let i = 0;i<arr.length;i++){
-//                                         console.log(i)
-//                                         console.log(arr[i])
-//                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
-//                                             console.log("routedata",route_data)
-//                                             let data = {
-//                                               start_point:route_data.start_point,
-//                                               end_point:route_data.end_point,
-//                                               id:route_data._id
-//                                           }
-//                                             list2.push(data);
-//                                             console.log(list2)
-//                                             await (async function (rowData) {
-//                                                 var u_data = {
-//                                                   id:rowData._id,
-//                                                   state:{name:state_data.name,id:rowData.state},
-//                                                   city:{name:city_data.name,id:rowData.city},
-//                                                   district:{name:district_data.name,id:rowData.district},
-//                                                   firmName:rowData.firmName,
-//                                                   partyType:rowData.partyType,
-//                                                     pincode:rowData.pincode,
-//                                                     image:rowData.image,
-//                                                     GSTNo:rowData.GSTNo,
-//                                                     contactPersonName:rowData.contactPersonName,
-//                                                     mobileNo:rowData.mobileNo,
-//                                                     email:rowData.email,
-//                                                     DOB:rowData.DOB,
-//                                                     DOA:rowData.DOA,
-//                                                     route:list2,
-//                                                   areas:rowData.address,
-//                                                   status:rowData.status
-//                                                 };
-//                                                 list.push(u_data);
-//                                               })(party_data[i]);
-//                                               counInfo++;
-//                                               if(counInfo==party_data.length){
-//                                                 let c = Math.ceil(count.length/limit);
-//                                                 if(c==0){
-//                                                    c+=1;
-//                                                 }
-//                                                 res.json({
-//                                                   status:true,
-//                                                   message:"Parties for this state found successfully",
-//                                                   result:list,
-//                                                   pageLength:c
-//                                               })
-//                                               }
-//                                             })
-//                                     }
-//                                 }
-//                             })
-//                         })
-//                     })
-//                 }
-//             }else{
-//                 res.json({
-//                     status:true,
-//                     message:"No party found",
-//                     result:[]
-//                 })
-//             }
-//         })
-//     }else{
-//       console.log("inside else>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-//         Party.find({company_id}).limit(limit*1).skip((page - 1) * limit).exec().then(party_data=>{
-//             if(party_data.length>0){
-//                 let counInfo = 0;
-//                 for(let i=0;i<party_data.length;i++){
-//                   list2=[]
-//                     Location.findOne({_id:party_data[i].state}).exec().then(state_data=>{
-//                         Location.findOne({_id:party_data[i].city}).exec().then(city_data=>{
-//                             Location.findOne({_id:party_data[i].district}).exec().then(async (district_data)=>{
-//                                 var arr = party_data[i].route?party_data[i].route[0].split(","):"";
-//                                 console.log(arr.length)
-//                                 if(arr==""){
-//                                     await (async function (rowData) {
-//                                         var u_data = {
-//                                           id:rowData._id,
-//                                           state:{name:state_data.name,id:rowData.state},
-//                                           city:{name:city_data.name,id:rowData.city},
-//                                           district:{name:district_data.name,id:rowData.district},
-//                                           firmName:rowData.firmName,
-//                                           partyType:rowData.partyType,
-//                                             pincode:rowData.pincode,
-//                                             GSTNo:rowData.GSTNo,
-//                                             image:rowData.image,
-//                                             contactPersonName:rowData.contactPersonName,
-//                                             mobileNo:rowData.mobileNo,
-//                                             email:rowData.email,
-//                                             DOB:rowData.DOB,
-//                                             DOA:rowData.DOA,
-//                                             route:list2,
-//                                           areas:rowData.address,
-//                                           status:rowData.status
-//                                         };
-//                                         list.push(u_data);
-//                                       })(party_data[i]);
-//                                       counInfo++;
-//                                       if(counInfo==party_data.length){
-//                                         let c = Math.ceil(count.length/limit);
-//                                         if(c==0){
-//                                            c+=1;
-//                                         }
-//                                         res.json({
-//                                           status:true,
-//                                           message:"Parties for this state found successfully",
-//                                           result:list,
-//                                           pageLength:c
-//                                       })
-//                                       }
-//                                 }else{
-//                                     console.log("inside else")
-//                                     for(let i = 0;i<arr.length;i++){
-//                                         console.log("i>>>>>>>>>>>>>>>",i)
-//                                         console.log("arr[i]>>>>>>>>>>>>>>>>>>>>>>>>>>",arr[i])
-//                                         Route.findOne({_id:arr[i]}).exec().then(async (route_data)=>{
-//                                             console.log("routedata",route_data)
-//                                             let data = {
-//                                               start_point:route_data.start_point,
-//                                               end_point:route_data.end_point,
-//                                               id:route_data._id
-//                                               }
-//                                             list2.push(data);
-//                                             console.log("list2>>>>>>>>>>>>>>>",list2)
-//                                             if(i==arr.length-1){
-//                                               await (async function (rowData) {
-//                                                 var u_data = {
-//                                                   id:rowData._id,
-//                                                   state:{name:state_data.name,id:rowData.state},
-//                                                   city:{name:city_data.name,id:rowData.city},
-//                                                   district:{name:district_data.name,id:rowData.district},
-//                                                   firmName:rowData.firmName,
-//                                                   partyType:rowData.partyType,
-//                                                     pincode:rowData.pincode,
-//                                                     GSTNo:rowData.GSTNo,
-//                                                     contactPersonName:rowData.contactPersonName,
-//                                                     mobileNo:rowData.mobileNo,
-//                                                     image:rowData.image,
-//                                                     email:rowData.email,
-//                                                     DOB:rowData.DOB,
-//                                                     DOA:rowData.DOA,
-//                                                     route:list2,
-//                                                   areas:rowData.address,
-//                                                   status:rowData.status
-//                                                 };
-//                                                 list.push(u_data);
-//                                               })(party_data[i]);
-//                                               counInfo++;
-//                                               if(counInfo==party_data.length){
-//                                                 // console.log("list>>>>>>>>>>>>>>>>>>>>>>",list)
-//                                                 let c = Math.ceil(count.length/limit);
-//                                                 if(c==0){
-//                                                    c+=1;
-//                                                 }
-//                                                 res.json({
-//                                                   status:true,
-//                                                   message:"Parties for this state found successfully",
-//                                                   result:list,
-//                                                   pageLength:c
-//                                               })
-//                                               }
-//                                             }
-
-//                                             })
-//                                     }
-//                                 }
-//                             })
-//                         })
-//                     })
-//                 }
-//             }else{
-//                 res.json({
-//                     status:true,
-//                     message:"No party found",
-//                     result:[]
-//                 })
-//             }
-//         })
-//     }
-//   }catch(e){
-//     console.log("err>>>>>>>>>>>>>>",e)
-//   }
-
-// });
 
 router.post("/getAllParty", async (req, res) => {
   const authHeader = req.headers["authorization"];
@@ -743,9 +301,7 @@ router.post("/getAllParty", async (req, res) => {
                   Location.findOne({ _id: party_data[i].district })
                     .exec()
                     .then((district_data) => {
-                      var arr = party_data[i].route
-                        ? party_data[i]?.route[0].split(",")
-                        : "";
+                      var arr = party_data[i].route? party_data[i].route[0].split(","): "";
                       if (arr == "") {
                         (async function (rowData) {
                           var u_data = {
@@ -999,10 +555,7 @@ router.post("/getParty", (req, res) => {
   }
 });
 
-router.post(
-  "/partyProfileImage",
-  imageUpload.fields([{ name: "party_image" }]),
-  (req, res) => {
+router.post("/partyProfileImage",imageUpload.fields([{ name: "party_image" }]),(req, res) => {
     console.log(req.body);
     const id = req.body.id ? req.body.id : "";
     if (id != "") {
@@ -1053,21 +606,38 @@ router.post(
 router.delete("/deleteParty", (req, res) => {
   var id = req.body.id ? req.body.id : "";
   if (id != "") {
-    Party.findOneAndDelete({ _id: id })
-      .exec()
-      .then(() => {
-        res.status(200).json({
-          status: true,
-          message: "Deleted successfully",
+    Party.findOne({ _id: id }).exec().then((party_data) => {
+      var arr = party_data.route?party_data.route[0].split(","): "";
+      if(arr==""){
+        Party.findOneAndDelete({ _id: id }).exec().then(() => {
+          res.status(200).json({
+            status: true,
+            message: "Deleted successfully",
+          });
         });
+      }else{
+        let count = 0;
+        for(let i = 0;i<arr.length;i++){
+          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:data._id}}).exec().then(route_data=>{
+            count++;
+            if(count==arr.length){
+              Party.findOneAndDelete({ _id: id }).exec().then(() => {
+                res.status(200).json({
+                  status: true,
+                  message: "Deleted successfully",
+                });
+              });
+            }
+          })
+        }      
+      }
+      
       });
+      
   }
 });
 
-router.post(
-  "/bulkImport",
-  imageUpload.fields([{ name: "party_excel" }]),
-  (req, res) => {
+router.post("/bulkImport",imageUpload.fields([{ name: "party_excel" }]),(req, res) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if (!token) {

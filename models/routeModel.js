@@ -11,6 +11,14 @@ const route_schema = new Schema({
     area:{
         type:String,
     },
+    is_assigned:{
+        type:String,
+        default:"0"
+    },
+    assigned_to:{
+        type:String,
+        default:""
+    },
     start_point:{
         type:String,
     },
