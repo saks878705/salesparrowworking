@@ -182,8 +182,21 @@ router.post("/editParty", (req, res) => {
         if (req.body.firmName) {
           updated_party.firmName = req.body.firmName;
         }
-        updated_party.route = req.body.route;
-
+        var arr2 = party_data[0].route[0]?party_data[0].route[0].split(","): "";
+        if(arr2==""){
+          updated_party.route = req.body.route;
+        }else{
+          let count2 = 0;
+          for(let j = 0;j<arr2.length;j++){
+            console.log(arr2[j])
+            Route.updateOne({_id:arr2[j]},{$set:{is_assigned:"0",assigned_to:""}}).exec().then(route_data=>{
+              count2++;
+              if(count2==arr2.length){
+                updated_party.route = req.body.route;
+              }
+            })
+          }
+        }
         if (req.body.GSTNo) {
           updated_party.GSTNo = req.body.GSTNo;
         }
@@ -224,27 +237,27 @@ router.post("/editParty", (req, res) => {
         Party.findOneAndUpdate({ _id: id },updated_party,{ new: true },(err, doc) => {
             if (doc) {
               var arr = route?route.split(","): "";
-                      if(arr==""){
-                        res.status(200).json({
-                          status: true,
-                          message: "Update successfully",
-                          results: updated_party,
-                        });
-                      }else{
-                        let count = 0;
-                        for(let i = 0;i<arr.length;i++){
-                          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:id}}).exec().then(route_data=>{
-                            count++;
-                            if(count==arr.length){
-                              res.status(200).json({
-                                status: true,
-                                message: "Update successfully",
-                                results: updated_party,
-                              });
-                            }
-                          })
-                        }
-                      }
+              if(arr==""){
+                res.status(200).json({
+                  status: true,
+                  message: "Update successfully",
+                  results: updated_party,
+                });
+              }else{
+                let count = 0;
+                for(let i = 0;i<arr.length;i++){
+                  Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:id}}).exec().then(route_data=>{
+                    count++;
+                    if(count==arr.length){
+                      res.status(200).json({
+                        status: true,
+                        message: "Update successfully",
+                        results: updated_party,
+                      });
+                    }
+                  })
+                }
+              }
               
             }
           }
@@ -611,6 +624,8 @@ router.delete("/deleteParty", (req, res) => {
   if (id != "") {
     Party.findOne({ _id: id }).exec().then((party_data) => {
       var arr = party_data.route?party_data.route[0].split(","): "";
+      console.log(arr)
+      
       if(arr==""){
         Party.findOneAndDelete({ _id: id }).exec().then(() => {
           res.status(200).json({
@@ -621,6 +636,7 @@ router.delete("/deleteParty", (req, res) => {
       }else{
         let count = 0;
         for(let i = 0;i<arr.length;i++){
+          console.log(arr[i])
           Route.updateOne({_id:arr[i]},{$set:{is_assigned:"0",assigned_to:""}}).exec().then(route_data=>{
             count++;
             if(count==arr.length){
