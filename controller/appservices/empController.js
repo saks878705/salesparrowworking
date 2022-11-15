@@ -771,12 +771,8 @@ router.post("/addBeatEmp", (req, res) => {
         if (employee_id != "") {
           if (day != "") {
             if (route_id != "") {
-              Employee.findOne({ _id: employee_id })
-                .exec()
-                .then((emp_data) => {
-                  Beat.find({ beatName: beatName })
-                    .exec()
-                    .then((beat_info) => {
+              Employee.findOne({ _id: employee_id }).exec().then((emp_data) => {
+                  Beat.find({ beatName: beatName }).exec().then((beat_info) => {
                       if (beat_info.length < 1) {
                         var new_beat = new Beat({
                           beatName: beatName,
@@ -801,7 +797,7 @@ router.post("/addBeatEmp", (req, res) => {
                         res.status(401).json({
                           status: true,
                           message: "Beat already exists",
-                          result: null,
+                          result: [],
                         });
                       }
                     });
@@ -810,42 +806,36 @@ router.post("/addBeatEmp", (req, res) => {
               return res.json({
                 status: false,
                 message: "Route id is required",
-                result: null,
               });
             }
           } else {
             return res.json({
               status: false,
               message: "Day is required",
-              result: null,
             });
           }
         } else {
           return res.json({
             status: false,
             message: "Employee id is required",
-            result: null,
           });
         }
       } else {
         return res.json({
           status: false,
           message: "Beat Name is required",
-          result: null,
         });
       }
     } else {
       return res.json({
         status: false,
         message: "City is required",
-        result: null,
       });
     }
   } else {
     return res.json({
       status: false,
       message: "State is required",
-      result: null,
     });
   }
 });
