@@ -89,7 +89,10 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),(req, res)
                       status: "Active",
                     });
                     new_party.save().then((data) => {
-                      var arr = route?route[0].split(","): "";
+                      console.log(route)
+                      console.log(route[0])
+                      var arr = route?route.split(","): "";
+                      console.log(arr)
                       if(arr==""){
                         res.status(200).json({
                           status: true,
@@ -220,7 +223,7 @@ router.post("/editParty", (req, res) => {
         updated_party.Updated_date = get_current_date();
         Party.findOneAndUpdate({ _id: id },updated_party,{ new: true },(err, doc) => {
             if (doc) {
-              var arr = route?route[0].split(","): "";
+              var arr = route?route.split(","): "";
                       if(arr==""){
                         res.status(200).json({
                           status: true,
