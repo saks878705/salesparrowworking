@@ -197,6 +197,7 @@ router.post("/editParty", (req, res) => {
             })
           }
         }
+        updated_party.route = req.body.route;
         if (req.body.GSTNo) {
           updated_party.GSTNo = req.body.GSTNo;
         }
