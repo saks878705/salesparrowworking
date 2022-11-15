@@ -945,40 +945,77 @@ router.post("/beatListing", async (req, res) => {
               }
               console.log(beat_data[i].employee_id);
               Route.findOne({ _id: beat_data[i].route_id }).exec().then((route_data) => {
+                if(route_data){
                   Location.findOne({ _id: beat_data[i].state }).exec().then((state_data) => {
-                      Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
-                          await (async function (rowData) {
-                            var u_data = {
-                              id: rowData._id,
-                              state: {
-                                name: state_data.name,
-                                id: beat_data[i].state,
-                              },
-                              city: {
-                                name: city_data.name,
-                                id: beat_data[i].city,
-                              },
-                              employee_name: emp_data.employeeName,
-                              route_name: {
-                                start_point: route_data.start_point?route_data.start_point: "",
-                                end_point: route_data.end_point?route_data.end_point: "",
-                              },
-                              beatName: rowData.beatName,
-                              day: rowData.day,
-                              status: rowData.status,
-                            };
-                            list.push(u_data);
-                          })(beat_data[i]);
-                          counInfo++;
-                          if (counInfo == beat_data.length) {
-                            res.json({
-                              status: true,
-                              message: "All Beats found successfully",
-                              result: list,
-                            });
-                          }
-                        });
-                    });
+                    Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
+                        await (async function (rowData) {
+                          var u_data = {
+                            id: rowData._id,
+                            state: {
+                              name: state_data.name,
+                              id: beat_data[i].state,
+                            },
+                            city: {
+                              name: city_data.name,
+                              id: beat_data[i].city,
+                            },
+                            employee_name: emp_data.employeeName,
+                            route_name: {
+                              start_point: route_data.start_point,
+                              end_point: route_data.end_point,
+                            },
+                            beatName: rowData.beatName,
+                            day: rowData.day,
+                            status: rowData.status,
+                          };
+                          list.push(u_data);
+                        })(beat_data[i]);
+                        counInfo++;
+                        if (counInfo == beat_data.length) {
+                          res.json({
+                            status: true,
+                            message: "All Beats found successfully",
+                            result: list,
+                          });
+                        }
+                      });
+                  });
+                }else{
+                  Location.findOne({ _id: beat_data[i].state }).exec().then((state_data) => {
+                    Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
+                        await (async function (rowData) {
+                          var u_data = {
+                            id: rowData._id,
+                            state: {
+                              name: state_data.name,
+                              id: beat_data[i].state,
+                            },
+                            city: {
+                              name: city_data.name,
+                              id: beat_data[i].city,
+                            },
+                            employee_name: emp_data.employeeName,
+                            route_name: {
+                              start_point: "",
+                              end_point: "",
+                            },
+                            beatName: rowData.beatName,
+                            day: rowData.day,
+                            status: rowData.status,
+                          };
+                          list.push(u_data);
+                        })(beat_data[i]);
+                        counInfo++;
+                        if (counInfo == beat_data.length) {
+                          res.json({
+                            status: true,
+                            message: "All Beats found successfully",
+                            result: list,
+                          });
+                        }
+                      });
+                  });
+                }
                 });
             });
         }
