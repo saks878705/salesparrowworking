@@ -331,6 +331,8 @@ router.post("/notAssignedRouteListing", async (req, res) => {
       message: "Token must be provided",
     });
   }
+  var state = req.body.state ? req.body.state : "";
+  var city = req.body.city ? req.body.city : "";
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
   var list = [];
@@ -346,7 +348,7 @@ router.post("/notAssignedRouteListing", async (req, res) => {
             if(route_data.length>0){
               let counInfo = 0;
             for (let i = 0; i < route_data.length; i++) {
-              if(route_data[i].is_assigned=="1"){
+              if(route_data[i].is_assigned=="0"){
                 Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
                   Location.findOne({ _id: route_data[i].city }).exec().then((city_data) => {
                       Location.findOne({ _id: route_data[i].area }).exec().then(async (area_data) => {
