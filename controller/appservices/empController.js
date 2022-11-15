@@ -960,8 +960,8 @@ router.post("/beatListing", async (req, res) => {
                               },
                               employee_name: emp_data.employeeName,
                               route_name: {
-                                start_point: route_data.start_point || "",
-                                end_point: route_data.end_point || "",
+                                start_point: route_data.start_point?route_data.start_point: "",
+                                end_point: route_data.end_point?route_data.end_point: "",
                               },
                               beatName: rowData.beatName,
                               day: rowData.day,
