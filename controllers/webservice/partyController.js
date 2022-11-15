@@ -233,7 +233,7 @@ router.post("/editParty", (req, res) => {
                       }else{
                         let count = 0;
                         for(let i = 0;i<arr.length;i++){
-                          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:data._id}}).exec().then(route_data=>{
+                          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:id}}).exec().then(route_data=>{
                             count++;
                             if(count==arr.length){
                               res.status(200).json({
