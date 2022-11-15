@@ -43,6 +43,7 @@ router.post("/addRoute", (req, res) => {
                 city: city,
                 area: area,
                 distance: distance,
+                is_assigned:"0",
                 start_point: start_point,
                 company_id: company_id,
                 end_point: end_point,
