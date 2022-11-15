@@ -608,34 +608,45 @@ router.post(
       var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
       for (let i = 0; i < xlData.length; i++) {
         console.log(xlData[i]);
-        var new_emp = new Employee({
-          employeeName: xlData[i].Employee_Name,
-          phone: xlData[i].Phone_Number,
-          email: xlData[i].Email,
-          address: xlData[i].Address,
-          city: xlData[i].City,
-          companyId: company_id,
-          image: xlData[i].Profile_Image,
-          headquarter: xlData[i].Headquarter,
-          state: xlData[i].State,
-          district: xlData[i].District,
-          pincode: xlData[i].Pincode,
-          qualification: xlData[i].Qualification,
-          experience: xlData[i].Experience,
-          Created_date: get_current_date(),
-          Updated_date: get_current_date(),
-          status: xlData[i].Status,
-        });
-        new_emp.save();
-        list.push(new_emp);
-        countInfo++;
-        if (countInfo == xlData.length) {
-          res.status(200).json({
-            status: true,
-            message: "Data imported successfully",
-            result: list,
-          });
-        }
+        Location.findOne({name:xlData[i].State}).exec().then(state_data=>{
+          Location.findOne({name:xlData[i].City}).exec().then(city_data=>{
+            Location.findOne({name:xlData[i].District}).exec().then(area_data=>{
+              Location.findOne({name:xlData[i].Headquarter_State}).exec().then(headquarter_state_data=>{
+                Location.findOne({name:xlData[i].Headquarter_City}).exec().then(headquarter_city_data=>{
+                  var new_emp = new Employee({
+                    employeeName: xlData[i].Employee_Name,
+                    phone: xlData[i].Phone_Number,
+                    email: xlData[i].Email,
+                    address: xlData[i].Address,
+                    city: city_data._id,
+                    companyId: company_id,
+                    image: xlData[i].Profile_Image,
+                    headquarterState: headquarter_state_data._id,
+                    headquarterCity: headquarter_city_data._id,
+                    state: state_data._id,
+                    district: area_data._id,
+                    pincode: xlData[i].Pincode,
+                    qualification: xlData[i].Qualification,
+                    experience: xlData[i].Experience,
+                    Created_date: get_current_date(),
+                    Updated_date: get_current_date(),
+                    status: xlData[i].Status,
+                  });
+                  new_emp.save();
+                  list.push(new_emp);
+                  countInfo++;
+                  if (countInfo == xlData.length) {
+                    res.status(200).json({
+                      status: true,
+                      message: "Data imported successfully",
+                      result: list,
+                    });
+                  }
+                })
+              })
+            })
+          })
+        })
       }
       x++;
     });

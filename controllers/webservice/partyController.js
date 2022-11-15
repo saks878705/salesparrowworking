@@ -1097,7 +1097,7 @@ router.post(
                   .exec()
                   .then((area_data) => {
                     var new_party = new Party({
-                      partyType: xlData[i].Part_Type,
+                      partyType: xlData[i].Party_Type,
                       firmName: xlData[i].Firm_Name,
                       GSTNo: xlData[i].GST_No,
                       route:"",
