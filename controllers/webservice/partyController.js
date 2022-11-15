@@ -1010,38 +1010,42 @@ router.post('/bulkImport',imageUpload.fields([{name:"party_excel"}]),(req,res)=>
      var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
      for(let i = 0; i < xlData.length; i++) {
        console.log(xlData[i]);
-       var new_party = new Party({
-        partyType:xlData[i].Part_Type,
-        firmName:xlData[i].Firm_Name,
-        GSTNo:xlData[i].GST_No,
-        image: xlData[i].Profile_Image,
-        contactPersonName:xlData[i].Contact_Person_Name,
-        mobileNo:xlData[i].Phone_Number,
-        email:xlData[i].Email,
-        company_id:company_id,
-        pincode:xlData[i].Pincode,
-        state:xlData[i].State,
-        route:xlData[i].Route,
-        city:xlData[i].City,
-        district:xlData[i].District,
-        address:xlData[i].Address,
-        DOB:xlData[i].DOB,
-        DOA:xlData[i].DOA,
-        Created_date:get_current_date(),
-        Updated_date:get_current_date(),
-        status:xlData[i].Status
-    });
-    new_party.save();
-    list.push(new_party)
-    countInfo++;
-    if(countInfo==xlData.length){
-        res.status(200).json({
-            status:true,
-            message:"Data imported successfully",
-            result:list
-        });
-    }
-    
+       Location.findOne({name:xlData[i].State}).exec().then(state_data=>{
+        Location.findOne({name:xlData[i].City}).exec().then(city_data=>{
+          Location.findOne({name:xlData[i].District}).exec().then(area_data=>{
+            var new_party = new Party({
+              partyType:xlData[i].Part_Type,
+              firmName:xlData[i].Firm_Name,
+              GSTNo:xlData[i].GST_No,
+              image: xlData[i].Profile_Image,
+              contactPersonName:xlData[i].Contact_Person_Name,
+              mobileNo:xlData[i].Phone_Number,
+              email:xlData[i].Email,
+              company_id:company_id,
+              pincode:xlData[i].Pincode,
+              state:state_data._id,
+              city:city_data._id,
+              district:area_data._id,
+              address:xlData[i].Address,
+              DOB:xlData[i].DOB,
+              DOA:xlData[i].DOA,
+              Created_date:get_current_date(),
+              Updated_date:get_current_date(),
+              status:xlData[i].Status
+          });
+          new_party.save();
+          list.push(new_party)
+          countInfo++;
+          if(countInfo==xlData.length){
+              res.status(200).json({
+                  status:true,
+                  message:"Data imported successfully",
+                  result:list
+              });
+          }
+          })
+        })
+       })
     }
 
      x++;
