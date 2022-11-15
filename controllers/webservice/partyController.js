@@ -621,7 +621,7 @@ router.delete("/deleteParty", (req, res) => {
       }else{
         let count = 0;
         for(let i = 0;i<arr.length;i++){
-          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:data._id}}).exec().then(route_data=>{
+          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"0",assigned_to:""}}).exec().then(route_data=>{
             count++;
             if(count==arr.length){
               Party.findOneAndDelete({ _id: id }).exec().then(() => {
