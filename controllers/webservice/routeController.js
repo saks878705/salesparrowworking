@@ -269,7 +269,6 @@ router.post("/routeListing", async (req, res) => {
   var company_id = decodedToken.user_id;
   var state = req.body.state ? req.body.state : "";
   var city = req.body.city ? req.body.city : "";
-  // var area = req.body.area ? req.body.area : "";
   var limit = 10;
   let arr = [];
   if (company_id != "" && state == "" && city == "") {
@@ -369,7 +368,6 @@ router.post("/notAssignedRouteListing", async (req, res) => {
                               status: true,
                               message: "All Routes found successfully",
                               result: list,
-                              pageLength: Math.ceil(count.length / limit),
                             });
                           }
                         });
