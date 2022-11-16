@@ -34,7 +34,6 @@ router.post('/addRetailer',(req,res)=>{
    let firmName= req.body.firmName?req.body.firmName:""
    let GSTNo= req.body.GSTNo?req.body.GSTNo:""
    let customerName= req.body.customerName?req.body.customerName:""
-   let area= req.body.area?req.body.area:""
    let location= req.body.location?req.body.location:""
    let mobileNo= req.body.mobileNo?req.body.mobileNo:""
    let DOB= req.body.DOB?req.body.DOB:""
@@ -64,7 +63,6 @@ router.post('/addRetailer',(req,res)=>{
                                             firmName:firmName,
                                             GSTNo:GSTNo,
                                             customerName:customerName,
-                                            area:area,
                                             location:location,
                                             mobileNo:mobileNo,
                                             DOB:DOB,
@@ -184,7 +182,6 @@ router.post('/getAllRetailers',async (req,res)=>{
                             firmName:rowData.firmName,
                             GSTNo:rowData.GSTNo,
                             customerName:rowData.customerName,
-                            area:rowData.area,
                             location:rowData.location,
                             mobileNo:rowData.mobileNo,
                             DOB:rowData.DOB,

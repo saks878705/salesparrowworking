@@ -624,6 +624,33 @@ router.post("/getAllPartyEmp", async (req, res) => {
     });
 });
 
+// router.post('/authorizedParty',(req,res)=>{
+//   const authHeader = req.headers["authorization"];
+//   const token = authHeader && authHeader.split(" ")[1];
+//   if (!token) {
+//     return res.json({
+//       status: false,
+//       message: "Token must be provided",
+//     });
+//   }
+//   var decodedToken = jwt.verify(token, "test");
+//   var employee_id = decodedToken.user_id;
+//   beat_id = req.body.beat_id?req.body.beat_id:"";
+//   if(beat_id==""){
+//     return res.send({
+//       status:false,
+//       message:"First select beat",
+//       result:[]
+//     })
+//   }
+//   Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
+//     Party.find({employee_id}).exec().then(party_data=>{
+//       if()
+//     })
+//   })
+
+// })
+
 router.post("/getParty", (req, res) => {
   var id = req.body.id ? req.body.id : "";
   var list = [];
