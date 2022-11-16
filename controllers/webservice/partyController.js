@@ -182,19 +182,23 @@ router.post("/editParty", (req, res) => {
         if (req.body.firmName) {
           updated_party.firmName = req.body.firmName;
         }
-        var arr2 = party_data[0].route[0]?party_data[0].route[0].split(","): "";
-        if(arr2==""){
+        if(party_data[0].route==null){
           updated_party.route = req.body.route;
-        }else{
-          let count2 = 0;
-          for(let j = 0;j<arr2.length;j++){
-            console.log(arr2[j])
-            Route.updateOne({_id:arr2[j]},{$set:{is_assigned:"0",assigned_to:""}}).exec().then(route_data=>{
-              count2++;
-              if(count2==arr2.length){
-                updated_party.route = req.body.route;
-              }
-            })
+        }else {
+          var arr2 = party_data[0].route[0]?party_data[0].route[0].split(","): "";
+          if(arr2==""){
+            updated_party.route = req.body.route;
+          }else{
+            let count2 = 0;
+            for(let j = 0;j<arr2.length;j++){
+              console.log(arr2[j])
+              Route.updateOne({_id:arr2[j]},{$set:{is_assigned:"0",assigned_to:""}}).exec().then(route_data=>{
+                count2++;
+                if(count2==arr2.length){
+                  updated_party.route = req.body.route;
+                }
+              })
+            }
           }
         }
         updated_party.route = req.body.route;
