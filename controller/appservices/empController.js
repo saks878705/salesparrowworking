@@ -621,6 +621,68 @@ router.post("/getAllPartyEmp", async (req, res) => {
     });
 });
 
+// router.post('/authorizedParty',(req,res)=>{
+//   const authHeader = req.headers["authorization"];
+//   const token = authHeader && authHeader.split(" ")[1];
+//   if (!token) {
+//     return res.json({
+//       status: false,
+//       message: "Token must be provided",
+//     });
+//   }
+//   var decodedToken = jwt.verify(token, "test");
+//   var employee_id = decodedToken.user_id;
+//   beat_id = req.body.beat_id?req.body.beat_id:"";
+//   if(beat_id==""){
+//     return res.send({
+//       status:false,
+//       message:"First select beat",
+//       result:[]
+//     })
+//   }
+//   Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+//     Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
+//       if(!beat_data) return res.send({status:true, message:"No Beat found", result:[] }) 
+//       Party.find({$or:[{company_id:emp_data.companyId}]}).exec().then(party_data=>{
+//         if(party_data.length<1) return res.send({status:true, message:"No party found", result:[] }) 
+//         let count = 0;
+//         for(let i = 0;i<party_data.length;i++){
+//           console.log(party_data[i])
+//           console.log(party_data[i].route)
+//           console.log(party_data[i].route[0])
+//           let arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
+//           if(arr==""){
+//             console.log("inside first if")
+//             if(count==party_data.length-1){
+//               res.json({
+//                 status:true,
+//                 message:"No party data found",
+//                 result:[]
+//               })
+//             }
+//           }else{
+//             console.log("insidde else");
+//             console.log(arr.length);
+//             for(let j = 0;j<arr.length;j++){
+//               console.log("inside for");
+//               if(arr[j]==beat_data.route_id){
+//                 console.log("insidde if");
+//                 return res.json({
+//                   status:true,
+//                   message:"Authorized party found",
+//                   result:party_data[i]
+//                 })
+//               }
+//             }
+//           }
+//           count++;
+//         }
+//       })
+//     })
+//   })
+
+// })
+
 router.post('/authorizedParty',(req,res)=>{
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -646,11 +708,15 @@ router.post('/authorizedParty',(req,res)=>{
       Party.find({$or:[{company_id:emp_data.companyId}]}).exec().then(party_data=>{
         if(party_data.length<1) return res.send({status:true, message:"No party found", result:[] }) 
         let count = 0;
+        let arr="";
         for(let i = 0;i<party_data.length;i++){
           console.log(party_data[i])
           console.log(party_data[i].route)
-          console.log(party_data[i].route[0])
-          let arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
+          if(party_data[i].route){
+            console.log(party_data[i].route[0])
+            arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
+
+          }
           if(arr==""){
             console.log("inside first if")
             if(count==party_data.length-1){
@@ -663,9 +729,11 @@ router.post('/authorizedParty',(req,res)=>{
           }else{
             console.log("insidde else");
             console.log(arr.length);
+            let check=0;
             for(let j = 0;j<arr.length;j++){
               console.log("inside for");
               if(arr[j]==beat_data.route_id){
+                check=1
                 console.log("insidde if");
                 return res.json({
                   status:true,
@@ -673,6 +741,13 @@ router.post('/authorizedParty',(req,res)=>{
                   result:party_data[i]
                 })
               }
+            }
+            if(check==0){
+              return res.json({
+                status:true,
+                message:"Authorized party not found",
+                result:[]
+              })
             }
           }
           count++;
