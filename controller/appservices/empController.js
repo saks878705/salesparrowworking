@@ -11,7 +11,7 @@ const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
 const sid = "ACc3f03d291aaa9b78b8088eb0b77bf616";
-const auth_token = "b088eeb84d39bd2cc2679faea930b620";
+const auth_token = "7e9c9135a3198fd3ff8ef1730eca650b";
 const twilio = require("twilio")(sid, auth_token);
 const jwt = require("jsonwebtoken");
 
@@ -624,32 +624,49 @@ router.post("/getAllPartyEmp", async (req, res) => {
     });
 });
 
-// router.post('/authorizedParty',(req,res)=>{
-//   const authHeader = req.headers["authorization"];
-//   const token = authHeader && authHeader.split(" ")[1];
-//   if (!token) {
-//     return res.json({
-//       status: false,
-//       message: "Token must be provided",
-//     });
-//   }
-//   var decodedToken = jwt.verify(token, "test");
-//   var employee_id = decodedToken.user_id;
-//   beat_id = req.body.beat_id?req.body.beat_id:"";
-//   if(beat_id==""){
-//     return res.send({
-//       status:false,
-//       message:"First select beat",
-//       result:[]
-//     })
-//   }
-//   Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
-//     Party.find({employee_id}).exec().then(party_data=>{
-//       if()
-//     })
-//   })
+router.post('/authorizedParty',(req,res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) {
+    return res.json({
+      status: false,
+      message: "Token must be provided",
+    });
+  }
+  var decodedToken = jwt.verify(token, "test");
+  var employee_id = decodedToken.user_id;
+  beat_id = req.body.beat_id?req.body.beat_id:"";
+  if(beat_id==""){
+    return res.send({
+      status:false,
+      message:"First select beat",
+      result:[]
+    })
+  }
+  Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
+    if(!beat_data) return res.send({status:true, message:"No Beat found", result:[] }) 
+    Party.find({employee_id}).exec().then(party_data=>{
+      if(party_data.length<1) return res.send({status:true, message:"No party found", result:[] }) 
+      for(let i = 0;i<party_data.length;i++){
+        let arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
+        if(arr==""){
+          continue
+        }else{
+          for(let j = 0;j<arr.length;j++){
+            if(arr[j]==beat_data.route_id){
+              return res.json({
+                status:true,
+                message:"Authorized party found",
+                result:party_data[i]
+              })
+            }
+          }
+        }
+      }
+    })
+  })
 
-// })
+})
 
 router.post("/getParty", (req, res) => {
   var id = req.body.id ? req.body.id : "";
