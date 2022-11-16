@@ -316,8 +316,8 @@ router.post("/routeListing", async (req, res) => {
             }
             }else{
               res.json({
-                status:false,
-                message:"No route found for this ",
+                status:true,
+                message:"No route found  ",
                 result:[]
               })
             }
@@ -380,7 +380,7 @@ router.post("/notAssignedRouteListing", async (req, res) => {
             }
             }else{
               res.json({
-                status:false,
+                status:true,
                 message:"No route found ",
                 result:[]
               })

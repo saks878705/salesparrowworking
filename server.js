@@ -47,6 +47,8 @@ app.use("/auth_api", require("./controllers/webservice/routeController"));
 app.use("/auth_api", require("./controllers/webservice/partyGrpController"));
 app.use("/auth_api", require("./controllers/webservice/subscriptionController"));
 app.use("/auth_api", require("./controllers/webservice/PurchaseSubController"));
+app.use("/auth_api", require("./controllers/webservice/customerTypeController"));
+app.use("/auth_api", require("./controllers/webservice/activityController"));
 
 app.use("/app_api", require("./controller/appservices/empController"));
 app.use("/app_api", require("./controller/appservices/changeBeatController"));

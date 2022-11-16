@@ -38,4 +38,6 @@ require('./purchaseSubModel');
 require('./changeBeatModel');
 require('./attendanceModel');
 require('./retailerModel');
+require('./customerTypeModel');
+require('./activityModel');
 
