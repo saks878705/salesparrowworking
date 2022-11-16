@@ -15,7 +15,7 @@ const party_schema = new Schema({
         type:String,
     },
     pincode:{
-        type:Number
+        type:String
     },
     state:{
         type:String
@@ -33,13 +33,13 @@ const party_schema = new Schema({
         type:String
     },
     GSTNo:{
-        type:Number
+        type:String
     },
     contactPersonName:{
         type:String
     },
     mobileNo:{
-        type:Number
+        type:String
     },
     email:{
         type:String
