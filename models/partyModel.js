@@ -69,6 +69,6 @@ const party_schema = new Schema({
         type: String,
         default:'InActive'
     }
-});
+},{strict:false});
 
 module.exports = mongoose.model('Party',party_schema)

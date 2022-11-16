@@ -230,6 +230,10 @@ router.get("/getEmployee", (req, res) => {
       message: "Token is required",
     });
   }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   Employee.findOne({ _id: employee_id })
@@ -304,6 +308,10 @@ router.post("/profile_update", (req, res) => {
       message: "Token is required",
     });
   }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   Employee.findOne({ _id: employee_id })
@@ -377,7 +385,11 @@ router.post(
         message: "Token is required",
       });
     }
-    var decodedToken = jwt.verify(token, "test");
+    let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
+  var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     Employee.findOne({ _id: employee_id })
       .exec()
@@ -427,6 +439,10 @@ router.post("/addPartyEmp", (req, res) => {
       status: false,
       message: "Token must be provided",
     });
+  }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
   }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
@@ -546,6 +562,10 @@ router.post("/getAllPartyEmp", async (req, res) => {
       message: "Token must be provided",
     });
   }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   var page = req.body.page ? req.body.page : "1";
@@ -630,7 +650,11 @@ router.post("/getAllPartyEmp", async (req, res) => {
 //       message: "Token must be provided",
 //     });
 //   }
-//   var decodedToken = jwt.verify(token, "test");
+//   let x = token.split(".")
+  // if(x.length<3){
+  //   return res.send({status:false,message:"Invalid token"})
+  // }
+  // var decodedToken = jwt.verify(token, "test");
 //   var employee_id = decodedToken.user_id;
 //   beat_id = req.body.beat_id?req.body.beat_id:"";
 //   if(beat_id==""){
@@ -691,6 +715,10 @@ router.post('/authorizedParty',(req,res)=>{
       status: false,
       message: "Token must be provided",
     });
+  }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
   }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
@@ -891,6 +919,10 @@ router.post("/addBeatEmp", (req, res) => {
       message: "Token must be provided",
     });
   }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   var beatName = req.body.beatName ? req.body.beatName : "";
@@ -986,6 +1018,10 @@ router.post("/getAllBeat", async (req, res) => {
   var limit = 10;
   var count = await Beat.find({ company_id });
   var list = [];
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   Beat.find({ employee_id }).limit(limit * 1).skip((page - 1) * limit).sort({ Created_date: -1 }).exec().then((beat_data) => {
@@ -1063,6 +1099,10 @@ router.post("/beatListing", async (req, res) => {
     });
   }
   var list = [];
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   Beat.find({ employee_id }).sort({ Created_date: -1 }).exec().then((beat_data) => {
@@ -1276,6 +1316,10 @@ router.post("/addRoute", (req, res) => {
       message: "Please give token",
     });
   }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
+  }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   var state = req.body.state ? req.body.state : "";
@@ -1361,7 +1405,11 @@ router.post("/addRoute", (req, res) => {
 //       message: "Please give token",
 //     });
 //   }
-//   var decodedToken = jwt.verify(token, "test");
+//   let x = token.split(".")
+  // if(x.length<3){
+  //   return res.send({status:false,message:"Invalid token"})
+  // }
+  // var decodedToken = jwt.verify(token, "test");
 //   var employee_id = decodedToken.user_id;
 //   var state = req.body.state ? req.body.state : "";
 //   var city = req.body.city ? req.body.city : "";
@@ -1455,6 +1503,10 @@ router.post("/routeListing", (req, res) => {
       status: false,
       message: "Please give token",
     });
+  }
+  let x = token.split(".")
+  if(x.length<3){
+    return res.send({status:false,message:"Invalid token"})
   }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;

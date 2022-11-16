@@ -60,6 +60,6 @@ const retailer_schema = new Schema({
         type: String,
         default:'InActive'
     }
-});
+},{strict:false});
 
 module.exports = mongoose.model('Retailer',retailer_schema)
