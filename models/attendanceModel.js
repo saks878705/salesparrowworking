@@ -5,13 +5,13 @@ const attendance_schema = new Schema({
     emp_id:{
         type:String
     },
-    distributor_id:{
+    party_id:{
         type:String
     },
     beat_id:{
         type:String
     },
-    activity:{
+    activity_id:{
         type:String
     },
     check_in:{

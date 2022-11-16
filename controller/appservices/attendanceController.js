@@ -44,20 +44,20 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     var beat = req.body.beat?req.body.beat:"";
-    var distributor = req.body.distributor?req.body.distributor:"";
+    var party = req.body.party?req.body.party:"";
     var activity = req.body.activity?req.body.activity:"";
     var location = req.body.location?req.body.location:"";
     if(beat!=""){
-        if(distributor!=""){
+        if(party!=""){
             if(activity!=""){
                 if(location!=""){
                     Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
                         if(emp_data.status=="Active" || emp_data.status=="Approved"){
                             var new_attendance = new Attendance({
                                 emp_id:employee_id,
-                                distributor_id:distributor,
+                                party_id:party,
                                 beat_id:beat,
-                                activity:activity,
+                                activity_id:activity,
                                 selfie:base_url+req.files.selfie[0].path,
                                 location:location,
                                 check_in:get_current_date(),
