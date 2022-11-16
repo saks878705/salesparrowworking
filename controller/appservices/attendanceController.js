@@ -73,35 +73,20 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                                 })
                             })
                         }else{
-                            res.json({
-                                status:false,
-                                message:"You are not active yet",
-                            })
+                            res.json({status:false,message:"You are not active yet",})
                         }
                     })
                 }else{
-                    res.json({
-                        status:false,
-                        message:"Location must be selected",
-                    })
+                    res.json({status:false,message:"Location must be selected",})
                 }
             }else{
-                res.json({
-                    status:false,
-                    message:"Activity must be selected",
-                })
+                res.json({status:false,message:"Activity must be selected",})
             }
         }else{
-            res.json({
-                status:false,
-                message:"Distributor must be selected",
-            })
+            res.json({status:false,message:"Distributor must be selected",})
         }
     }else{
-        res.json({
-            status:false,
-            message:"Beat must be selected",
-        })
+        res.json({status:false,message:"Beat must be selected",})
     }
 
 });

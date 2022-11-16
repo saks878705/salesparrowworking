@@ -58,7 +58,8 @@ router.post('/partyGrpList',async (req,res)=>{
             }else{
                 res.json({
                     status:false,
-                    message:"No Party Group found in thid state for this org."
+                    message:"No Party Group found in thid state for this org.",
+                    result:[]
                 })
             }
         })
