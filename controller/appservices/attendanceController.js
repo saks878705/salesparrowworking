@@ -35,12 +35,7 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
     console.log(req.body);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    if (!token) {
-      return res.json({
-        status: false,
-        message: "Token must be provided",
-      });
-    }
+    if (!token) return res.json({status: false,message: "Token must be provided",});
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     var beat = req.body.beat?req.body.beat:"";
