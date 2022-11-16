@@ -297,6 +297,7 @@ router.post("/routeListing", async (req, res) => {
                               start_point: rowData.start_point,
                               distance: rowData.distance,
                               end_point: rowData.end_point,
+                              status: rowData.status,
                             };
                             list.push(u_data);
                           })(route_data[i]);
@@ -361,6 +362,7 @@ router.post("/notAssignedRouteListing", async (req, res) => {
                               start_point: rowData.start_point,
                               distance: rowData.distance,
                               end_point: rowData.end_point,
+                              status: rowData.status,
                             };
                             list.push(u_data);
                           })(route_data[i]);
