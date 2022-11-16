@@ -643,38 +643,44 @@ router.post('/authorizedParty',(req,res)=>{
       result:[]
     })
   }
-  Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
-    if(!beat_data) return res.send({status:true, message:"No Beat found", result:[] }) 
-    Party.find({employee_id}).exec().then(party_data=>{
-      if(party_data.length<1) return res.send({status:true, message:"No party found", result:[] }) 
-      for(let i = 0;i<party_data.length;i++){
-        console.log(party_data[i])
-        console.log(party_data[i].route)
-        console.log(party_data[i].route[0])
-        let arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
-        if(arr==""){
-          console.log("inside first if")
-          res.json({
-            status:true,
-            message:"No party data found",
-            result:[]
-          })
-        }else{
-          console.log("insidde else");
-          console.log(arr.length);
-          for(let j = 0;j<arr.length;j++){
-            console.log("inside for");
-            if(arr[j]==beat_data.route_id){
-              console.log("insidde if");
-              return res.json({
+  Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+    Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
+      if(!beat_data) return res.send({status:true, message:"No Beat found", result:[] }) 
+      Party.find({$or:[{company_id:emp_data.companyId}]}).exec().then(party_data=>{
+        if(party_data.length<1) return res.send({status:true, message:"No party found", result:[] }) 
+        let count = 0;
+        for(let i = 0;i<party_data.length;i++){
+          console.log(party_data[i])
+          console.log(party_data[i].route)
+          console.log(party_data[i].route[0])
+          let arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
+          if(arr==""){
+            console.log("inside first if")
+            if(count==party_data.length-1){
+              res.json({
                 status:true,
-                message:"Authorized party found",
-                result:party_data[i]
+                message:"No party data found",
+                result:[]
               })
             }
+          }else{
+            console.log("insidde else");
+            console.log(arr.length);
+            for(let j = 0;j<arr.length;j++){
+              console.log("inside for");
+              if(arr[j]==beat_data.route_id){
+                console.log("insidde if");
+                return res.json({
+                  status:true,
+                  message:"Authorized party found",
+                  result:party_data[i]
+                })
+              }
+            }
           }
+          count++;
         }
-      }
+      })
     })
   })
 
