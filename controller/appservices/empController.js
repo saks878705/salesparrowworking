@@ -121,9 +121,8 @@ router.post("/sendOtp", (req, res) => {
     ? req.body.to_phone_number
     : "";
   if (to_phone_number != "") {
-    Employee.findOne({ phone: to_phone_number })
-      .exec()
-      .then((data) => {
+    Employee.findOne({ phone: to_phone_number }).exec().then((data) => {
+      if(data){
         if (data.status == "InActive" || data.status == "UnApproved") {
           return res.json({
             status: false,
@@ -136,7 +135,7 @@ router.post("/sendOtp", (req, res) => {
         //   { user_id: data._id, is_token_valide: 1 },
         //   "test"
         // );
-        if (data) {
+        if (data.status=="Active" || data.status=="Approved") {
           twilio.messages
             .create({
               from: "+18505186447",
@@ -153,23 +152,45 @@ router.post("/sendOtp", (req, res) => {
                   res.json({
                     status: true,
                     message: "Message has been sent",
-                    //token: token,
                   });
                 });
             })
             .catch((err) => {
-              console.log(err);
-              res.json({
-                status: false,
-                message: "There is some error.",
+              console.log(`err--------${err.message}-------thats all`);
+              if(err.message.includes("unverified")){
+                console.log("inside if")
+                Employee.findOneAndUpdate(
+                  { phone: to_phone_number },
+                  { $set: { otp: OTP } }
+                )
+                  .exec()
+                  .then(() => {
+                   return res.json({
+                      status: true,
+                      message: "Message has been sent",
+                    });
+                  });
+              }else{
+                console.log("inside else")
+                res.json({
+                  status: false,
+                  message: "There is some error.",
+                });
+              }
               });
-            });
+              
         } else {
           res.json({
             status: false,
             message: "Not registered yet.please contact your admin.",
           });
         }
+      }else{
+        res.json({
+          status: true,
+          message: "Employee not found",
+        });
+      }
       });
   } else {
     res.json({
