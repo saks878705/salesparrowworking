@@ -40,4 +40,5 @@ require('./attendanceModel');
 require('./retailerModel');
 require('./customerTypeModel');
 require('./activityModel');
+require('./partytypeModel');
 
