@@ -412,7 +412,7 @@ router.post("/edit_route", (req, res) => {
     }
     if (req.body.status) {
       updated_route.status = req.body.status;
-    }status
+    }
     Route.findOneAndUpdate({_id:id},updated_route,{new:true},(err,doc)=>{
         if(doc){
             res.json({
