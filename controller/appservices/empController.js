@@ -204,7 +204,7 @@ router.post("/emplogin", (req, res) => {
   console.log(req.body);
   var phone = req.body.phone ? req.body.phone : "";
   var otp = req.body.otp ? req.body.otp : "";
-  if(otp="") return res.json({status:false,message:"Otp is required"})
+  if(otp=="") return res.json({status:false,message:"Otp is required"})
   if (phone != "") {
     Employee.findOne({$and:[{otp},{ phone }]}).exec().then((emp_data) => {
         if (emp_data) {
