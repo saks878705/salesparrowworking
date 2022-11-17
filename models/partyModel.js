@@ -15,7 +15,7 @@ const party_schema = new Schema({
         type:String,
     },
     pincode:{
-        type:String
+        type:Number
     },
     state:{
         type:String
@@ -39,7 +39,7 @@ const party_schema = new Schema({
         type:String
     },
     mobileNo:{
-        type:String
+        type:Number
     },
     email:{
         type:String
