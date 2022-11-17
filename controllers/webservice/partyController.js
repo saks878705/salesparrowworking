@@ -31,7 +31,10 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
 
-router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),(req, res) => {
+router.post(
+  "/addParty",
+  imageUpload.fields([{ name: "Party_image" }]),
+  (req, res) => {
     console.log(req.body);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -89,32 +92,38 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),(req, res)
                       status: "Active",
                     });
                     new_party.save().then((data) => {
-                      console.log(route)
-                      console.log(route[0])
-                      var arr = route?route.split(","): "";
-                      console.log(arr)
-                      if(arr==""){
+                      console.log(route);
+                      console.log(route[0]);
+                      var arr = route ? route.split(",") : "";
+                      console.log(arr);
+                      if (arr == "") {
                         res.status(200).json({
                           status: true,
                           message: "Party created successfully",
                           result: data,
                         });
-                      }else{
+                      } else {
                         let count = 0;
-                        for(let i = 0;i<arr.length;i++){
-                          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:data._id}}).exec().then(route_data=>{
-                            count++;
-                            if(count==arr.length){
-                              res.status(200).json({
-                                status: true,
-                                message: "Party created successfully",
-                                result: data,
-                              });
+                        for (let i = 0; i < arr.length; i++) {
+                          Route.updateOne(
+                            { _id: arr[i] },
+                            {
+                              $set: { is_assigned: "1", assigned_to: data._id },
                             }
-                          })
+                          )
+                            .exec()
+                            .then((route_data) => {
+                              count++;
+                              if (count == arr.length) {
+                                res.status(200).json({
+                                  status: true,
+                                  message: "Party created successfully",
+                                  result: data,
+                                });
+                              }
+                            });
                         }
                       }
-                      
                     });
                   } else {
                     res.json({
@@ -169,7 +178,7 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),(req, res)
 
 router.post("/editParty", (req, res) => {
   console.log(req.body);
-  var route = req.body.route?req.body.route:""
+  var route = req.body.route ? req.body.route : "";
   var id = req.body.id ? req.body.id : "";
   Party.find({ _id: id })
     .exec()
@@ -182,22 +191,29 @@ router.post("/editParty", (req, res) => {
         if (req.body.firmName) {
           updated_party.firmName = req.body.firmName;
         }
-        if(party_data[0].route==null){
+        if (party_data[0].route == null) {
           updated_party.route = req.body.route;
-        }else {
-          var arr2 = party_data[0].route[0]?party_data[0].route[0].split(","): "";
-          if(arr2==""){
+        } else {
+          var arr2 = party_data[0].route[0]
+            ? party_data[0].route[0].split(",")
+            : "";
+          if (arr2 == "") {
             updated_party.route = req.body.route;
-          }else{
+          } else {
             let count2 = 0;
-            for(let j = 0;j<arr2.length;j++){
-              console.log(arr2[j])
-              Route.updateOne({_id:arr2[j]},{$set:{is_assigned:"0",assigned_to:""}}).exec().then(route_data=>{
-                count2++;
-                if(count2==arr2.length){
-                  updated_party.route = req.body.route;
-                }
-              })
+            for (let j = 0; j < arr2.length; j++) {
+              console.log(arr2[j]);
+              Route.updateOne(
+                { _id: arr2[j] },
+                { $set: { is_assigned: "0", assigned_to: "" } }
+              )
+                .exec()
+                .then((route_data) => {
+                  count2++;
+                  if (count2 == arr2.length) {
+                    updated_party.route = req.body.route;
+                  }
+                });
             }
           }
         }
@@ -239,31 +255,39 @@ router.post("/editParty", (req, res) => {
           updated_party.status = req.body.status;
         }
         updated_party.Updated_date = get_current_date();
-        Party.findOneAndUpdate({ _id: id },updated_party,{ new: true },(err, doc) => {
+        Party.findOneAndUpdate(
+          { _id: id },
+          updated_party,
+          { new: true },
+          (err, doc) => {
             if (doc) {
-              var arr = route?route.split(","): "";
-              if(arr==""){
+              var arr = route ? route.split(",") : "";
+              if (arr == "") {
                 res.status(200).json({
                   status: true,
                   message: "Update successfully",
                   results: updated_party,
                 });
-              }else{
+              } else {
                 let count = 0;
-                for(let i = 0;i<arr.length;i++){
-                  Route.updateOne({_id:arr[i]},{$set:{is_assigned:"1",assigned_to:id}}).exec().then(route_data=>{
-                    count++;
-                    if(count==arr.length){
-                      res.status(200).json({
-                        status: true,
-                        message: "Update successfully",
-                        results: updated_party,
-                      });
-                    }
-                  })
+                for (let i = 0; i < arr.length; i++) {
+                  Route.updateOne(
+                    { _id: arr[i] },
+                    { $set: { is_assigned: "1", assigned_to: id } }
+                  )
+                    .exec()
+                    .then((route_data) => {
+                      count++;
+                      if (count == arr.length) {
+                        res.status(200).json({
+                          status: true,
+                          message: "Update successfully",
+                          results: updated_party,
+                        });
+                      }
+                    });
                 }
               }
-              
             }
           }
         );
@@ -304,139 +328,143 @@ router.post("/getAllParty", async (req, res) => {
   } else if (company_id != "" && state != "" && partyType != "") {
     obj1 = [{ company_id }, { state }, { partyType }];
   }
-  Party.find({ $and: obj1 }).sort({status:-1}).limit(limit * 1).skip((page - 1) * limit).exec().then((party_data) => {
-      console.log("party_data", party_data);
+  Party.find({ $and: obj1 })
+    .sort({ "status": -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit)
+    .exec()
+    .then(async (party_data) => {
+      console.log(party_data);
       if (party_data.length > 0) {
         let counInfo = 0;
         for (let i = 0; i < party_data.length; i++) {
-          Location.findOne({ _id: party_data[i].state })
-            .exec()
-            .then((state_data) => {
-              Location.findOne({ _id: party_data[i].city })
-                .exec()
-                .then((city_data) => {
-                  Location.findOne({ _id: party_data[i].district })
-                    .exec()
-                    .then((district_data) => {
-                      var arr = party_data[i].route? party_data[i].route[0].split(","): "";
-                      if (arr == "") {
-                        (async function (rowData) {
-                          var u_data = {
-                            id: rowData._id,
-                            state: { name: state_data.name, id: rowData.state },
-                            city: { name: city_data.name, id: rowData.city },
-                            district: {
-                              name: district_data.name,
-                              id: rowData.district,
-                            },
-                            firmName: rowData.firmName,
-                            partyType: rowData.partyType,
-                            image: rowData.image,
-                            pincode: rowData.pincode,
-                            GSTNo: rowData.GSTNo,
-                            contactPersonName: rowData.contactPersonName,
-                            mobileNo: rowData.mobileNo,
-                            email: rowData.email,
-                            DOB: rowData.DOB,
-                            DOA: rowData.DOA,
-                            route: list2,
-                            areas: rowData.address,
-                            status: rowData.status,
-                          };
-                          list.push(u_data);
-                        })(party_data[i]);
-                        counInfo++;
-                        if (counInfo == party_data.length) {
-                          let c = Math.ceil(count.length / limit);
-                          console.log(count.length);
-                          console.log(c);
-                          if (c == 0) {
-                            c += 1;
-                          }
-                          res.json({
-                            status: true,
-                            message:
-                              "Parties for this state found successfully",
-                            result: list,
-                            pageLength: c,
-                          });
-                        }
-                      } else {
-                        console.log("inside else");
-                        for (let j = 0; j < arr.length; j++) {
-                          console.log(j);
-                          console.log(arr[j]);
-                          Route.findOne({ _id: arr[j] })
-                            .exec()
-                            .then(async (route_data) => {
-                              console.log("routedata", route_data);
-                              let data = {
-                                start_point: route_data.start_point,
-                                end_point: route_data.end_point,
-                                id: route_data._id,
-                              };
-                              list2.push(data);
-                              console.log(list2);
-                              if (arr.length == j + 1) {
-                                console.log("ye kitti baar chala");
-                                console.log(
-                                  "party_data near rowData>>>>>",
-                                  party_data[i]
-                                );
-                                await (async function (rowData) {
-                                  var u_data = {
-                                    id: rowData._id,
-                                    state: {
-                                      name: state_data.name,
-                                      id: rowData.state,
-                                    },
-                                    city: {
-                                      name: city_data.name,
-                                      id: rowData.city,
-                                    },
-                                    district: {
-                                      name: district_data.name,
-                                      id: rowData.district,
-                                    },
-                                    firmName: rowData.firmName,
-                                    partyType: rowData.partyType,
-                                    pincode: rowData.pincode,
-                                    image: rowData.image,
-                                    GSTNo: rowData.GSTNo,
-                                    contactPersonName:
-                                      rowData.contactPersonName,
-                                    mobileNo: rowData.mobileNo,
-                                    email: rowData.email,
-                                    DOB: rowData.DOB,
-                                    DOA: rowData.DOA,
-                                    route: list2,
-                                    areas: rowData.address,
-                                    status: rowData.status,
-                                  };
-                                  list.push(u_data);
-                                  list2 = [];
-                                })(party_data[i]);
-                                counInfo++;
-                                if (counInfo == party_data.length) {
-                                  let c = Math.ceil(count.length / limit);
-                                  if (c == 0) {
-                                    c += 1;
-                                  }
-                                  res.json({
-                                    status: true,
-                                    message:
-                                      "Parties for this state found successfully",
-                                    result: list,
-                                    pageLength: c,
-                                  });
-                                }
-                              }
-                            });
-                        }
+          var arr = party_data[i].route
+            ? party_data[i].route[0].split(",")
+            : "";
+          if (arr == "") {
+            await (async function (rowData) {
+              var state_data = await Location.findOne({
+                _id: party_data[i].state,
+              });
+              var city_data = await Location.findOne({
+                _id: party_data[i].city,
+              });
+              var district_data = await Location.findOne({
+                _id: party_data[i].district,
+              });
+              var u_data = {
+                id: rowData._id,
+                state: { name: state_data.name, id: rowData.state },
+                city: { name: city_data.name, id: rowData.city },
+                district: {
+                  name: district_data.name,
+                  id: rowData.district,
+                },
+                firmName: rowData.firmName,
+                partyType: rowData.partyType,
+                image: rowData.image,
+                pincode: rowData.pincode,
+                GSTNo: rowData.GSTNo,
+                contactPersonName: rowData.contactPersonName,
+                mobileNo: rowData.mobileNo,
+                email: rowData.email,
+                DOB: rowData.DOB,
+                DOA: rowData.DOA,
+                route: list2,
+                areas: rowData.address,
+                status: rowData.status,
+              };
+              list.push(u_data);
+            })(party_data[i]);
+            counInfo++;
+            if (counInfo == party_data.length) {
+              let c = Math.ceil(count.length / limit);
+              console.log(count.length);
+              console.log(c);
+              if (c == 0) {
+                c += 1;
+              }
+              res.json({
+                status: true,
+                message: "Parties for this state found successfully",
+                result: list,
+                pageLength: c,
+              });
+            }
+          } else {
+            console.log("inside else");
+            for (let j = 0; j < arr.length; j++) {
+              var state_data = await Location.findOne({
+                _id: party_data[i].state,
+              });
+              var city_data = await Location.findOne({
+                _id: party_data[i].city,
+              });
+              var district_data = await Location.findOne({
+                _id: party_data[i].district,
+              });
+              console.log(j);
+              console.log(arr[j]);
+              var route_data = await Route.findOne({ _id: arr[j] })
+                  console.log("routedata", route_data);
+                  let data = {
+                    start_point: route_data.start_point,
+                    end_point: route_data.end_point,
+                    id: route_data._id,
+                  };
+                  list2.push(data);
+                  console.log(list2);
+                  if (arr.length == j + 1) {
+                    console.log("ye kitti baar chala");
+                    console.log("party_data near rowData>>>>>", party_data[i]);
+                    await (async function (rowData) {
+                      var u_data = {
+                        id: rowData._id,
+                        state: {
+                          name: state_data.name,
+                          id: rowData.state,
+                        },
+                        city: {
+                          name: city_data.name,
+                          id: rowData.city,
+                        },
+                        district: {
+                          name: district_data.name,
+                          id: rowData.district,
+                        },
+                        firmName: rowData.firmName,
+                        partyType: rowData.partyType,
+                        pincode: rowData.pincode,
+                        image: rowData.image,
+                        GSTNo: rowData.GSTNo,
+                        contactPersonName: rowData.contactPersonName,
+                        mobileNo: rowData.mobileNo,
+                        email: rowData.email,
+                        DOB: rowData.DOB,
+                        DOA: rowData.DOA,
+                        route: list2,
+                        areas: rowData.address,
+                        status: rowData.status,
+                      };
+                      list.push(u_data);
+                      list2 = [];
+                    })(party_data[i]);
+                    counInfo++;
+                    if (counInfo == party_data.length) {
+                      let c = Math.ceil(count.length / limit);
+                      if (c == 0) {
+                        c += 1;
                       }
-                    });
-                });
-            });
+                      res.json({
+                        status: true,
+                        message: "Parties for this state found successfully",
+                        result: list,
+                        pageLength: c,
+                      });
+                    }
+                  }
+            }
+          }
         }
       } else {
         res.json({
@@ -572,7 +600,10 @@ router.post("/getParty", (req, res) => {
   }
 });
 
-router.post("/partyProfileImage",imageUpload.fields([{ name: "party_image" }]),(req, res) => {
+router.post(
+  "/partyProfileImage",
+  imageUpload.fields([{ name: "party_image" }]),
+  (req, res) => {
     console.log(req.body);
     const id = req.body.id ? req.body.id : "";
     if (id != "") {
@@ -623,41 +654,53 @@ router.post("/partyProfileImage",imageUpload.fields([{ name: "party_image" }]),(
 router.delete("/deleteParty", (req, res) => {
   var id = req.body.id ? req.body.id : "";
   if (id != "") {
-    Party.findOne({ _id: id }).exec().then((party_data) => {
-      var arr = party_data.route?party_data.route[0].split(","): "";
-      console.log(arr)
-      
-      if(arr==""){
-        Party.findOneAndDelete({ _id: id }).exec().then(() => {
-          res.status(200).json({
-            status: true,
-            message: "Deleted successfully",
-          });
-        });
-      }else{
-        let count = 0;
-        for(let i = 0;i<arr.length;i++){
-          console.log(arr[i])
-          Route.updateOne({_id:arr[i]},{$set:{is_assigned:"0",assigned_to:""}}).exec().then(route_data=>{
-            count++;
-            if(count==arr.length){
-              Party.findOneAndDelete({ _id: id }).exec().then(() => {
-                res.status(200).json({
-                  status: true,
-                  message: "Deleted successfully",
-                });
+    Party.findOne({ _id: id })
+      .exec()
+      .then((party_data) => {
+        var arr = party_data.route ? party_data.route[0].split(",") : "";
+        console.log(arr);
+
+        if (arr == "") {
+          Party.findOneAndDelete({ _id: id })
+            .exec()
+            .then(() => {
+              res.status(200).json({
+                status: true,
+                message: "Deleted successfully",
               });
-            }
-          })
-        }      
-      }
-      
+            });
+        } else {
+          let count = 0;
+          for (let i = 0; i < arr.length; i++) {
+            console.log(arr[i]);
+            Route.updateOne(
+              { _id: arr[i] },
+              { $set: { is_assigned: "0", assigned_to: "" } }
+            )
+              .exec()
+              .then((route_data) => {
+                count++;
+                if (count == arr.length) {
+                  Party.findOneAndDelete({ _id: id })
+                    .exec()
+                    .then(() => {
+                      res.status(200).json({
+                        status: true,
+                        message: "Deleted successfully",
+                      });
+                    });
+                }
+              });
+          }
+        }
       });
-      
   }
 });
 
-router.post("/bulkImport",imageUpload.fields([{ name: "party_excel" }]),(req, res) => {
+router.post(
+  "/bulkImport",
+  imageUpload.fields([{ name: "party_excel" }]),
+  (req, res) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if (!token) {
@@ -690,7 +733,7 @@ router.post("/bulkImport",imageUpload.fields([{ name: "party_excel" }]),(req, re
                       partyType: xlData[i].Party_Type,
                       firmName: xlData[i].Firm_Name,
                       GSTNo: xlData[i].GST_No,
-                      route:"",
+                      route: "",
                       image: xlData[i].Profile_Image,
                       contactPersonName: xlData[i].Contact_Person_Name,
                       mobileNo: xlData[i].Phone_Number,
