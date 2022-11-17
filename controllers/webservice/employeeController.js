@@ -244,7 +244,7 @@ router.post("/getAllEmployee", async (req, res) => {
   }
   console.log(arr);
   var list = [];
-  Employee.find({ $and: arr }).limit(limit*1).skip((page - 1) * limit).exec().then((emp_data) => {
+  Employee.find({ $and: arr }).sort({Updated_date:-1}).limit(limit*1).skip((page - 1) * limit).exec().then((emp_data) => {
     console.log(emp_data)
     if (emp_data.length > 0) {
       let counInfo = 0;
