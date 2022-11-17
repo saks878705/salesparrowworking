@@ -304,12 +304,7 @@ router.post("/getAllParty", async (req, res) => {
   } else if (company_id != "" && state != "" && partyType != "") {
     obj1 = [{ company_id }, { state }, { partyType }];
   }
-  Party.find({ $and: obj1 })
-    .sort({"status":-1})
-    .limit(limit * 1)
-    .skip((page - 1) * limit)
-    .exec()
-    .then((party_data) => {
+  Party.find({ $and: obj1 }).sort({status:-1}).limit(limit * 1).skip((page - 1) * limit).exec().then((party_data) => {
       console.log("party_data", party_data);
       if (party_data.length > 0) {
         let counInfo = 0;
