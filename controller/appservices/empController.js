@@ -591,6 +591,7 @@ router.post("/getAllPartyEmp", async (req, res) => {
   var count = await Party.find({ employee_id });
   var list = [];
   Party.find({ employee_id })
+    .sort({Updated_date:-1})
     .limit(limit * 1)
     .skip((page - 1) * limit)
     .exec()
@@ -976,7 +977,7 @@ router.post("/getAllBeat", async (req, res) => {
   }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
-  Beat.find({ employee_id }).limit(limit * 1).skip((page - 1) * limit).sort({ Created_date: -1 }).exec().then((beat_data) => {
+  Beat.find({ employee_id }).sort({Updated_date:-1}).limit(limit * 1).skip((page - 1) * limit).sort({ Created_date: -1 }).exec().then((beat_data) => {
       let counInfo = 0;
       if (beat_data.length > 0) {
         for (let i = 0; i < beat_data.length; i++) {
