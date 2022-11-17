@@ -25,7 +25,7 @@ const employee_schema = new Schema({
         type:String
     },
     phone:{
-        type:String
+        type:Number
     },
     email:{
         type:String,
@@ -34,7 +34,7 @@ const employee_schema = new Schema({
         type:String
     },
     pincode:{
-        type:String
+        type:Number
     },
     state:{
         type:String
