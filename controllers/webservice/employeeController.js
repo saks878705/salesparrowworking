@@ -43,8 +43,12 @@ router.post(
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     var employeeName = req.body.employeeName ? req.body.employeeName : "";
-    var headquarterState = req.body.headquarterState ? req.body.headquarterState : "";
-    var headquarterCity = req.body.headquarterCity ? req.body.headquarterCity : "";
+    var headquarterState = req.body.headquarterState
+      ? req.body.headquarterState
+      : "";
+    var headquarterCity = req.body.headquarterCity
+      ? req.body.headquarterCity
+      : "";
     var phone = req.body.phone ? req.body.phone : "";
     var email = req.body.email ? req.body.email : "";
     var address = req.body.address ? req.body.address : "";
@@ -221,11 +225,11 @@ router.patch("/editEmployee", (req, res) => {
 router.post("/getAllEmployee", async (req, res) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if(!token){
+  if (!token) {
     return res.json({
-      status:false,
-      message:"Token must be provided"
-    })
+      status: false,
+      message: "Token must be provided",
+    });
   }
   var decodedToken = jwt.verify(token, "test");
   var user_id = decodedToken.user_id;
@@ -244,128 +248,156 @@ router.post("/getAllEmployee", async (req, res) => {
   }
   console.log(arr);
   var list = [];
-  Employee.find({ $and: arr }).sort({"status":-1}).limit(limit*1).skip((page - 1) * limit).exec().then((emp_data) => {
-    console.log(emp_data)
-    if (emp_data.length > 0) {
-      let counInfo = 0;
-      for (let i = 0; i < emp_data.length; i++) {
-        Location.findOne({ _id: emp_data[i].state }).exec().then((state_data) => {
-          Location.findOne({ _id: emp_data[i].headquarterState }).exec().then((headquarter_state_data) => {
-            Location.findOne({ _id: emp_data[i].headquarterCity }).exec().then((headquarter_city_data) => {
-              Location.findOne({ _id: emp_data[i].city }).exec().then((city_data) => {
-                Location.findOne({ _id: emp_data[i].district }).exec().then((area_data) => {
-                    Role.findOne({ _id: emp_data[i].roleId }).exec().then(async (role_data) => {
-                        if (!role_data) {
-                          await (async function (rowData) {
-                            var u_data = {
-                              id: rowData._id,
-                              employeeName: rowData.employeeName,
-                              phone: rowData.phone,
-                              email: rowData.email,
-                              address: rowData.address,
-                              pincode: rowData.pincode,
-                              image: rowData.image,
-                              state: {
-                                name: state_data.name,
-                                id: state_data._id,
-                              },
-                              headquarterState: {
-                                name: headquarter_state_data ? headquarter_state_data.name : "",
-                                id: headquarter_state_data ? headquarter_state_data._id : "",
-                              },
-                              headquarterCity: {
-                                name: headquarter_city_data ? headquarter_city_data.name : "",
-                                id: headquarter_city_data ? headquarter_city_data._id : "",
-                              },
-                              city: {
-                                name: city_data.name,
-                                id: city_data._id,
-                              },
-                              district: {
-                                name: area_data.name,
-                                id: area_data._id,
-                              },
-                              experience: rowData.experience,
-                              qualification: rowData.qualification,
-                              status: rowData.status,
-                              role: "SA",
-                            };
-                            list.push(u_data);
-                          })(emp_data[i]);
-                          counInfo++;
-                          if (counInfo == emp_data.length) {
-                            res.json({
-                              status: true,
-                              message: "All Employees found successfully",
-                              result: list,
-                              pageLength: Math.ceil(count.length / limit),
-                            });
-                          }
-                        } else {
-                          await (async function (rowData) {
-                            var u_data = {
-                              id: rowData._id,
-                              employeeName: rowData.employeeName,
-                              phone: rowData.phone,
-                              email: rowData.email,
-                              address: rowData.address,
-                              pincode: rowData.pincode,
-                              image: rowData.image,
-                              state: {
-                                name: state_data.name,
-                                id: state_data._id,
-                              },
-                              headquarterState: {
-                                name: headquarter_state_data ? headquarter_state_data.name : "",
-                                id: headquarter_state_data ? headquarter_state_data._id : "",
-                              },
-                              headquarterCity: {
-                                name: headquarter_city_data ? headquarter_city_data.name : "",
-                                id: headquarter_city_data ? headquarter_city_data._id : "",
-                              },
-                              city: {
-                                name: city_data.name,
-                                id: city_data._id,
-                              },
-                              district: {
-                                name: area_data.name,
-                                id: area_data._id,
-                              },
-                              experience: rowData.experience,
-                              qualification: rowData.qualification,
-                              status: rowData.status,
-                              role: role_data.rolename,
-                            };
-                            list.push(u_data);
-                          })(emp_data[i]);
-                          counInfo++;
-                          if (counInfo == emp_data.length) {
-                            res.json({
-                              status: true,
-                              message: "All Employees found successfully",
-                              result: list,
-                              pageLength: Math.ceil(count.length / limit),
-                            });
-                          }
-                        }
-                      });
-                  });
+  Employee.find({ $and: arr })
+    .sort({ status: -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit)
+    .exec()
+    .then(async (emp_data) => {
+      console.log(emp_data);
+      if (emp_data.length > 0) {
+        let counInfo = 0;
+        for (let i = 0; i < emp_data.length; i++) {
+          let role_data = await Role.findOne({ _id: emp_data[i].roleId });
+          if (!role_data) {
+            await (async function (rowData) {
+              let state_data = await Location.findOne({
+                _id: emp_data[i].state,
               });
-            });
-          });
-        })
+              let headquarter_state_data = await Location.findOne({
+                _id: emp_data[i].headquarterState,
+              });
+              let headquarter_city_data = await Location.findOne({
+                _id: emp_data[i].headquarterCity,
+              });
+              let city_data = await Location.findOne({ _id: emp_data[i].city });
+              let area_data = await Location.findOne({
+                _id: emp_data[i].district,
+              });
+              var u_data = {
+                id: rowData._id,
+                employeeName: rowData.employeeName,
+                phone: rowData.phone,
+                email: rowData.email,
+                address: rowData.address,
+                pincode: rowData.pincode,
+                image: rowData.image,
+                state: {
+                  name: state_data.name,
+                  id: state_data._id,
+                },
+                headquarterState: {
+                  name: headquarter_state_data
+                    ? headquarter_state_data.name
+                    : "",
+                  id: headquarter_state_data ? headquarter_state_data._id : "",
+                },
+                headquarterCity: {
+                  name: headquarter_city_data ? headquarter_city_data.name : "",
+                  id: headquarter_city_data ? headquarter_city_data._id : "",
+                },
+                city: {
+                  name: city_data.name,
+                  id: city_data._id,
+                },
+                district: {
+                  name: area_data.name,
+                  id: area_data._id,
+                },
+                experience: rowData.experience,
+                qualification: rowData.qualification,
+                status: rowData.status,
+                role: "SA",
+              };
+              list.push(u_data);
+            })(emp_data[i]);
+            counInfo++;
+            if (counInfo == emp_data.length) {
+              res.json({
+                status: true,
+                message: "All Employees found successfully",
+                result: list,
+                pageLength: Math.ceil(count.length / limit),
+              });
+            }
+          } else {
+            await (async function (rowData) {
+              let state_data = await Location.findOne({
+                _id: emp_data[i].state,
+              });
+              let headquarter_state_data = await Location.findOne({
+                _id: emp_data[i].headquarterState,
+              });
+              let headquarter_city_data = await Location.findOne({
+                _id: emp_data[i].headquarterCity,
+              });
+              let city_data = await Location.findOne({ _id: emp_data[i].city });
+              let area_data = await Location.findOne({
+                _id: emp_data[i].district,
+              });
+              let role_data = await Role.findOne({ _id: emp_data[i].roleId });
+              var u_data = {
+                id: rowData._id,
+                employeeName: rowData.employeeName,
+                phone: rowData.phone,
+                email: rowData.email,
+                address: rowData.address,
+                pincode: rowData.pincode,
+                image: rowData.image,
+                state: {
+                  name: state_data.name,
+                  id: state_data._id,
+                },
+                headquarterState: {
+                  name: headquarter_state_data
+                    ? headquarter_state_data.name
+                    : "",
+                  id: headquarter_state_data ? headquarter_state_data._id : "",
+                },
+                headquarterCity: {
+                  name: headquarter_city_data ? headquarter_city_data.name : "",
+                  id: headquarter_city_data ? headquarter_city_data._id : "",
+                },
+                city: {
+                  name: city_data.name,
+                  id: city_data._id,
+                },
+                district: {
+                  name: area_data.name,
+                  id: area_data._id,
+                },
+                experience: rowData.experience,
+                qualification: rowData.qualification,
+                status: rowData.status,
+                role: role_data.rolename,
+              };
+              list.push(u_data);
+            })(emp_data[i]);
+            counInfo++;
+            if (counInfo == emp_data.length) {
+              res.json({
+                status: true,
+                message: "All Employees found successfully",
+                result: list,
+                pageLength: Math.ceil(count.length / limit),
+              });
+            }
+          }
+        }
+      } else {
+        res.json({
+          status: false,
+          message: "No employee found",
+          result: [],
+        });
       }
-    } else {
-      res.json({
-        status: false,
-        message: "No employee found",
-        result: [],
-      });
-    }
-  });
+    });
 });
 
-router.post("/employeeProfileImage",imageUpload.fields([{ name: "Employee_image" }]),(req, res) => {
+router.post(
+  "/employeeProfileImage",
+  imageUpload.fields([{ name: "Employee_image" }]),
+  (req, res) => {
     console.log(req.files);
     const id = req.body.id ? req.body.id : "";
     if (id != "") {
@@ -490,7 +522,9 @@ router.post("/getEmp", (req, res) => {
                               result: u_data,
                             });
                           } else {
-                            Employee.findOne({ $and: [{ _id: id }, { companyId: user_id }] })
+                            Employee.findOne({
+                              $and: [{ _id: id }, { companyId: user_id }],
+                            })
                               .exec()
                               .then((employee_data) => {
                                 console.log(
@@ -504,9 +538,13 @@ router.post("/getEmp", (req, res) => {
                                 Role.findOne({ _id: employee_data.roleId })
                                   .exec()
                                   .then((role_data) => {
-                                    if (employee_data.manager == "" || employee_data.manager == undefined) {
+                                    if (
+                                      employee_data.manager == "" ||
+                                      employee_data.manager == undefined
+                                    ) {
                                       var u_data = {
-                                        employeeName: employee_data.employeeName,
+                                        employeeName:
+                                          employee_data.employeeName,
                                         roleId: {
                                           name: role_data.rolename,
                                           id: role_data._id,
@@ -517,15 +555,20 @@ router.post("/getEmp", (req, res) => {
                                         address: employee_data.address,
                                         pincode: employee_data.pincode,
                                         state: state_data.name,
-                                        headquarterState: headquarter_state_data.name,
-                                        headquarterCity: headquarter_city_data.name,
+                                        headquarterState:
+                                          headquarter_state_data.name,
+                                        headquarterCity:
+                                          headquarter_city_data.name,
                                         image: employee_data.image,
                                         city: city_data.name,
                                         district: area_data.name,
                                         experience: employee_data.experience,
-                                        qualification: employee_data.qualification,
-                                        userExpenses: employee_data.userExpenses,
-                                        transportWays: employee_data.transportWays,
+                                        qualification:
+                                          employee_data.qualification,
+                                        userExpenses:
+                                          employee_data.userExpenses,
+                                        transportWays:
+                                          employee_data.transportWays,
                                         status: employee_data.status,
                                       };
                                       res.json({
@@ -553,12 +596,15 @@ router.post("/getEmp", (req, res) => {
                                             address: employee_data.address,
                                             pincode: employee_data.pincode,
                                             state: state_data.name,
-                                            headquarterState: headquarter_state_data.name,
-                                            headquarterCity: headquarter_city_data.name,
+                                            headquarterState:
+                                              headquarter_state_data.name,
+                                            headquarterCity:
+                                              headquarter_city_data.name,
                                             image: employee_data.image,
                                             city: city_data.name,
                                             district: area_data.name,
-                                            experience: employee_data.experience,
+                                            experience:
+                                              employee_data.experience,
                                             qualification:
                                               employee_data.qualification,
                                             userExpenses:
@@ -569,14 +615,14 @@ router.post("/getEmp", (req, res) => {
                                           };
                                           res.json({
                                             status: true,
-                                            message: "Employee found successfully",
+                                            message:
+                                              "Employee found successfully",
                                             result: u_data,
                                           });
                                         });
                                     }
-                                  })
-
-                              })
+                                  });
+                              });
                           }
                         });
                     });
@@ -609,45 +655,55 @@ router.post(
       var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
       for (let i = 0; i < xlData.length; i++) {
         console.log(xlData[i]);
-        Location.findOne({name:xlData[i].State}).exec().then(state_data=>{
-          Location.findOne({name:xlData[i].City}).exec().then(city_data=>{
-            Location.findOne({name:xlData[i].District}).exec().then(area_data=>{
-              Location.findOne({name:xlData[i].Headquarter_State}).exec().then(headquarter_state_data=>{
-                Location.findOne({name:xlData[i].Headquarter_City}).exec().then(headquarter_city_data=>{
-                  var new_emp = new Employee({
-                    employeeName: xlData[i].Employee_Name,
-                    phone: xlData[i].Phone_Number,
-                    email: xlData[i].Email,
-                    address: xlData[i].Address,
-                    city: city_data._id,
-                    companyId: company_id,
-                    image: xlData[i].Profile_Image,
-                    headquarterState: headquarter_state_data._id,
-                    headquarterCity: headquarter_city_data._id,
-                    state: state_data._id,
-                    district: area_data._id,
-                    pincode: xlData[i].Pincode,
-                    qualification: xlData[i].Qualification,
-                    experience: xlData[i].Experience,
-                    Created_date: get_current_date(),
-                    Updated_date: get_current_date(),
-                    status: xlData[i].Status,
+        Location.findOne({ name: xlData[i].State })
+          .exec()
+          .then((state_data) => {
+            Location.findOne({ name: xlData[i].City })
+              .exec()
+              .then((city_data) => {
+                Location.findOne({ name: xlData[i].District })
+                  .exec()
+                  .then((area_data) => {
+                    Location.findOne({ name: xlData[i].Headquarter_State })
+                      .exec()
+                      .then((headquarter_state_data) => {
+                        Location.findOne({ name: xlData[i].Headquarter_City })
+                          .exec()
+                          .then((headquarter_city_data) => {
+                            var new_emp = new Employee({
+                              employeeName: xlData[i].Employee_Name,
+                              phone: xlData[i].Phone_Number,
+                              email: xlData[i].Email,
+                              address: xlData[i].Address,
+                              city: city_data._id,
+                              companyId: company_id,
+                              image: xlData[i].Profile_Image,
+                              headquarterState: headquarter_state_data._id,
+                              headquarterCity: headquarter_city_data._id,
+                              state: state_data._id,
+                              district: area_data._id,
+                              pincode: xlData[i].Pincode,
+                              qualification: xlData[i].Qualification,
+                              experience: xlData[i].Experience,
+                              Created_date: get_current_date(),
+                              Updated_date: get_current_date(),
+                              status: xlData[i].Status,
+                            });
+                            new_emp.save();
+                            list.push(new_emp);
+                            countInfo++;
+                            if (countInfo == xlData.length) {
+                              res.status(200).json({
+                                status: true,
+                                message: "Data imported successfully",
+                                result: list,
+                              });
+                            }
+                          });
+                      });
                   });
-                  new_emp.save();
-                  list.push(new_emp);
-                  countInfo++;
-                  if (countInfo == xlData.length) {
-                    res.status(200).json({
-                      status: true,
-                      message: "Data imported successfully",
-                      result: list,
-                    });
-                  }
-                })
-              })
-            })
-          })
-        })
+              });
+          });
       }
       x++;
     });
