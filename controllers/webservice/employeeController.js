@@ -84,7 +84,7 @@ router.post(
                     phone: phone,
                     email: email,
                     address: address,
-                    company_code:company.companyShortCode,
+                    company_code:company.companyShortCode+"E",
                     employee_code:employee_code,
                     headquarterState: headquarterState,
                     headquarterCity: headquarterCity,

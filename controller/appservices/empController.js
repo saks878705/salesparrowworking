@@ -56,15 +56,22 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
     if (employeeName != "") {
       if (phone != "") {
         if (companyShortCode != "") {
-          Admin.findOne({ companyShortCode })
-            .exec()
-            .then((admin_info) => {
+          Admin.findOne({ companyShortCode }).exec().then(async (admin_info) => {
               console.log(admin_info);
+              let company = await Admin.findOne({companyShortCode});
+              var emp_data = await Employee.findOne({companyId:company._id}).sort({employee_code:-1});
+              if(emp_data){
+                var employee_code = emp_data.employee_code + 1;
+              }else{
+                var employee_code = 0000;
+              }
               if (admin_info) {
                 var new_employee = new Employee({
                   employeeName: employeeName,
                   phone: phone,
                   city: city,
+                  company_code:admin_info.companyShortCode+"E",
+                  employee_code:employee_code,
                   headquarterState: headquarterState,
                   headquarterCity: headquarterCity,
                   companyId: admin_info._id,
@@ -282,6 +289,8 @@ router.get("/getEmployee", (req, res) => {
                               phone: employee_data.phone,
                               email: employee_data.email,
                               address: employee_data.address,
+                              employee_code:employee_data.employee_code?employee_data.employee_code:0,
+                              company_code:employee_data.company_code?employee_data.company_code:"",
                               headquarterState:
                                 headquarter_state_data.headquarterState,
                               headquarterCity:
