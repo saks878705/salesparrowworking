@@ -305,7 +305,7 @@ router.post("/getAllParty", async (req, res) => {
     obj1 = [{ company_id }, { state }, { partyType }];
   }
   Party.find({ $and: obj1 })
-    .sort({Updated_date:-1})
+    .sort({"status":-1})
     .limit(limit * 1)
     .skip((page - 1) * limit)
     .exec()
