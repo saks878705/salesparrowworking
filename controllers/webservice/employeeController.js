@@ -77,7 +77,7 @@ router.post(
                   if(emp_data){
                     var employee_code = emp_data.employee_code + 1;
                   }else{
-                    var employee_code = 0000;
+                    var employee_code = 1;
                   }
                   var new_employee = new Employee({
                     employeeName: employeeName,
@@ -296,8 +296,7 @@ router.post("/getAllEmployee", async (req, res) => {
                 phone: rowData.phone,
                 email: rowData.email,
                 address: rowData.address,
-                employee_code:rowData.employee_code?rowData.employee_code:0,
-                company_code:rowData.company_code?rowData.company_code:"",
+                employee_unique_id:`${rowData.company_code}${rowData.employee_code}`,
                 pincode: rowData.pincode,
                 image: rowData.image,
                 state: {
@@ -360,8 +359,7 @@ router.post("/getAllEmployee", async (req, res) => {
                 phone: rowData.phone,
                 email: rowData.email,
                 address: rowData.address,
-                employee_code:rowData.employee_code?rowData.employee_code:0,
-                company_code:rowData.company_code?rowData.company_code:"",
+                employee_unique_id:`${rowData.company_code}${rowData.employee_code}`,
                 pincode: rowData.pincode,
                 image: rowData.image,
                 state: {
@@ -522,8 +520,7 @@ router.post("/getEmp", (req, res) => {
                               companyId: employee_data.companyId,
                               phone: employee_data.phone,
                               email: employee_data.email,
-                              company_code:employee_data.company_code?employee_data.company_code:"",
-                              employee_code:employee_data.employee_code?employee_data.employee_code:"",
+                              employee_unique_id:`${rowData.company_code}${rowData.employee_code}`,
                               address: employee_data.address,
                               pincode: employee_data.pincode,
                               state: state_data.name,
@@ -574,8 +571,7 @@ router.post("/getEmp", (req, res) => {
                                         companyId: employee_data.companyId,
                                         phone: employee_data.phone,
                                         email: employee_data.email,
-                                        company_code:employee_data.company_code?employee_data.company_code:"",
-                                        employee_code:employee_data.employee_code?employee_data.employee_code:"",
+                                        employee_unique_id:`${rowData.company_code}${rowData.employee_code}`,
                                         address: employee_data.address,
                                         pincode: employee_data.pincode,
                                         state: state_data.name,
@@ -616,8 +612,7 @@ router.post("/getEmp", (req, res) => {
                                             companyId: employee_data.companyId,
                                             manager: manager_data.employeeName,
                                             phone: employee_data.phone,
-                                            company_code:employee_data.company_code?employee_data.company_code:"",
-                                            employee_code:employee_data.employee_code?employee_data.employee_code:"",
+                                            employee_unique_id:`${rowData.company_code}${rowData.employee_code}`,
                                             email: employee_data.email,
                                             address: employee_data.address,
                                             pincode: employee_data.pincode,
@@ -702,7 +697,6 @@ router.post(
                               phone: xlData[i].Phone_Number,
                               email: xlData[i].Email,
                               address: xlData[i].Address,
-                              employee_code:company.companyName,
                               city: city_data._id,
                               companyId: company_id,
                               image: xlData[i].Profile_Image,

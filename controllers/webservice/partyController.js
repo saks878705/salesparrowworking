@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Party = mongoose.model("Party");
 const Location = mongoose.model("Location");
 const Route = mongoose.model("Route");
+const Admin = mongoose.model("AdminInfo");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const base_url = "http://salesparrow.herokuapp.com/";
@@ -31,10 +32,7 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
 
-router.post(
-  "/addParty",
-  imageUpload.fields([{ name: "Party_image" }]),
-  (req, res) => {
+router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req, res) => {
     console.log(req.body);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -70,12 +68,24 @@ router.post(
               if (state != "") {
                 if (district != "") {
                   if (address != "") {
+                    let company = await Admin.findOne({_id:company_id});
+                    var party_data = await Party.findOne({company_id:company._id}).sort({party_code:-1});
+                    console.log("party_data------------",party_data)
+                    let party_code;
+                    if(party_data){
+                      party_code = party_data.party_code + 1;
+                    }else{
+                      party_code = 1;
+                    }
+                    console.log("party code ------------",party_code)
                     var new_party = new Party({
                       partyType: partyType,
                       firmName: firmName,
                       GSTNo: GSTNo,
                       image: base_url + req.files.Party_image[0].path,
                       contactPersonName: contactPersonName,
+                      company_code:company.companyShortCode+"P",
+                      party_code:party_code,
                       mobileNo: mobileNo,
                       email: email,
                       company_id: company_id,
@@ -362,6 +372,7 @@ router.post("/getAllParty", async (req, res) => {
                 },
                 firmName: rowData.firmName,
                 partyType: rowData.partyType,
+                partyid:`${rowData.company_code}${rowData.party_code}`,
                 image: rowData.image,
                 pincode: rowData.pincode,
                 GSTNo: rowData.GSTNo,
@@ -435,6 +446,7 @@ router.post("/getAllParty", async (req, res) => {
                         firmName: rowData.firmName,
                         partyType: rowData.partyType,
                         pincode: rowData.pincode,
+                        partyid:`${rowData.company_code}${rowData.party_code}`,
                         image: rowData.image,
                         GSTNo: rowData.GSTNo,
                         contactPersonName: rowData.contactPersonName,
@@ -511,6 +523,7 @@ router.post("/getParty", (req, res) => {
                             id: party_data.district,
                           },
                           firmName: party_data.firmName,
+                          partyid:`${rowData.company_code}${rowData.party_code}`,
                           address: party_data.address,
                           partyType: party_data.partyType,
                           image: party_data.image,
@@ -559,6 +572,7 @@ router.post("/getParty", (req, res) => {
                                     id: party_data.district,
                                   },
                                   firmName: party_data.firmName,
+                                  partyid:`${rowData.company_code}${rowData.party_code}`,
                                   address: party_data.address,
                                   partyType: party_data.partyType,
                                   image: party_data.image,
@@ -769,4 +783,20 @@ router.post(
     });
   }
 );
+
+router.delete('/deleteallparties',(req,res)=>{
+  const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) {
+      return res.json({
+        status: false,
+        message: "Token must be provided",
+      });
+    }
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    Party.deleteMany({company_id}).exec().then(()=>{
+      res.send({status:true,message:"parties deleted successfully"})
+    })
+})
 module.exports = router;

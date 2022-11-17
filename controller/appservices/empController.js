@@ -57,7 +57,7 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
               if(emp_data){
                 var employee_code = emp_data.employee_code + 1;
               }else{
-                var employee_code = 0000;
+                var employee_code = 1;
               }
               if (admin_info) {
                 var employee_data = await Employee.find({phone});
@@ -287,8 +287,7 @@ router.get("/getEmployee", (req, res) => {
                               phone: employee_data.phone,
                               email: employee_data.email,
                               address: employee_data.address,
-                              employee_code:employee_data.employee_code?employee_data.employee_code:0,
-                              company_code:employee_data.company_code?employee_data.company_code:"",
+                              employee_unique_id:`${employee_data.company_code}${employee_data.employee_code}`,
                               headquarterState:
                                 headquarter_state_data.headquarterState,
                               headquarterCity:
@@ -497,13 +496,24 @@ router.post("/addPartyEmp", (req, res) => {
                 if (address != "") {
                   Employee.findOne({ _id: employee_id })
                     .exec()
-                    .then((emp_data) => {
+                    .then(async(emp_data) => {
                       console.log("employee", emp_data);
+                      let company = await Admin.findOne({_id:emp_data.companyId});
+                      var party_data = await Party.findOne({company_id:company._id}).sort({party_code:-1});
+                      console.log("party_data------------",party_data)
+                      let party_code;
+                      if(party_data){
+                        party_code = party_data.party_code + 1;
+                      }else{
+                        party_code = 1;
+                      }
                       var new_party = new Party({
                         partyType: partyType,
                         firmName: firmName,
                         GSTNo: GSTNo,
                         contactPersonName: contactPersonName,
+                        company_code:company.companyShortCode,
+                        party_code:party_code,
                         mobileNo: mobileNo,
                         email: email,
                         company_id: emp_data.companyId,
@@ -625,6 +635,7 @@ router.post("/getAllPartyEmp", async (req, res) => {
                             id: rowData.district,
                           },
                           firmName: rowData.firmName,
+                          party_unique_id:`${rowData.company_code}${rowData.party_code}`,
                           address: rowData.address,
                           partyType: rowData.partyType,
                           image: rowData.image,
@@ -780,6 +791,7 @@ router.post("/getParty", (req, res) => {
                             id: party_data.district,
                           },
                           firmName: party_data.firmName,
+                          party_unique_id:`${rowData.company_code}${rowData.party_code}`,
                           address: party_data.address,
                           partyType: party_data.partyType,
                           image: party_data.image,
@@ -828,6 +840,7 @@ router.post("/getParty", (req, res) => {
                                     id: party_data.district,
                                   },
                                   firmName: party_data.firmName,
+                                  party_unique_id:`${rowData.company_code}${rowData.party_code}`,
                                   address: party_data.address,
                                   partyType: party_data.partyType,
                                   image: party_data.image,

@@ -41,6 +41,12 @@ const party_schema = new Schema({
     mobileNo:{
         type:Number
     },
+    company_code:{
+        type:String
+    },
+    party_code:{
+        type:Number
+    },
     email:{
         type:String
     },
