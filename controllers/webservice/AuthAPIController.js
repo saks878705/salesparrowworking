@@ -64,6 +64,13 @@ const getDecodedToken = async (authHeader) => {
 }
 }
 
+function order_id() {
+  var text = "";
+  var possible = "1234567890";
+  for (var i = 0; i < 3; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  return text;
+}
 router.post('/register',(req,res)=>{
   console.log(req.body);
   var companyName = req.body.companyName ? req.body.companyName : "";
@@ -83,9 +90,16 @@ router.post('/register',(req,res)=>{
               if(pincode!=""){
                 if(GSTNo!=""){
                   Admin.find({ email: email }).exec().then((email_info) => {
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var yyyy = today.getFullYear();
                     if (email_info.length < 1) {
                       bcrypt.hash(password, 10, function (err, hash) {
-                        let csc = (Math.random() + 1).toString(36).substring(7);
+                        // var companyName_s = companyName;
+                        // companyName_s = companyName_s.slice(0,4);
+                        // let rand_int = order_id();
+                        // let csc = companyName_s+dd+yyyy+rand_int;
+                        let csc = `${companyName.slice(0,4)}${dd}${yyyy}${order_id()}`;
                         console.log("random", csc);
                         var new_admin = new Admin({
                           company_name: companyName,

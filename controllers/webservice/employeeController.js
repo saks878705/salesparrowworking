@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Location = mongoose.model("Location");
+const Admin = mongoose.model("AdminInfo");
 const Role = mongoose.model("role");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
@@ -11,6 +12,7 @@ const auth_token = "b088eeb84d39bd2cc2679faea930b620";
 const twilio = require("twilio")(sid, auth_token);
 const jwt = require("jsonwebtoken");
 const XLSX = require("xlsx");
+const { AuthorizationDocumentInstance } = require("twilio/lib/rest/preview/hosted_numbers/authorizationDocument");
 
 const imageStorage = multer.diskStorage({
   destination: "images/Employee_image",
@@ -40,6 +42,12 @@ router.post(
     console.log(req.body);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
+    if (!token) {
+      res.json({
+        status: false,
+        message: "Token is required",
+      });
+    }
     var decodedToken = jwt.verify(token, "test");
     var user_id = decodedToken.user_id;
     var employeeName = req.body.employeeName ? req.body.employeeName : "";
@@ -62,15 +70,22 @@ router.post(
       if (phone != "") {
         if (email != "") {
           if (address != "") {
-            Employee.find({ email: email })
-              .exec()
-              .then((email_info) => {
+            Employee.find({ email: email }).exec().then(async (email_info) => {
                 if (email_info.length < 1) {
+                  let company = await Admin.findOne({_id:user_id});
+                  var emp_data = await Employee.findOne({companyId:company._id}).sort({employee_code:-1});
+                  if(emp_data){
+                    var employee_code = emp_data.employee_code + 1;
+                  }else{
+                    var employee_code = 0000;
+                  }
                   var new_employee = new Employee({
                     employeeName: employeeName,
                     phone: phone,
                     email: email,
                     address: address,
+                    company_code:company.companyShortCode,
+                    employee_code:employee_code,
                     headquarterState: headquarterState,
                     headquarterCity: headquarterCity,
                     city: city,
@@ -86,6 +101,7 @@ router.post(
                     status: "Active",
                   });
                   new_employee.save().then((data) => {
+                    console.log(data)
                     res.status(200).json({
                       status: true,
                       message: "New Employee is created successfully",
@@ -280,6 +296,8 @@ router.post("/getAllEmployee", async (req, res) => {
                 phone: rowData.phone,
                 email: rowData.email,
                 address: rowData.address,
+                employee_code:rowData.employee_code?rowData.employee_code:0,
+                company_code:rowData.company_code?rowData.company_code:"",
                 pincode: rowData.pincode,
                 image: rowData.image,
                 state: {
@@ -342,6 +360,8 @@ router.post("/getAllEmployee", async (req, res) => {
                 phone: rowData.phone,
                 email: rowData.email,
                 address: rowData.address,
+                employee_code:rowData.employee_code?rowData.employee_code:0,
+                company_code:rowData.company_code?rowData.company_code:"",
                 pincode: rowData.pincode,
                 image: rowData.image,
                 state: {
@@ -502,6 +522,8 @@ router.post("/getEmp", (req, res) => {
                               companyId: employee_data.companyId,
                               phone: employee_data.phone,
                               email: employee_data.email,
+                              company_code:employee_data.company_code?employee_data.company_code:"",
+                              employee_code:employee_data.employee_code?employee_data.employee_code:"",
                               address: employee_data.address,
                               pincode: employee_data.pincode,
                               state: state_data.name,
@@ -552,6 +574,8 @@ router.post("/getEmp", (req, res) => {
                                         companyId: employee_data.companyId,
                                         phone: employee_data.phone,
                                         email: employee_data.email,
+                                        company_code:employee_data.company_code?employee_data.company_code:"",
+                                        employee_code:employee_data.employee_code?employee_data.employee_code:"",
                                         address: employee_data.address,
                                         pincode: employee_data.pincode,
                                         state: state_data.name,
@@ -592,6 +616,8 @@ router.post("/getEmp", (req, res) => {
                                             companyId: employee_data.companyId,
                                             manager: manager_data.employeeName,
                                             phone: employee_data.phone,
+                                            company_code:employee_data.company_code?employee_data.company_code:"",
+                                            employee_code:employee_data.employee_code?employee_data.employee_code:"",
                                             email: employee_data.email,
                                             address: employee_data.address,
                                             pincode: employee_data.pincode,
@@ -651,10 +677,11 @@ router.post(
     var x = 0;
     var list = [];
     let countInfo = 0;
-    sheet_namelist.forEach((element) => {
+    sheet_namelist.forEach(async (element) => {
       var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
       for (let i = 0; i < xlData.length; i++) {
         console.log(xlData[i]);
+        let company =await Admin.findOne({_id:company_id})
         Location.findOne({ name: xlData[i].State })
           .exec()
           .then((state_data) => {
@@ -675,6 +702,7 @@ router.post(
                               phone: xlData[i].Phone_Number,
                               email: xlData[i].Email,
                               address: xlData[i].Address,
+                              employee_code:company.companyName,
                               city: city_data._id,
                               companyId: company_id,
                               image: xlData[i].Profile_Image,

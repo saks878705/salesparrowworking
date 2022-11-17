@@ -33,6 +33,14 @@ const employee_schema = new Schema({
     address:{
         type:String
     },
+    company_code:{
+        type:String,
+        default:""
+    },
+    employee_code:{
+        type:Number,
+        default:0
+    },
     pincode:{
         type:Number
     },
