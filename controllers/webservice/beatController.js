@@ -41,7 +41,7 @@ router.post("/addBeat", (req, res) => {
         if (employee_id != "") {
           if (day != "") {
             if (route_id != "") {
-              Beat.find({ beatName: beatName })
+              Beat.find({$and:[{company_id},{ beatName: beatName }]})
                 .exec()
                 .then((beat_info) => {
                   if (beat_info.length < 1) {
@@ -65,7 +65,7 @@ router.post("/addBeat", (req, res) => {
                       });
                     });
                   } else {
-                    res.status(401).json({
+                    res.json({
                       status: true,
                       message: "Beat already exists",
                       result: null,
