@@ -39,17 +39,11 @@ function get_current_date() {
 router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (req, res) => {
     console.log(req.body);
     var employeeName = req.body.employeeName ? req.body.employeeName : "";
-    var companyShortCode = req.body.companyShortCode
-      ? req.body.companyShortCode
-      : "";
+    var companyShortCode = req.body.companyShortCode? req.body.companyShortCode: "";
     var phone = req.body.phone ? req.body.phone : "";
     var state = req.body.state ? req.body.state : "";
-    var headquarterState = req.body.headquarterState
-      ? req.body.headquarterState
-      : "";
-    var headquarterCity = req.body.headquarterCity
-      ? req.body.headquarterCity
-      : "";
+    var headquarterState = req.body.headquarterState? req.body.headquarterState: "";
+    var headquarterCity = req.body.headquarterCity? req.body.headquarterCity: "";
     var city = req.body.city ? req.body.city : "";
     var pincode = req.body.pincode ? req.body.pincode : "";
     var district = req.body.district ? req.body.district : "";
@@ -66,6 +60,10 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
                 var employee_code = 0000;
               }
               if (admin_info) {
+                var employee_data = await Employee.find({phone});
+                if(employee_data.length>0){
+                  res.json({status:false,message:"Phone number already exists"})
+                }
                 var new_employee = new Employee({
                   employeeName: employeeName,
                   phone: phone,
