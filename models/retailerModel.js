@@ -36,7 +36,7 @@ const retailer_schema = new Schema({
         type:Array
     },
     mobileNo:{
-        type:Number
+        type:String
     },
     DOB:{
         type:String

@@ -7,7 +7,7 @@ var AdminSchema = new Schema({
         required:'This is mendatory',
     },
     phone:{
-        type:Number,
+        type:String,
         required:'This is mendatory',
     },
     password:{
@@ -27,11 +27,11 @@ var AdminSchema = new Schema({
         default:""
     },
     pincode:{
-        type:Number,
+        type:String,
         default:""
     },
     GSTNo:{
-        type:Number,
+        type:String,
         default:""
     },
     companyAddress:{

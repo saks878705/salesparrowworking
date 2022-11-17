@@ -34,7 +34,7 @@ const employee_schema = new Schema({
         type:String
     },
     pincode:{
-        type:Number
+        type:String
     },
     state:{
         type:String
