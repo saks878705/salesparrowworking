@@ -63,7 +63,7 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
               if (admin_info) {
                 var employee_data = await Employee.find({phone});
                 if(employee_data.length>0){
-                  res.json({status:false,message:"Phone number already exists"})
+                  return res.json({status:false,message:"Phone number already exists"})
                 }
                 var new_employee = new Employee({
                   employeeName: employeeName,
@@ -84,14 +84,14 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
                   status: "UnApproved",
                 });
                 new_employee.save().then((data) => {
-                  res.status(200).json({
+                  return res.status(200).json({
                     status: true,
                     message: "New Employee is created successfully",
                     results: data,
                   });
                 });
               } else {
-                res.json({
+                return res.json({
                   status: false,
                   message: "Company short code is wrong",
                   result: null,
