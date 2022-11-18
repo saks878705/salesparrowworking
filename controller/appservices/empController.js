@@ -123,102 +123,102 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
   }
 );
 
-router.post("/sendOtp", (req, res) => {
-  console.log(req.body);
-  var to_phone_number = req.body.to_phone_number
-    ? req.body.to_phone_number
-    : "";
-  if (to_phone_number != "") {
-    Employee.findOne({ phone: to_phone_number }).exec().then((data) => {
-      if(data){
-        if (data.status == "InActive" || data.status == "UnApproved") {
-          return res.json({
-            status: false,
-            message: `You are ${data.status}. Please contact company.`,
-          });
-        }
-        //var OTP = Math.floor(1000 + Math.random() * 9000);
-        var OTP = "1234";
-        // const token = jwt.sign(
-        //   { user_id: data._id, is_token_valide: 1 },
-        //   "test"
-        // );
-        if (data.status=="Active" || data.status=="Approved") {
-          twilio.messages
-            .create({
-              from: "+18505186447",
-              to: to_phone_number,
-              body: OTP,
-            })
-            .then(() => {
-              Employee.findOneAndUpdate(
-                { phone: to_phone_number },
-                { $set: { otp: OTP } }
-              )
-                .exec()
-                .then(() => {
-                  res.json({
-                    status: true,
-                    message: "Message has been sent",
-                  });
-                });
-            })
-            .catch((err) => {
-              console.log(`err--------${err.message}-------thats all`);
-              if(err.message.includes("unverified")){
-                console.log("inside if")
-                Employee.findOneAndUpdate(
-                  { phone: to_phone_number },
-                  { $set: { otp: OTP } }
-                )
-                  .exec()
-                  .then(() => {
-                   return res.json({
-                      status: true,
-                      message: "Message has been sent",
-                    });
-                  });
-              }else{
-                console.log("inside else")
-                res.json({
-                  status: false,
-                  message: "There is some error.",
-                });
-              }
-              });
+// router.post("/sendOtp", (req, res) => {
+//   console.log(req.body);
+//   var to_phone_number = req.body.to_phone_number
+//     ? req.body.to_phone_number
+//     : "";
+//   if (to_phone_number != "") {
+//     Employee.findOne({ phone: to_phone_number }).exec().then((data) => {
+//       if(data){
+//         if (data.status == "InActive" || data.status == "UnApproved") {
+//           return res.json({
+//             status: false,
+//             message: `You are ${data.status}. Please contact company.`,
+//           });
+//         }
+//         //var OTP = Math.floor(1000 + Math.random() * 9000);
+//         var OTP = "1234";
+//         // const token = jwt.sign(
+//         //   { user_id: data._id, is_token_valide: 1 },
+//         //   "test"
+//         // );
+//         if (data.status=="Active" || data.status=="Approved") {
+//           twilio.messages
+//             .create({
+//               from: "+18505186447",
+//               to: to_phone_number,
+//               body: OTP,
+//             })
+//             .then(() => {
+//               Employee.findOneAndUpdate(
+//                 { phone: to_phone_number },
+//                 { $set: { otp: OTP } }
+//               )
+//                 .exec()
+//                 .then(() => {
+//                   res.json({
+//                     status: true,
+//                     message: "Message has been sent",
+//                   });
+//                 });
+//             })
+//             .catch((err) => {
+//               console.log(`err--------${err.message}-------thats all`);
+//               if(err.message.includes("unverified")){
+//                 console.log("inside if")
+//                 Employee.findOneAndUpdate(
+//                   { phone: to_phone_number },
+//                   { $set: { otp: OTP } }
+//                 )
+//                   .exec()
+//                   .then(() => {
+//                    return res.json({
+//                       status: true,
+//                       message: "Message has been sent",
+//                     });
+//                   });
+//               }else{
+//                 console.log("inside else")
+//                 res.json({
+//                   status: false,
+//                   message: "There is some error.",
+//                 });
+//               }
+//               });
               
-        } else {
-          res.json({
-            status: false,
-            message: "Not registered yet.please contact your admin.",
-          });
-        }
-      }else{
-        res.json({
-          status: true,
-          message: "Employee not found",
-        });
-      }
-      });
-  } else {
-    res.json({
-      status: false,
-      message: "Phone number is required",
-    });
-  }
-});
+//         } else {
+//           res.json({
+//             status: false,
+//             message: "Not registered yet.please contact your admin.",
+//           });
+//         }
+//       }else{
+//         res.json({
+//           status: true,
+//           message: "Employee not found",
+//         });
+//       }
+//       });
+//   } else {
+//     res.json({
+//       status: false,
+//       message: "Phone number is required",
+//     });
+//   }
+// });
 
-// router.post('/sendOtp',async(req,res)=>{
-//   var to_phone_number = req.body.to_phone_number? req.body.to_phone_number: "";
-//   let otp = Math.floor(1000 + Math.random() * 9000);
-//   let emp_data =await Employee.findOneAndUpdate({phone:to_phone_number});
-//   if(!emp_data) return res.json({status:true,message:"Employee not found"});
-//   Employee.findOneAndUpdate({phone:to_phone_number},{$set:{otp:otp}},{new:true},()=>{
-//     let res1 = axios.get(`https://2factor.in/API/V1/f77ba5e8-641e-11ed-9c12-0200cd936042/SMS/${to_phone_number}/${otp}`)
-//     if(res1.status=="Success") return res.json({status:res1.status,message:"Message sent"})
-//     if(res1.status!="Success") return res.json({status:res1.status,message:"Message not sent"})
-//   })
-// })
+router.post('/sendOtp',async(req,res)=>{
+  var to_phone_number = req.body.to_phone_number? req.body.to_phone_number: "";
+  let otp = Math.floor(1000 + Math.random() * 9000);
+  Employee.findOne({phone:to_phone_number}).exec().then(emp_data=>{
+    if(!emp_data) return res.json({status:true,message:"Employee not found"});
+    Employee.findOneAndUpdate({phone:to_phone_number},{$set:{otp:otp}},{new:true},async()=>{
+    let res1 =await axios.get(`https://2factor.in/API/V1/f77ba5e8-641e-11ed-9c12-0200cd936042/SMS/${to_phone_number}/${otp}`)
+    return res.json({status:res1.data.Status})
+  })
+  });
+})
 
 router.post("/emplogin", (req, res) => {
   console.log(req.body);
