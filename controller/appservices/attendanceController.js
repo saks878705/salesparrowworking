@@ -65,7 +65,7 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                             new_attendance.save().then(async (data)=>{
                                 if(data){
                                     let beat_data = await Beat.findOne({_id:data.beat_id});
-                                    res.json({
+                                    return res.json({
                                         status:true,
                                         message:"Attendance marked successfully",
                                         result:beat_data
@@ -73,20 +73,20 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                                 }
                             })
                         }else{
-                            res.json({status:false,message:"You are not active yet",})
+                            return res.json({status:false,message:"You are not active yet",})
                         }
                     })
                 }else{
-                    res.json({status:false,message:"Location must be selected",})
+                    return res.json({status:false,message:"Location must be selected",})
                 }
             }else{
-                res.json({status:false,message:"Activity must be selected",})
+                return res.json({status:false,message:"Activity must be selected",})
             }
         }else{
-            res.json({status:false,message:"Distributor must be selected",})
+            return res.json({status:false,message:"Distributor must be selected",})
         }
     }else{
-        res.json({status:false,message:"Beat must be selected",})
+        return res.json({status:false,message:"Beat must be selected",})
     }
 
 });
