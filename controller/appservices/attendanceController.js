@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Attendance = mongoose.model("Attendance");
+const Beat = mongoose.model("Beat");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
@@ -62,7 +63,7 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                             });
                             new_attendance.save().then(async (data)=>{
                                 if(data){
-                                    let beat_data = await beat.findOne({_id:data.beat_id});
+                                    let beat_data = await Beat.findOne({_id:data.beat_id});
                                     res.json({
                                         status:true,
                                         message:"Attendance marked successfully",
@@ -88,5 +89,11 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
     }
 
 });
+
+router.post('/attendanceListOfEmployee',(req,res)=>{
+    let employee_id = req.body.employee_id?req.body.employee_id:"";
+    if(employee_id=="") return res.json({status:false,message:"Please provide the Employee"});
+    Attendance.find
+})
 
 module.exports = router;
