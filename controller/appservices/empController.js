@@ -61,7 +61,7 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
                 var employee_code = 1;
               }
               if (admin_info) {
-                var employee_data = await Employee.find({phone});
+                var employee_data = await Employee.find({$and:[{companyId:company._id},{phone}]});
                 if(employee_data.length>0){
                   return res.json({status:false,message:"Phone number already exists"})
                 }
