@@ -512,6 +512,9 @@ router.post("/getParty", (req, res) => {
                   Location.findOne({ _id: party_data.district })
                     .exec()
                     .then((district_data) => {
+                      PartyType.findOne({ _id: party_data.party_type })
+                        .exec()
+                        .then((party_type_data) => {
                       //console.log(party_data.route[0])
                       var arr = party_data.route
                         ? party_data.route[0].split(",")
@@ -530,9 +533,9 @@ router.post("/getParty", (req, res) => {
                             id: party_data.district,
                           },
                           firmName: party_data.firmName,
-                          partyid:`${rowData.company_code}${rowData.party_code}`,
+                          partyid:`${party_data.company_code}${party_data.party_code}`,
                           address: party_data.address,
-                          partyType: party_data.partyType,
+                          partyType: party_type_data.party_type,
                           image: party_data.image,
                           pincode: party_data.pincode,
                           GSTNo: party_data.GSTNo,
@@ -579,9 +582,9 @@ router.post("/getParty", (req, res) => {
                                     id: party_data.district,
                                   },
                                   firmName: party_data.firmName,
-                                  partyid:`${rowData.company_code}${rowData.party_code}`,
+                                  partyid:`${party_data.company_code}${party_data.party_code}`,
                                   address: party_data.address,
-                                  partyType: party_data.partyType,
+                                  partyType: party_type_data.party_type,
                                   image: party_data.image,
                                   pincode: party_data.pincode,
                                   GSTNo: party_data.GSTNo,
@@ -602,6 +605,7 @@ router.post("/getParty", (req, res) => {
                             });
                         }
                       }
+                    })
                     });
                 });
             });
