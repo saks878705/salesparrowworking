@@ -207,6 +207,14 @@ router.post("/sendOtp", (req, res) => {
   }
 });
 
+// router.post('/sendOtp',async(req,res)=>{
+//   var to_phone_number = req.body.to_phone_number? req.body.to_phone_number: "";
+//   let otp = Math.floor(1000 + Math.random() * 9000);
+//   let emp_data =await Employee.findOne({phone:to_phone_number});
+//   if(!emp_data) return res.json({status:true,message:"Employee not found"});
+//   let res = axios.get(`https://2factor.in/API/V1/f77ba5e8-641e-11ed-9c12-0200cd936042/SMS/${to_phone_number}/${otp}`)
+// })
+
 router.post("/emplogin", (req, res) => {
   console.log(req.body);
   var phone = req.body.phone ? req.body.phone : "";
@@ -706,7 +714,7 @@ router.post('/authorizedParty',(req,res)=>{
   Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
     Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
       if(!beat_data) return res.send({status:true, message:"No Beat found", result:[] }) 
-      Party.find({$or:[{company_id:emp_data.companyId}]}).exec().then(party_data=>{
+      Party.find({company_id:emp_data.companyId}).exec().then(party_data=>{
         if(party_data.length<1) return res.send({status:true, message:"No party found", result:[] }) 
         let count = 0;
         for(let i = 0;i<party_data.length;i++){
@@ -728,11 +736,9 @@ router.post('/authorizedParty',(req,res)=>{
             }else{
               console.log("insidde else");
               console.log(arr.length);
-              let check=0;
               for(let j = 0;j<arr.length;j++){
                 console.log("inside for");
                 if(arr[j]==beat_data.route_id){
-                  check=1
                   console.log("insidde if");
                   return res.json({
                     status:true,
@@ -741,17 +747,15 @@ router.post('/authorizedParty',(req,res)=>{
                   })
                 }
               }
-              if(check==0){
-                return res.json({
-                  status:true,
-                  message:"Authorized party not found",
-                  result:[]
-                })
-              }
             }
           }
           count++;
         }
+          return res.json({
+            status:true,
+            message:"Authorized party not found",
+            result:[]
+          })
       })
     })
   })
