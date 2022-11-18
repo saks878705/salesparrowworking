@@ -93,9 +93,13 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
 
 router.post('/attendanceListOfEmployee',async(req,res)=>{
     let employee_id = req.body.employee_id?req.body.employee_id:"";
+    let page = req.body.page?req.body.page:"1";
     if(employee_id=="") return res.json({status:false,message:"Please provide the Employee"});
-    let attendance_data =await Attendance.find({emp_id:employee_id});
+    let count = await Attendance.find({emp_id:employee_id});
+    let attendance_data =await Attendance.find({emp_id:employee_id}).limit(limit*1).skip((page-1)*limit);
     if(attendance_data.length<1) return res.json({status:true,message:"No Data",result:[]});
+    let limit = 10;
+    let counInfo = 0
     for(let i = 0;i<attendance_data.length;i++){
         let list = [];
         await (async function (rowData) {
@@ -113,9 +117,9 @@ router.post('/attendanceListOfEmployee',async(req,res)=>{
                 status:rowData.status
             };
             list.push(u_data);
-          })(party_data[i]);
+          })(attendance_data[i]);
           counInfo++;
-          if (counInfo == party_data.length) {
+          if (counInfo == attendance_data.length) {
             let c = Math.ceil(count.length / limit);
             console.log(count.length);
             console.log(c);
