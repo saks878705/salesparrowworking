@@ -89,11 +89,13 @@ router.post('/register',(req,res)=>{
             if(state!=""){
               if(pincode!=""){
                 if(GSTNo!=""){
-                  Admin.find({ email: email }).exec().then((email_info) => {
+                  Admin.find({ phone: phone }).exec().then((phone_info) => {
+                    Admin.find({ email: email }).exec().then((email_info) => {
                     var today = new Date();
                     var dd = String(today.getDate()).padStart(2, '0');
                     var yyyy = today.getFullYear();
-                    if (email_info.length < 1) {
+                    if (phone_info.length < 1) {
+                      if(email_info.length>0) return res.json({status:false,message:"Email already exists"})
                       bcrypt.hash(password, 10, function (err, hash) {
                         // var companyName_s = companyName;
                         // companyName_s = companyName_s.slice(0,4);
@@ -126,10 +128,11 @@ router.post('/register',(req,res)=>{
                     } else {
                       res.status(200).json({
                         status: false,
-                        message: "Email already exists",
+                        message: "Phone already exists",
                         result: null,
                       });
                     }
+                  })
                   });
                 }else{
                   return res.json({
