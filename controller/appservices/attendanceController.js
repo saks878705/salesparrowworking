@@ -96,9 +96,9 @@ router.post('/attendanceListOfEmployee',async(req,res)=>{
     let page = req.body.page?req.body.page:"1";
     if(employee_id=="") return res.json({status:false,message:"Please provide the Employee"});
     let count = await Attendance.find({emp_id:employee_id});
+    let limit = 10;
     let attendance_data =await Attendance.find({emp_id:employee_id}).limit(limit*1).skip((page-1)*limit);
     if(attendance_data.length<1) return res.json({status:true,message:"No Data",result:[]});
-    let limit = 10;
     let counInfo = 0
     for(let i = 0;i<attendance_data.length;i++){
         let list = [];
