@@ -60,12 +60,15 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                                 Updated_date:get_current_date(),
                                 status:"Working",
                             });
-                            new_attendance.save().then(data=>{
-                                res.json({
-                                    status:true,
-                                    message:"Attendance marked successfully",
-                                    result:data
-                                })
+                            new_attendance.save().then(async (data)=>{
+                                if(data){
+                                    let beat_data = await beat.findOne({_id:data.beat_id});
+                                    res.json({
+                                        status:true,
+                                        message:"Attendance marked successfully",
+                                        result:beat_data
+                                    })
+                                }
                             })
                         }else{
                             res.json({status:false,message:"You are not active yet",})

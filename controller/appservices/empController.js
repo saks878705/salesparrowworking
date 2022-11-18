@@ -42,6 +42,7 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
     var companyShortCode = req.body.companyShortCode? req.body.companyShortCode: "";
     var phone = req.body.phone ? req.body.phone : "";
     var state = req.body.state ? req.body.state : "";
+    var email = req.body.email ? req.body.email : "";
     var headquarterState = req.body.headquarterState? req.body.headquarterState: "";
     var headquarterCity = req.body.headquarterCity? req.body.headquarterCity: "";
     var city = req.body.city ? req.body.city : "";
@@ -70,6 +71,7 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
                   city: city,
                   company_code:admin_info.companyShortCode+"E",
                   employee_code:employee_code,
+                  email:email,
                   headquarterState: headquarterState,
                   headquarterCity: headquarterCity,
                   companyId: admin_info._id,
