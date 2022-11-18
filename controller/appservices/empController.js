@@ -11,7 +11,7 @@ const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
 const sid = "ACc3f03d291aaa9b78b8088eb0b77bf616";
-const auth_token = "7e9c9135a3198fd3ff8ef1730eca650b";
+const auth_token = "dcd61bc9945d61c11b67612fdef40534";
 const twilio = require("twilio")(sid, auth_token);
 const jwt = require("jsonwebtoken");
 

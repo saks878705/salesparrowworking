@@ -4,6 +4,7 @@ const Party = mongoose.model("Party");
 const Location = mongoose.model("Location");
 const Route = mongoose.model("Route");
 const Admin = mongoose.model("AdminInfo");
+const PartyType = mongoose.model("PartyType");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const base_url = "http://salesparrow.herokuapp.com/";
@@ -362,6 +363,9 @@ router.post("/getAllParty", async (req, res) => {
               var district_data = await Location.findOne({
                 _id: party_data[i].district,
               });
+              var party_type_data = await PartyType.findOne({
+                _id: party_data[i].partyType,
+              });
               var u_data = {
                 id: rowData._id,
                 state: { name: state_data.name, id: rowData.state },
@@ -371,7 +375,7 @@ router.post("/getAllParty", async (req, res) => {
                   id: rowData.district,
                 },
                 firmName: rowData.firmName,
-                partyType: rowData.partyType,
+                partyType: party_type_data.party_type,
                 partyid:`${rowData.company_code}${rowData.party_code}`,
                 image: rowData.image,
                 pincode: rowData.pincode,
@@ -414,6 +418,9 @@ router.post("/getAllParty", async (req, res) => {
               var district_data = await Location.findOne({
                 _id: party_data[i].district,
               });
+              var party_type_data = await PartyType.findOne({
+                _id: party_data[i].partyType,
+              });
               console.log(j);
               console.log(arr[j]);
               var route_data = await Route.findOne({ _id: arr[j] })
@@ -444,7 +451,7 @@ router.post("/getAllParty", async (req, res) => {
                           id: rowData.district,
                         },
                         firmName: rowData.firmName,
-                        partyType: rowData.partyType,
+                        partyType: party_type_data.party_type,
                         pincode: rowData.pincode,
                         partyid:`${rowData.company_code}${rowData.party_code}`,
                         image: rowData.image,
