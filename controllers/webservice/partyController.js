@@ -512,7 +512,7 @@ router.post("/getParty", (req, res) => {
                   Location.findOne({ _id: party_data.district })
                     .exec()
                     .then((district_data) => {
-                      PartyType.findOne({ _id: party_data.party_type })
+                      PartyType.findOne({ _id: party_data.partyType })
                         .exec()
                         .then((party_type_data) => {
                       //console.log(party_data.route[0])
