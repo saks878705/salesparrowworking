@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Attendance = mongoose.model("Attendance");
 const Beat = mongoose.model("Beat");
+const Party = mongoose.model("Party");
 const router = express.Router();
 const base_url = "http://salesparrow.herokuapp.com/";
 const multer = require("multer");
@@ -90,10 +91,45 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
 
 });
 
-router.post('/attendanceListOfEmployee',(req,res)=>{
+router.post('/attendanceListOfEmployee',async(req,res)=>{
     let employee_id = req.body.employee_id?req.body.employee_id:"";
     if(employee_id=="") return res.json({status:false,message:"Please provide the Employee"});
-    Attendance.find
+    let attendance_data =await Attendance.find({emp_id:employee_id});
+    if(attendance_data.length<1) return res.json({status:true,message:"No Data",result:[]});
+    for(let i = 0;i<attendance_data.length;i++){
+        let list = [];
+        await (async function (rowData) {
+            var beat_data = await Beat.findOne({_id: attendance_data[i].beat_id,});
+            var party_data = await Party.findOne({_id: attendance_data[i].party_id,});
+            var employee_data = await Employee.findOne({_id: attendance_data[i].emp_id,});
+            var u_data = {
+                id: rowData._id,
+                party: { name: party_data.firmName, id: party_data._id },
+                beat: { name: beat_data.beatName, id: beat_data._id },
+                employee:{name:employee_data.employeeName,id:employee_data._id},
+                activity:rowData.activity,
+                selfie:rowData.selfie,
+                location:rowData.location,
+                status:rowData.status
+            };
+            list.push(u_data);
+          })(party_data[i]);
+          counInfo++;
+          if (counInfo == party_data.length) {
+            let c = Math.ceil(count.length / limit);
+            console.log(count.length);
+            console.log(c);
+            if (c == 0) {
+              c += 1;
+            }
+            res.json({
+              status: true,
+              message: "Parties for this state found successfully",
+              result: list,
+              pageLength: c,
+            });
+          }
+    }
 })
 
 module.exports = router;
