@@ -606,89 +606,56 @@ router.post("/addPartyEmp", (req, res) => {
 router.post("/getAllPartyEmp", async (req, res) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (!token) {
-    return res.json({
-      status: false,
-      message: "Token must be provided",
-    });
-  }
+  if (!token) return res.json({status: false,message: "Token must be provided",});
   let x = token.split(".")
-  if(x.length<3){
-    return res.send({status:false,message:"Invalid token"})
-  }
+  if(x.length<3) return res.send({status:false,message:"Invalid token"})
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   var page = req.body.page ? req.body.page : "1";
   var limit = 10;
   var count = await Party.find({ employee_id });
   var list = [];
-  Party.find({ employee_id })
-    .sort({"status":-1})
-    .limit(limit * 1)
-    .skip((page - 1) * limit)
-    .exec()
-    .then((party_data) => {
+  Party.find({ employee_id }).sort({"status":-1}).limit(limit * 1).skip((page - 1) * limit).exec().then(async (party_data) => {
       if (party_data.length > 0) {
         let counInfo = 0;
         for (let i = 0; i < party_data.length; i++) {
-          Location.findOne({ _id: party_data[i].state })
-            .exec()
-            .then((state_data) => {
-              Location.findOne({ _id: party_data[i].city })
-                .exec()
-                .then((city_data) => {
-                  Location.findOne({ _id: party_data[i].district })
-                    .exec()
-                    .then(async (district_data) => {
-                      await (async function (rowData) {
-                        var u_data = {
-                          id: rowData._id,
-                          state: { name: state_data.name, id: rowData.state },
-                          city: { name: city_data.name, id: rowData.city },
-                          district: {
-                            name: district_data.name,
-                            id: rowData.district,
-                          },
-                          firmName: rowData.firmName,
-                          party_unique_id:`${rowData.company_code}${rowData.party_code}`,
-                          address: rowData.address,
-                          partyType: rowData.partyType,
-                          image: rowData.image,
-                          pincode: rowData.pincode,
-                          GSTNo: rowData.GSTNo,
-                          contactPersonName: rowData.contactPersonName,
-                          mobileNo: rowData.mobileNo,
-                          email: rowData.email,
-                          DOB: rowData.DOB,
-                          DOA: rowData.DOA,
-                          route: rowData.route,
-                          status: rowData.status,
-                        };
-                        list.push(u_data);
-                      })(party_data[i]);
-                      counInfo++;
-                      if (counInfo == party_data.length) {
-                        let c = Math.ceil(count.length / limit);
-                        if (c == 0) {
-                          c += 1;
-                        }
-                        res.json({
-                          status: true,
-                          message: "All Parties found successfully",
-                          result: list,
-                          pageLength: c,
-                        });
-                      }
-                    });
-                });
-            });
+          let state_data = await Location.findOne({ _id: party_data[i].state });
+          let city_data = await Location.findOne({ _id: party_data[i].city });
+          let district_data = await Location.findOne({ _id: party_data[i].district });
+          await (async function (rowData) {
+            var u_data = {
+              id: rowData._id,
+              state: { name: state_data.name, id: rowData.state },
+              city: { name: city_data.name, id: rowData.city },
+              district: {name: district_data.name,id: rowData.district,},
+              firmName: rowData.firmName,
+              party_unique_id:`${rowData.company_code}${rowData.party_code}`,
+              address: rowData.address,
+              partyType: rowData.partyType,
+              image: rowData.image,
+              pincode: rowData.pincode,
+              GSTNo: rowData.GSTNo,
+              contactPersonName: rowData.contactPersonName,
+              mobileNo: rowData.mobileNo,
+              email: rowData.email,
+              DOB: rowData.DOB,
+              DOA: rowData.DOA,
+              route: rowData.route,
+              status: rowData.status,
+            };
+            list.push(u_data);
+          })(party_data[i]);
+          counInfo++;
+          if (counInfo == party_data.length) {
+            let c = Math.ceil(count.length / limit);
+            if (c == 0) {
+              c += 1;
+            }
+             return res.json({status: true,message: "All Parties found successfully",result: list,pageLength: c,});
+          }
         }
       } else {
-        res.json({
-          status: true,
-          message: "No party found",
-          result: [],
-        });
+        return res.json({status: true,message: "No party found",result: [],});
       }
     });
 });
