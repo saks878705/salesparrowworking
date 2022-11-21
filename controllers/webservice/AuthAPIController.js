@@ -1,6 +1,6 @@
 const express      = require('express');
 var router         = express.Router();
-const base_url     = 'http://salesparrow.herokuapp.com/';
+const base_url     = 'https://salesparrow.teknikoglobal.com/';
 const jwt          = require('jsonwebtoken');
 const bcrypt       = require('bcrypt');
 const mongoose     = require('mongoose');
