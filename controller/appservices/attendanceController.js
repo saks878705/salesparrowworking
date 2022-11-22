@@ -61,10 +61,12 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                             new_attendance.save().then(async (data)=>{
                                 if(data){
                                     let beat_data = await Beat.findOne({_id:data.beat_id});
+                                    let party_data = await Party.findOne({_id:data.party_id});
+                                    let arr = [beat_data,party_data];
                                     return res.json({
                                         status:true,
                                         message:"Attendance marked successfully",
-                                        result:beat_data
+                                        result:arr
                                     })
                                 }
                             })
