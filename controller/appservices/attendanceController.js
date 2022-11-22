@@ -7,9 +7,6 @@ const Party = mongoose.model("Party");
 const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
 const multer = require("multer");
-const sid = "ACc3f03d291aaa9b78b8088eb0b77bf616";
-const auth_token = "b088eeb84d39bd2cc2679faea930b620";
-const twilio = require("twilio")(sid, auth_token);
 const jwt = require("jsonwebtoken");
 
 const imageStorage = multer.diskStorage({
@@ -57,7 +54,6 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                                 activity_id:activity,
                                 selfie:base_url+req.files.selfie[0].path,
                                 location:location,
-                                check_in:get_current_date(),
                                 Created_date:get_current_date(),
                                 Updated_date:get_current_date(),
                                 status:"Working",

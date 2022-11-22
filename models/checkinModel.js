@@ -1,21 +1,25 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const attendance_schema = new Schema({
+const check_in_out_schema = new Schema({
     emp_id:{
         type:String
     },
-    party_id:{
-        type:String
+    check_in_time:{
+        type:String,
+        default: ""
     },
-    beat_id:{
-        type:String
+    check_out_time:{
+        type:String,
+        default: ""
     },
-    activity_id:{
-        type:String
+    check_in_date:{
+        type:String,
+        default: ""
     },
-    selfie:{
-        type:String
+    check_out_date:{
+        type:String,
+        default: ""
     },
     location:{
         type:Array,
@@ -38,4 +42,4 @@ const attendance_schema = new Schema({
     }
 })
 
-module.exports = mongoose.model('Attendance',attendance_schema)
+module.exports = mongoose.model('Check',check_in_out_schema)

@@ -42,6 +42,11 @@ var AdminSchema = new Schema({
         type:String,
 
     },
+    companyShortCode2:{
+        type:Number,
+        default:0
+
+    },
     companyCatagory:{
         type:String,
         default:""

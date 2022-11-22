@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Location = mongoose.model("Location");
-const Role = mongoose.model("role");
+const PartyType = mongoose.model("PartyType");
 const Party = mongoose.model("Party");
 const Admin = mongoose.model("AdminInfo");
 const Beat = mongoose.model("Beat");
@@ -201,14 +201,15 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
 
 router.post('/sendOtp',async(req,res)=>{
   var to_phone_number = req.body.to_phone_number? req.body.to_phone_number: "";
-  let otp = Math.floor(1000 + Math.random() * 9000);
+  // let otp = Math.floor(1000 + Math.random() * 9000);
+  let otp = '1234';
   Employee.findOne({phone:to_phone_number}).exec().then(emp_data=>{
-    if(!emp_data) return res.json({status:true,message:"Employee not found"});
+    if(!emp_data) return res.json({status:true,message:"Employee not found",type:"Register"});
     Employee.findOneAndUpdate({phone:to_phone_number},{$set:{otp:otp}},{new:true},async()=>{
     let res1 =await axios.get(`https://2factor.in/API/V1/f77ba5e8-641e-11ed-9c12-0200cd936042/SMS/${to_phone_number}/${otp}`)
     console.log(res1.data.Status);
     if(res1.data.Status=="Success"){
-      return res.json({status:true,message:res1.data.Status})
+      return res.json({status:true,message:res1.data.Status,type:"Login",})
     }
   })
   });
@@ -616,6 +617,7 @@ router.post("/getAllPartyEmp", async (req, res) => {
           let state_data = await Location.findOne({ _id: party_data[i].state });
           let city_data = await Location.findOne({ _id: party_data[i].city });
           let district_data = await Location.findOne({ _id: party_data[i].district });
+          let party_type_data = await PartyType.findOne({ _id: party_data[i].partyType });
           await (async function (rowData) {
             var u_data = {
               id: rowData._id,
@@ -625,7 +627,7 @@ router.post("/getAllPartyEmp", async (req, res) => {
               firmName: rowData.firmName,
               party_unique_id:`${rowData.company_code}${rowData.party_code}`,
               address: rowData.address,
-              partyType: rowData.partyType,
+              partyType: party_type_data.party_type,
               image: rowData.image,
               pincode: rowData.pincode,
               GSTNo: rowData.GSTNo,
@@ -745,6 +747,9 @@ router.post("/getParty", (req, res) => {
                   Location.findOne({ _id: party_data.district })
                     .exec()
                     .then((district_data) => {
+                      PartyType.findOne({ _id: party_data.partyType })
+                        .exec()
+                        .then((party_type_data) => {
                       //console.log(party_data.route[0])
                       var arr = party_data.route
                         ? party_data.route[0].split(",")
@@ -765,7 +770,7 @@ router.post("/getParty", (req, res) => {
                           firmName: party_data.firmName,
                           party_unique_id:`${rowData.company_code}${rowData.party_code}`,
                           address: party_data.address,
-                          partyType: party_data.partyType,
+                          partyType: party_type_data.party_type,
                           image: party_data.image,
                           pincode: party_data.pincode,
                           GSTNo: party_data.GSTNo,
@@ -814,7 +819,7 @@ router.post("/getParty", (req, res) => {
                                   firmName: party_data.firmName,
                                   party_unique_id:`${rowData.company_code}${rowData.party_code}`,
                                   address: party_data.address,
-                                  partyType: party_data.partyType,
+                                  partyType: party_type_data.party_type,
                                   image: party_data.image,
                                   pincode: party_data.pincode,
                                   GSTNo: party_data.GSTNo,
@@ -836,6 +841,7 @@ router.post("/getParty", (req, res) => {
                         }
                       }
                     });
+                  })
                 });
             });
         } else {

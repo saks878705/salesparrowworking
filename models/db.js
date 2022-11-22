@@ -41,4 +41,5 @@ require('./retailerModel');
 require('./customerTypeModel');
 require('./activityModel');
 require('./partytypeModel');
+require('./checkinModel');
 

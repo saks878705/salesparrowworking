@@ -90,22 +90,34 @@ router.post('/register',(req,res)=>{
               if(pincode!=""){
                 if(GSTNo!=""){
                   Admin.find({ phone: phone }).exec().then((phone_info) => {
-                    Admin.find({ email: email }).exec().then((email_info) => {
+                    Admin.find({ email: email }).exec().then(async (email_info) => {
                     var today = new Date();
                     var dd = String(today.getDate()).padStart(2, '0');
-                    var yyyy = today.getFullYear();
+                    var yyyy = today.getFullYear().toString();
+                    console.log(yyyy);
                     if (phone_info.length < 1) {
                       if(email_info.length>0) return res.json({status:false,message:"Email already exists"})
+                      let csc2;
+                      let company =await Admin.findOne().sort({companyShortCode2:-1});
+                      if(company){
+                        console.log("companyShortCode2------",company.companyShortCode2)
+                        csc2 = company.companyShortCode2 +1;
+                      }else{
+                        console.log("inside else")
+                        csc2 = 1;
+                      }
                       bcrypt.hash(password, 10, function (err, hash) {
                         // var companyName_s = companyName;
                         // companyName_s = companyName_s.slice(0,4);
                         // let rand_int = order_id();
                         // let csc = companyName_s+dd+yyyy+rand_int;
-                        let csc = `${companyName.slice(0,4)}${dd}${yyyy}${order_id()}`;
+                        let csc = `${companyName.slice(0,4)}${dd}${yyyy.slice(2)}`;
+                        
                         console.log("random", csc);
                         var new_admin = new Admin({
                           company_name: companyName,
                           companyShortCode:csc,
+                          companyShortCode2:csc2,
                           phone: phone,
                           password: hash,
                           email: email,
@@ -381,7 +393,7 @@ router.get('/getadminprofile',(req,res)=>{
                 id:admin_data._id,
                 company_name:admin_data.company_name,
                 phone:admin_data.phone,
-                companyShortCode:admin_data.companyShortCode,
+                companyShortCode:`${admin_data.companyShortCode}${admin_data.companyShortCode2}`,
                 password:admin_data.password,
                 email:admin_data.email,
                 city:{name:city_data.name,id:city_data._id},
@@ -412,7 +424,7 @@ router.get('/getadminprofile',(req,res)=>{
                     password:admin_data.password,
                     email:admin_data.email,
                     city:{name:city_data.name,id:city_data._id},
-                    companyShortCode:admin_data.companyShortCode,
+                    companyShortCode:`${admin_data.companyShortCode}${admin_data.companyShortCode2}`,
                     state:{name:state_data.name,id:state_data._id},
                     pincode:admin_data.pincode,
                     GSTNo:admin_data.GSTNo,
