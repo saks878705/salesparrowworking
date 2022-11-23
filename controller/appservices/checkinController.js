@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Check = mongoose.model("Check");
+const Employee = mongoose.model("Employee");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
@@ -22,22 +23,25 @@ router.post('/check_in',async (req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     let location = req.body.location?req.body.location:null;
+    let employee = await Employee.findOne({_id:employee_id});
+    if(!employee) return res.json({status: false,message: "Employee not found",});
+    if(employee.status == "InActive" || employee.status == "UnApproved") return res.json({status: false,message: `you are ${employee.status}. Contact company.`,});
     if(location==null) return res.json({status:false,message:"Provide the location"});
     let today = new Date();
+    let date = get_current_date().split(" ")[0];
     var time =today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    let check =await Check.findOne({$and:[{check_in_date:get_current_date()},{emp_id:employee_id}]});
+    let check =await Check.findOne({$and:[{check_in_date:date},{emp_id:employee_id}]});
     if(check) return res.json({status:false,message:"Already checked inn"})
     let new_check_in = new Check({
         emp_id:employee_id,
         check_in_time:time,
-        check_in_date:get_current_date(),
+        check_in_date:date,
         location:location,
         Created_date:get_current_date(),
         Updated_date:get_current_date(),
         status:"Active"
     });
-    new_check_in.save().then((err,doc)=>{
-        if(err) return res.json({status:false,messaage:"There is some error"});
+    new_check_in.save().then((doc)=>{
         if(doc) return res.json({status:true,message:"Check_In Successful",result:doc})
     })
 });
