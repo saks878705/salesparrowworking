@@ -140,15 +140,32 @@ router.post("/get_all_product_catagory",async (req, res) => {
     var company_id = decodedToken.user_id;
     let p_id = req.body.p_id?req.body.p_id:"";
     let page = req.body.page?req.body.page:"1";
+    let list = [];
     let limit = 10;
     if(p_id!=""){
         let count = await ProductCatagory.find({$and:[{company_id},{p_id}]});
         let sub_catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id}]}).limit(limit*1).sort((page-1)*limit);
-        if(sub_catagory_data.length>0) return res.json({status:true,message:"Sub-Catagories found.",result:sub_catagory_data,pagelength:Math.ceil(count.length/limit)})
         if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
-    }else{
+        let counInfo = 0;
+        for(let i = 0;i<sub_catagory_data.length;i++){
+          let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
+          await (async function (rowData) {
+            var u_data = {
+              id: rowData._id,
+              name: rowData.name,
+              gst: rowData.gst,
+              image: rowData.image,
+              catagory:catagory_data.name,
+              status: rowData.status,
+          };
+          list.push(u_data);
+          })(sub_catagory_data[i]);
+          counInfo++;
+          if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+    }
+  }else{
         let count = await ProductCatagory.find({$and:[{company_id},{p_id:""}]});
-        let catagory_data = await ProductCatagory.find({company_id}).limit(limit*1).sort((page-1)*limit);
+        let catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id:""}]}).limit(limit*1).sort((page-1)*limit);
         if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
         if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
     }
