@@ -1,18 +1,20 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const product_catagory_model = new Schema({
-    name:{
+const product_varient_model = new Schema({
+    product_id:{
         type:String
     },
-    p_id:{
-        type:String,
-        default: ""
-    },
-    gst:{
+    varient_name:{
         type:String
     },
-    image:{
+    mrp:{
+        type:String
+    },
+    price:{
+        type:String
+    },
+    display_image:{
         type:String
     },
     company_id:{
@@ -36,4 +38,4 @@ const product_catagory_model = new Schema({
     }
 });
 
-module.exports = mongoose.model('ProductCatagory',product_catagory_model)
+module.exports = mongoose.model('ProductVarient',product_varient_model)

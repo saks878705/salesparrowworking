@@ -1,15 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const product_catagory_model = new Schema({
+const brand_model = new Schema({
     name:{
-        type:String
-    },
-    p_id:{
-        type:String,
-        default: ""
-    },
-    gst:{
         type:String
     },
     image:{
@@ -36,4 +29,4 @@ const product_catagory_model = new Schema({
     }
 });
 
-module.exports = mongoose.model('ProductCatagory',product_catagory_model)
+module.exports = mongoose.model('Brand',brand_model)

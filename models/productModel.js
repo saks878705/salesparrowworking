@@ -2,42 +2,50 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const product_model = new Schema({
-    productCatagory_id:{
-        type:String
+    catagory_id:{
+        type:String,
+        default:""
+    },
+    sub_catagory_id:{
+        type:String,
+        default:""
     },
     productName:{
         type:String
     },
-    tax:{
-        type:Number
-    },
-    SKU_ID:{
+    description:{
         type:String
     },
-    HSN_Code:{
+    company_id:{
         type:String
     },
-    productImage:{
+    gst:{
         type:String
     },
-    pricing_details:{
-        type:Array,
-        /*MRP:{
-            type:Number
-        },
-        Distributor:{
-            type:Array
-        },
-        Retailer:{
-            type:Array
-        },
-        SS:{
-            type:Array
-        }*/
+    display_image:{
+        type:String
     },
-    packing_details:{
-        type:Array
+    brand_id:{
+        type:String
     },
+    // tax:{
+    //     type:Number
+    // },
+    // SKU_ID:{
+    //     type:String
+    // },
+    // HSN_Code:{
+    //     type:String
+    // },
+    // productImage:{
+    //     type:String
+    // },
+    // pricing_details:{
+    //     type:Array,
+    // },
+    // packing_details:{
+    //     type:Array
+    // },
     Created_date: {
         type: String,
         default: ""

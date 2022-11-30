@@ -30,6 +30,7 @@ require('./bannerModel');
 require('./unitModel');
 require('./productCatagoryModel');
 require('./productModel');
+require('./productVarientModel');
 require('./routeModel');
 require('./pgroupModel');
 require('./partyGrouping');
@@ -42,4 +43,5 @@ require('./customerTypeModel');
 require('./activityModel');
 require('./partytypeModel');
 require('./checkinModel');
+require('./brandModel');
 
