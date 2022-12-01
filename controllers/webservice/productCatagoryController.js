@@ -143,8 +143,8 @@ router.post("/get_all_product_catagory",async (req, res) => {
     let list = [];
     let limit = 10;
     if(p_id!=""){
-        let count = await ProductCatagory.find({$and:[{company_id},{p_id}]});
-        let sub_catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id}]}).limit(limit*1).sort((page-1)*limit);
+        let count = await ProductCatagory.find({$and:[{company_id},{p_id},{is_delete:"0"}]});
+        let sub_catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
         if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
         let counInfo = 0;
         for(let i = 0;i<sub_catagory_data.length;i++){
@@ -170,5 +170,17 @@ router.post("/get_all_product_catagory",async (req, res) => {
         if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
     }
 });
+
+router.delete('/delete_catagory',async (req,res)=>{
+  let id = req.body.id?req.body.id:"";
+  if(id=="") return res.json({status:false,message:"Please give id"});
+  let sub_catagory_data = await ProductCatagory.find({p_id:id});
+  console.log(sub_catagory_data);
+  for(let i = 0;i<sub_catagory_data.length;i++){
+    console.log(i);
+    await ProductCatagory.findOneAndUpdate({_id:sub_catagory_data[i]._id},{$set:{is_delete:"1"}});
+  }
+  res.json({status:true,message:"Deleted successfully"});
+})
 
 module.exports = router;

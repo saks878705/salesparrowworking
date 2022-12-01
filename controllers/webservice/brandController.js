@@ -80,21 +80,18 @@ router.post("/get_all_brands", async (req, res) => {
     return res.send({ status: false, message: "Invalid token" });
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
-  let page = req.body.page ? req.body.page : "1";
+  let page = req.body.page ? req.body.page : "";
   let limit = 10;
-  let count = await Brand.find({ company_id });
-  let brand_data = await Brand.find({ company_id })
-    .limit(limit * 1)
-    .sort((page - 1) * limit);
-  if (brand_data.length < 1)
-    return res.json({ status: true, message: "No brand found", result: [] });
-  if (brand_data.length > 0)
-    return res.json({
-      status: true,
-      message: "Brands found",
-      result: brand_data,
-      pageLength: Math.ceil(count.length / limit),
-    });
+  if(page!=""){
+    let count = await Brand.find({ company_id });
+    let brand_data = await Brand.find({ company_id }).limit(limit * 1).sort((page - 1) * limit);
+    if (brand_data.length < 1) return res.json({ status: true, message: "No brand found", result: [] });
+    if (brand_data.length > 0) return res.json({status: true,message: "Brands found",result: brand_data,pageLength: Math.ceil(count.length / limit),});
+  }else{
+    let brand_data = await Brand.find({ company_id });
+    if (brand_data.length < 1) return res.json({ status: true, message: "No brand found", result: [] });
+    if (brand_data.length > 0) return res.json({status: true,message: "Brands found",result: brand_data});
+  }
 });
 
 router.post("/edit_brand", async (req, res) => {
