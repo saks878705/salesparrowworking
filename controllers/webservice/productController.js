@@ -57,7 +57,7 @@ router.post('/addProduct',(req,res)=>{
             description:description,
             company_id:company_id,
             gst:gst,
-            display_image:`${base_url}_${productName.toLowerCase()}_${req.file.path}`,
+            display_image:`${base_url}${req.file.path}`,
             brand_id:brand_id,
             Created_date:get_current_date(),
             Updated_date:get_current_date(),
@@ -82,6 +82,15 @@ router.post('/edit_product',async (req,res)=>{
         if(req.body.description){
             updated_product.description = req.body.description;
         }
+        if(req.body.brand_id){
+            updated_product.brand_id = req.body.brand_id;
+        }
+        if(req.body.catagory_id){
+            updated_product.catagory_id = req.body.catagory_id;
+        }
+        if(req.body.sub_catagory_id){
+            updated_product.sub_catagory_id = req.body.sub_catagory_id;
+        }
         if(req.body.gst){
             updated_product.gst = req.body.gst;
         }
@@ -89,11 +98,7 @@ router.post('/edit_product',async (req,res)=>{
             updated_product.status = req.body.status;
         }
         if(req.file){
-            if(req.body.productName){
-                updated_product.display_image = `${base_url}_${req.body.productName}_${req.file.path}`;
-            }else{
-                updated_product.display_image = `${base_url}_${product_data.productName}_${req.file.path}`;
-            } 
+            updated_product.display_image = `${base_url}${req.file.path}` 
         }
         updated_product.Updated_date = get_current_date();
         Product.findByIdAndUpdate({_id:id},updated_product,{new:true},(err,data)=>{
