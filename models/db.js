@@ -44,4 +44,6 @@ require('./activityModel');
 require('./partytypeModel');
 require('./checkinModel');
 require('./brandModel');
+require('./productGroupingModel');
+require('./productgrpModel');
 

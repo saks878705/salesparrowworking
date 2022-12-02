@@ -103,38 +103,11 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
                       status: "Active",
                     });
                     new_party.save().then((data) => {
-                      console.log(route);
-                      console.log(route[0]);
-                      var arr = route ? route.split(",") : "";
-                      console.log(arr);
-                      if (arr == "") {
-                        res.status(200).json({
-                          status: true,
-                          message: "Party created successfully",
-                          result: data,
-                        });
-                      } else {
-                        let count = 0;
-                        for (let i = 0; i < arr.length; i++) {
-                          Route.updateOne(
-                            { _id: arr[i] },
-                            {
-                              $set: { is_assigned: "1", assigned_to: data._id },
-                            }
-                          )
-                            .exec()
-                            .then((route_data) => {
-                              count++;
-                              if (count == arr.length) {
-                                res.status(200).json({
-                                  status: true,
-                                  message: "Party created successfully",
-                                  result: data,
-                                });
-                              }
-                            });
-                        }
-                      }
+                      res.status(200).json({
+                        status: true,
+                        message: "Party created successfully",
+                        result: data,
+                      });
                     });
                   } else {
                     res.json({
@@ -191,9 +164,7 @@ router.post("/editParty", (req, res) => {
   console.log(req.body);
   var route = req.body.route ? req.body.route : "";
   var id = req.body.id ? req.body.id : "";
-  Party.find({ _id: id })
-    .exec()
-    .then((party_data) => {
+  Party.find({ _id: id }).exec().then((party_data) => {
       if (party_data.length > 0) {
         var updated_party = {};
         if (req.body.partyType) {
@@ -201,32 +172,6 @@ router.post("/editParty", (req, res) => {
         }
         if (req.body.firmName) {
           updated_party.firmName = req.body.firmName;
-        }
-        if (party_data[0].route == null) {
-          updated_party.route = req.body.route;
-        } else {
-          var arr2 = party_data[0].route[0]
-            ? party_data[0].route[0].split(",")
-            : "";
-          if (arr2 == "") {
-            updated_party.route = req.body.route;
-          } else {
-            let count2 = 0;
-            for (let j = 0; j < arr2.length; j++) {
-              console.log(arr2[j]);
-              Route.updateOne(
-                { _id: arr2[j] },
-                { $set: { is_assigned: "0", assigned_to: "" } }
-              )
-                .exec()
-                .then((route_data) => {
-                  count2++;
-                  if (count2 == arr2.length) {
-                    updated_party.route = req.body.route;
-                  }
-                });
-            }
-          }
         }
         updated_party.route = req.body.route;
         if (req.body.GSTNo) {
@@ -272,33 +217,11 @@ router.post("/editParty", (req, res) => {
           { new: true },
           (err, doc) => {
             if (doc) {
-              var arr = route ? route.split(",") : "";
-              if (arr == "") {
-                res.status(200).json({
-                  status: true,
-                  message: "Update successfully",
-                  results: updated_party,
-                });
-              } else {
-                let count = 0;
-                for (let i = 0; i < arr.length; i++) {
-                  Route.updateOne(
-                    { _id: arr[i] },
-                    { $set: { is_assigned: "1", assigned_to: id } }
-                  )
-                    .exec()
-                    .then((route_data) => {
-                      count++;
-                      if (count == arr.length) {
-                        res.status(200).json({
-                          status: true,
-                          message: "Update successfully",
-                          results: updated_party,
-                        });
-                      }
-                    });
-                }
-              }
+              res.status(200).json({
+                status: true,
+                message: "Update successfully",
+                results: updated_party,
+              });
             }
           }
         );
@@ -339,19 +262,12 @@ router.post("/getAllParty", async (req, res) => {
   } else if (company_id != "" && state != "" && partyType != "") {
     obj1 = [{ company_id }, { state }, { partyType }];
   }
-  Party.find({ $and: obj1 })
-    .sort({ "status": -1 })
-    .limit(limit * 1)
-    .skip((page - 1) * limit)
-    .exec()
-    .then(async (party_data) => {
+  Party.find({ $and: obj1 }).sort({ "status": -1 }).limit(limit * 1).skip((page - 1) * limit).exec().then(async (party_data) => {
       console.log(party_data);
       if (party_data.length > 0) {
         let counInfo = 0;
         for (let i = 0; i < party_data.length; i++) {
-          var arr = party_data[i].route
-            ? party_data[i].route[0].split(",")
-            : "";
+          var arr = party_data[i].route? party_data[i].route[0].split(","): "";
           if (arr == "") {
             await (async function (rowData) {
               var state_data = await Location.findOne({
@@ -499,26 +415,14 @@ router.post("/getParty", (req, res) => {
   var id = req.body.id ? req.body.id : "";
   var list = [];
   if (id != "") {
-    Party.findOne({ _id: id })
-      .exec()
-      .then((party_data) => {
+    Party.findOne({ _id: id }).exec().then((party_data) => {
         if (party_data) {
-          Location.findOne({ _id: party_data.state })
-            .exec()
-            .then((state_data) => {
-              Location.findOne({ _id: party_data.city })
-                .exec()
-                .then((city_data) => {
-                  Location.findOne({ _id: party_data.district })
-                    .exec()
-                    .then((district_data) => {
-                      PartyType.findOne({ _id: party_data.partyType })
-                        .exec()
-                        .then((party_type_data) => {
+          Location.findOne({ _id: party_data.state }).exec().then((state_data) => {
+              Location.findOne({ _id: party_data.city }).exec().then((city_data) => {
+                  Location.findOne({ _id: party_data.district }).exec().then((district_data) => {
+                      PartyType.findOne({ _id: party_data.partyType }).exec().then((party_type_data) => {
                       //console.log(party_data.route[0])
-                      var arr = party_data.route
-                        ? party_data.route[0].split(",")
-                        : "";
+                      var arr = party_data.route? party_data.route[0].split(","): "";
                       console.log(arr);
                       if (arr == "") {
                         var u_data = {
@@ -679,46 +583,12 @@ router.post(
 router.delete("/deleteParty", (req, res) => {
   var id = req.body.id ? req.body.id : "";
   if (id != "") {
-    Party.findOne({ _id: id })
-      .exec()
-      .then((party_data) => {
-        var arr = party_data.route ? party_data.route[0].split(",") : "";
-        console.log(arr);
-
-        if (arr == "") {
-          Party.findOneAndDelete({ _id: id })
-            .exec()
-            .then(() => {
-              res.status(200).json({
-                status: true,
-                message: "Deleted successfully",
-              });
-            });
-        } else {
-          let count = 0;
-          for (let i = 0; i < arr.length; i++) {
-            console.log(arr[i]);
-            Route.updateOne(
-              { _id: arr[i] },
-              { $set: { is_assigned: "0", assigned_to: "" } }
-            )
-              .exec()
-              .then((route_data) => {
-                count++;
-                if (count == arr.length) {
-                  Party.findOneAndDelete({ _id: id })
-                    .exec()
-                    .then(() => {
-                      res.status(200).json({
-                        status: true,
-                        message: "Deleted successfully",
-                      });
-                    });
-                }
-              });
-          }
-        }
+    Party.findOneAndDelete({ _id: id }).exec().then(() => {
+      res.status(200).json({
+        status: true,
+        message: "Deleted successfully",
       });
+    });
   }
 });
 

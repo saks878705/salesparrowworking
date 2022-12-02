@@ -51,7 +51,7 @@ router.post('/add_product_varient',(req,res)=>{
             price:price,
             varient_name:varient_name,
             company_id:company_id,
-            display_image:`${base_url}_${req.file.path}`,
+            display_image:`${base_url}${req.file.path}`,
             Created_date:get_current_date(),
             Updated_date:get_current_date(),
             status:"Active",
@@ -85,7 +85,7 @@ router.post('/edit_product_varient',async (req,res)=>{
             updated_product_varient.varient_name = req.body.varient_name;
         }
         if(req.file){
-            updated_product_varient.display_image = `${base_url}_${req.file.path}`; 
+            updated_product_varient.display_image = `${base_url}${req.file.path}`; 
         }
         updated_product_varient.Updated_date = get_current_date();
         ProductVarient.findByIdAndUpdate({_id:id},updated_product_varient,{new:true},(err,data)=>{
@@ -102,15 +102,15 @@ router.post('/get_all_product_varients',async (req,res)=>{
     if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
-    let product_id = req.body.brand_id?req.body.brand_id:"";
+    let product_id = req.body.product_id?req.body.product_id:"";
     let arr =[];
     let limit = 10;
     let list = [];
     let page = req.body.page?req.body.page:"1";
     if(product_id!=""){
-        arr.push({company_id},{product_id})
+        arr.push({company_id},{product_id},{is_delete:"0"})
     }else{
-        arr.push({company_id})
+        arr.push({company_id},{is_delete:"0"})
     }
     let count = await ProductVarient.find({$and:arr});
     let product_varient_data = await ProductVarient.find({$and:arr}).limit(limit*1).sort((page-1)*limit);
@@ -139,7 +139,7 @@ router.delete('/delete_product_varient',(req,res)=>{
     let id = req.body.id ? req.body.id : "";
   if (id == "")
     return res.json({ status: false, message: "Please provide Id" });
-  ProductVarient.deleteOne({ _id: id }).exec().then(() => {
+  ProductVarient.findOneAndUpdate({ _id: id },{$set:{is_delete:"1"}}).exec().then(() => {
       return res.json({ status: true, message: "Deleted successfully" });
     });
 });

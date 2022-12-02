@@ -7,6 +7,7 @@ const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
 const multer = require("multer");
 const jwt = require('jsonwebtoken');
+const XLSX = require("xlsx");
 
 const imageStorage = multer.diskStorage({
   destination: "images/Product_img",
@@ -18,6 +19,17 @@ const imageStorage = multer.diskStorage({
 const imageUpload = multer({
   storage: imageStorage,
 }).single("product_image");
+
+const imageStorage2 = multer.diskStorage({
+  destination: "images/product_excel",
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + "_" + Date.now());
+  },
+});
+
+const imageUpload2 = multer({
+  storage: imageStorage2,
+}).single("product_excel");
 
 function get_current_date() {
     var today = new Date();
@@ -118,21 +130,15 @@ router.post('/get_all_products',async (req,res)=>{
     let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
     let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
     let brand_id = req.body.brand_id?req.body.brand_id:"";
-    let arr =[];
     let limit = 10;
     let list = [];
     let page = req.body.page?req.body.page:"1";
-    if(brand_id!="" && catagory_id=="" && sub_catagory_id==""){
-        arr.push({company_id},{brand_id})
-    }else if(brand_id!="" && catagory_id!="" && sub_catagory_id!=""){
-        arr.push({company_id},{brand_id},{catagory_id},{sub_catagory_id})
-    }else if(brand_id=="" && catagory_id!="" && sub_catagory_id==""){
-        arr.push({company_id},{catagory_id})
-    }else if(brand_id=="" && catagory_id!="" && sub_catagory_id!=""){
-        arr.push({company_id},{catagory_id},{sub_catagory_id})
-    }else if(brand_id=="" && catagory_id=="" && sub_catagory_id==""){
-        arr.push({company_id})
-    }
+    
+    arr =[{company_id}]
+    if(brand_id) arr.push({brand_id})
+    if(catagory_id) arr.push({catagory_id})
+    if(sub_catagory_id) arr.push({sub_catagory_id})
+
     let count = await Product.find({$and:arr});
     let product_data = await Product.find({$and:arr}).limit(limit*1).sort((page-1)*limit);
     if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
@@ -183,5 +189,44 @@ router.delete('/delete_product',(req,res)=>{
       return res.json({ status: true, message: "Deleted successfully" });
     });
 })
+
+router.post("/bulk_import_products",(req, res) => {
+    imageUpload2(req, res, async (err) => {
+        console.log("file",req.file);
+        console.log("body",req.body);
+        if (!req.file) return res.status(201).json({ status: true, message: "File not found"});
+        const authHeader = req.headers["authorization"];
+      const token = authHeader && authHeader.split(" ")[1];
+      if (!token) return res.json({status: false,message: "Token must be provided",});
+      var decodedToken = jwt.verify(token, "test");
+      var company_id = decodedToken.user_id;
+      var workbook = XLSX.readFile(req.files.product_excel[0].path);
+      var sheet_namelist = workbook.SheetNames;
+      var x = 0;
+      var list = [];
+      let countInfo = 0;
+      sheet_namelist.forEach(async (element) => {
+        var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_namelist[x]]);
+        for (let i = 0; i < xlData.length; i++) {
+          console.log(xlData[i]);
+          var new_product = new Product({
+            productName:xlData[i].Product_Name,
+            description:xlData[i].Description,
+            company_id:company_id,
+            gst:xlData[i].GST,
+            display_image:xlData[i].Image,
+            Created_date: get_current_date(),
+            Updated_date: get_current_date(),
+            status: "Active",
+          });
+          new_product.save();
+          list.push(new_product);
+          countInfo++;
+          if(countInfo == xlData.length) return res.status(200).json({status: true,message: "Data imported successfully",result: list,});
+        }
+        x++;
+    });
+    })
+});
 
 module.exports = router;

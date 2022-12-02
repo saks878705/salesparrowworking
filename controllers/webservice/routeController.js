@@ -43,7 +43,6 @@ router.post("/addRoute", (req, res) => {
                 city: city,
                 area: area,
                 distance: distance,
-                is_assigned:"0",
                 start_point: start_point,
                 company_id: company_id,
                 end_point: end_point,
@@ -324,69 +323,69 @@ router.post("/routeListing", async (req, res) => {
           });
 });
 
-router.post("/notAssignedRouteListing", async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) {
-    return res.json({
-      status: false,
-      message: "Token must be provided",
-    });
-  }
-  var state = req.body.state ? req.body.state : "";
-  var city = req.body.city ? req.body.city : "";
-  var decodedToken = jwt.verify(token, "test");
-  var company_id = decodedToken.user_id;
-  var list = [];
-  let arr = [];
-  if (company_id != "" && state == "" && city == "") {
-    arr = [{ company_id },{is_assigned:"0"}];
-  } else if (company_id != "" && state != "" && city == "") {
-    arr = [{ company_id }, { state },{is_assigned:"0"}];
-  } else if (company_id != "" && state != "" && city != "") {
-    arr = [{ company_id }, { state }, { city },{is_assigned:"0"}];
-  }
-        Route.find({ $and:arr }).exec().then((route_data) => {
-            if(route_data.length>0){
-              let counInfo = 0;
-            for (let i = 0; i < route_data.length; i++) {
-                Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
-                  Location.findOne({ _id: route_data[i].city }).exec().then((city_data) => {
-                      Location.findOne({ _id: route_data[i].area }).exec().then(async (area_data) => {
-                          await (async function (rowData) {
-                            var u_data = {
-                              id: rowData._id,
-                              state:{name:state_data.name,id:rowData.state},
-                              city:{name:city_data.name,id:rowData.city},
-                              area:{name:area_data.name,id:rowData.area},
-                              start_point: rowData.start_point,
-                              distance: rowData.distance,
-                              end_point: rowData.end_point,
-                              status: rowData.status,
-                            };
-                            list.push(u_data);
-                          })(route_data[i]);
-                          counInfo++;
-                          if (counInfo == route_data.length) {
-                            res.json({
-                              status: true,
-                              message: "All Routes found successfully",
-                              result: list,
-                            });
-                          }
-                        });
-                    });
-                });
-            }
-            }else{
-              res.json({
-                status:true,
-                message:"No route found ",
-                result:[]
-              })
-            }
-          });
-});
+// router.post("/notAssignedRouteListing", async (req, res) => {
+//   const authHeader = req.headers["authorization"];
+//   const token = authHeader && authHeader.split(" ")[1];
+//   if (!token) {
+//     return res.json({
+//       status: false,
+//       message: "Token must be provided",
+//     });
+//   }
+//   var state = req.body.state ? req.body.state : "";
+//   var city = req.body.city ? req.body.city : "";
+//   var decodedToken = jwt.verify(token, "test");
+//   var company_id = decodedToken.user_id;
+//   var list = [];
+//   let arr = [];
+//   if (company_id != "" && state == "" && city == "") {
+//     arr = [{ company_id },{is_assigned:"0"}];
+//   } else if (company_id != "" && state != "" && city == "") {
+//     arr = [{ company_id }, { state },{is_assigned:"0"}];
+//   } else if (company_id != "" && state != "" && city != "") {
+//     arr = [{ company_id }, { state }, { city },{is_assigned:"0"}];
+//   }
+//         Route.find({ $and:arr }).exec().then((route_data) => {
+//             if(route_data.length>0){
+//               let counInfo = 0;
+//             for (let i = 0; i < route_data.length; i++) {
+//                 Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
+//                   Location.findOne({ _id: route_data[i].city }).exec().then((city_data) => {
+//                       Location.findOne({ _id: route_data[i].area }).exec().then(async (area_data) => {
+//                           await (async function (rowData) {
+//                             var u_data = {
+//                               id: rowData._id,
+//                               state:{name:state_data.name,id:rowData.state},
+//                               city:{name:city_data.name,id:rowData.city},
+//                               area:{name:area_data.name,id:rowData.area},
+//                               start_point: rowData.start_point,
+//                               distance: rowData.distance,
+//                               end_point: rowData.end_point,
+//                               status: rowData.status,
+//                             };
+//                             list.push(u_data);
+//                           })(route_data[i]);
+//                           counInfo++;
+//                           if (counInfo == route_data.length) {
+//                             res.json({
+//                               status: true,
+//                               message: "All Routes found successfully",
+//                               result: list,
+//                             });
+//                           }
+//                         });
+//                     });
+//                 });
+//             }
+//             }else{
+//               res.json({
+//                 status:true,
+//                 message:"No route found ",
+//                 result:[]
+//               })
+//             }
+//           });
+// });
 
 router.post("/edit_route", (req, res) => {
   var id = req.body.id ? req.body.id : "";

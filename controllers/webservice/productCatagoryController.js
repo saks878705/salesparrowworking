@@ -61,7 +61,7 @@ router.post("/addProductCatagory",async (req, res) => {
     var new_product_catagory = new ProductCatagory({
       name: name.toLowerCase(),
       gst: gst,
-      image: `${base_url}_${name.toLowerCase()}_${req.file.path}`,
+      image: `${base_url}${req.file.path}`,
       company_id: company_id,
       p_id:p_id,
       Created_date: get_current_date(),
