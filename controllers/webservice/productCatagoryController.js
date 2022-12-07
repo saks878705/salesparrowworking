@@ -50,6 +50,7 @@ router.post("/addProductCatagory",async (req, res) => {
     var name = req.body.name ? req.body.name : "";
     var p_id = req.body.p_id ? req.body.p_id : "";
     var gst = req.body.gst ? req.body.gst : "";
+    var status = req.body.status ? req.body.status : "";
     if (name == "")
       return res.json({ status: false, message: "Name is required" });
     let catagory_data = await ProductCatagory.find({ name });
@@ -59,14 +60,14 @@ router.post("/addProductCatagory",async (req, res) => {
         message: "Product catagory already exists",
       });
     var new_product_catagory = new ProductCatagory({
-      name: name.toLowerCase(),
+      name: name,
       gst: gst,
       image: `${base_url}${req.file.path}`,
       company_id: company_id,
       p_id:p_id,
       Created_date: get_current_date(),
       Updated_date: get_current_date(),
-      status: "Active",
+      status: status,
     });
     new_product_catagory.save().then((data) => {
       res.status(200).json({

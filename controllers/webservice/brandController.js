@@ -43,6 +43,7 @@ router.post("/add_brand", async (req, res) => {
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     let name = req.body.name ? req.body.name : "";
+    let status = req.body.status ? req.body.status : "";
     if (name == "")
       return res.json({ status: false, message: "Please give brand name" });
     let brand_data = await Brand.find({ name });
@@ -57,7 +58,7 @@ router.post("/add_brand", async (req, res) => {
       image: `${base_url}${req.file.path}`,
       Created_date: get_current_date(),
       Updated_date: get_current_date(),
-      status: "Active",
+      status: status,
     });
     let data = await new_brand.save();
     if (data)

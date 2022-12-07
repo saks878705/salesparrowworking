@@ -57,6 +57,7 @@ router.post('/addProduct',(req,res)=>{
         let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
         let sub_catagory_id = req.body.sub_catagory_id?req.body.sub_catagory_id:"";
         let description = req.body.description?req.body.description:"";
+        let hsn_code = req.body.hsn_code?req.body.hsn_code:"";
         let gst = req.body.gst?req.body.gst:"";
         let brand_id = req.body.brand_id?req.body.brand_id:"";
         if(productName=="") return res.json({status:false,message:"Product name is required"})
@@ -69,6 +70,7 @@ router.post('/addProduct',(req,res)=>{
             description:description,
             company_id:company_id,
             gst:gst,
+            hsn_code:hsn_code,
             display_image:`${base_url}${req.file.path}`,
             brand_id:brand_id,
             Created_date:get_current_date(),
@@ -90,6 +92,9 @@ router.post('/edit_product',async (req,res)=>{
         let updated_product = {};
         if(req.body.productName){
             updated_product.productName = req.body.productName;
+        }
+        if(req.body.hsn_code){
+            updated_product.hsn_code = req.body.hsn_code;
         }
         if(req.body.description){
             updated_product.description = req.body.description;
@@ -149,23 +154,41 @@ router.post('/get_all_products',async (req,res)=>{
             let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
             if(product_data[i].sub_catagory_id){
                 let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
-                var u_data = {
-                    id: rowData._id,
-                    name:rowData.productName,
-                    brand_name:brand_data.name,
-                    catagory_name:catagory_data.name,
-                    sub_catagory_name:sub_catagory_data.name,
-                    description:rowData.description,
-                    gst:rowData.gst,
-                    image:rowData.display_image,
-                    status:rowData.status,
-                };
-                list.push(u_data);
+                if(sub_catagory_data){
+                    var u_data = {
+                        id: rowData._id,
+                        name:rowData.productName,
+                        brand_name:brand_data.name,
+                        hsn_code:rowData.hsn_code,
+                        catagory_name:catagory_data.name,
+                        sub_catagory_name:sub_catagory_data.name,
+                        description:rowData.description,
+                        gst:rowData.gst,
+                        image:rowData.display_image,
+                        status:rowData.status,
+                    };
+                    list.push(u_data);
+                }else{
+                    var u_data = {
+                        id: rowData._id,
+                        name:rowData.productName,
+                        brand_name:brand_data.name,
+                        hsn_code:rowData.hsn_code,
+                        catagory_name:catagory_data.name,
+                        sub_catagory_name:"",
+                        description:rowData.description,
+                        gst:rowData.gst,
+                        image:rowData.display_image,
+                        status:rowData.status,
+                    };
+                    list.push(u_data);
+                }
             }else{
                 var u_data = {
                     id: rowData._id,
                     name:rowData.productName,
                     brand_name:brand_data.name,
+                    hsn_code:rowData.hsn_code,
                     catagory_name:catagory_data.name,
                     sub_catagory_name:"",
                     description:rowData.description,
@@ -212,6 +235,7 @@ router.post("/bulk_import_products",(req, res) => {
           var new_product = new Product({
             productName:xlData[i].Product_Name,
             description:xlData[i].Description,
+            hsn_code:xlData[i].hsn_code,
             company_id:company_id,
             gst:xlData[i].GST,
             display_image:xlData[i].Image,

@@ -1,9 +1,12 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const unit_model = new Schema({
-    productUnit:{
-        type:String
+const new_unit_schema = new Schema({
+    company_id:{
+        type:String,
+    },
+    unit:{
+        type:String,
     },
     Created_date: {
         type: String,
@@ -23,4 +26,4 @@ const unit_model = new Schema({
     }
 });
 
-module.exports = mongoose.model('Unit',unit_model)
+module.exports = mongoose.model('Unit',new_unit_schema)

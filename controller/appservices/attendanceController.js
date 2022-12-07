@@ -41,6 +41,7 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
     var party = req.body.party?req.body.party:"";
     var activity = req.body.activity?req.body.activity:"";
     var location = req.body.location?req.body.location:"";
+    let date = get_current_date().split(" ")[0];
     if(beat!=""){
         if(party!=""){
             if(activity!=""){
@@ -51,6 +52,7 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                                 emp_id:employee_id,
                                 party_id:party,
                                 beat_id:beat,
+                                date:date,
                                 activity_id:activity,
                                 selfie:base_url+req.files.selfie[0].path,
                                 location:location,
@@ -110,6 +112,7 @@ router.post('/attendanceListOfEmployee',async(req,res)=>{
                 beat: { name: beat_data.beatName, id: beat_data._id },
                 employee:{name:employee_data.employeeName,id:employee_data._id},
                 activity:rowData.activity,
+                date:rowData.date,
                 selfie:rowData.selfie,
                 location:rowData.location,
                 status:rowData.status

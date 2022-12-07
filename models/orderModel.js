@@ -1,27 +1,27 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const attendance_schema = new Schema({
+const new_order_schema = new Schema({
     emp_id:{
-        type:String
+        type:String,
+    },
+    company_id:{
+        type:String,
     },
     party_id:{
-        type:String
+        type:String,
     },
-    beat_id:{
-        type:String
+    order_date:{
+        type:String,
     },
-    date:{
-        type:String
+    type:{
+        type:String,
     },
-    activity_id:{
-        type:String
+    order_status:{
+        type:String,
     },
-    selfie:{
-        type:String
-    },
-    location:{
-        type:Array,
+    total_amount:{
+        type:String,
     },
     Created_date: {
         type: String,
@@ -39,6 +39,6 @@ const attendance_schema = new Schema({
         type: String,
         default:'InActive'
     }
-})
+});
 
-module.exports = mongoose.model('Attendance',attendance_schema)
+module.exports = mongoose.model('Order',new_order_schema)

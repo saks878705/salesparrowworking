@@ -27,7 +27,6 @@ require('./empGroupingModel');
 require('./groupModel');
 require('./leadModel');
 require('./bannerModel');
-require('./unitModel');
 require('./productCatagoryModel');
 require('./productModel');
 require('./productVarientModel');
@@ -46,4 +45,7 @@ require('./checkinModel');
 require('./brandModel');
 require('./productGroupingModel');
 require('./productgrpModel');
+require('./orderModel');
+require('./orderItemModel');
+require('./productUnitModel');
 

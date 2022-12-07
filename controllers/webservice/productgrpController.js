@@ -82,6 +82,7 @@ router.post('/get_product_grp_list',async (req,res)=>{
             await (async function(rowData){
                 let catagory_data = await ProductCatagory.findOne({_id:catagory_id});
                 var u_data = {
+                    id:rowData._id,
                     grp_name:rowData.grp_name,
                     grp_description:rowData.grp_description,
                     catagory_id:catagory_data.name,
@@ -101,6 +102,7 @@ router.post('/get_product_grp_list',async (req,res)=>{
             await (async function(rowData){
                 let catagory_data = await ProductCatagory.findOne({_id:rowData.catagory_id});
                 var u_data = {
+                    id:rowData._id,
                     grp_name:rowData.grp_name,
                     grp_description:rowData.grp_description,
                     catagory_id:catagory_data.name,
@@ -130,10 +132,11 @@ router.post('/get_grp_data',async (req,res)=>{
     if(product_grouping_data.length>0){
         let catagory_data = await ProductCatagory.findOne({_id:product_grp_data.catagory_id});
         for(let i = 0;i<product_grouping_data.length;i++){
-            let obj = {id:product_grouping_data[i]._id,name:product_grouping_data[i].productName}
+            let obj = {id:product_grouping_data[i].product_id,name:product_grouping_data[i].productName}
             list.push(obj);
         }
         let u_data = {
+            id:product_grp_data._id,
             grp_name:product_grp_data.grp_name,
             grp_description:product_grp_data.grp_description,
             catagory:{id:catagory_data._id,name:catagory_data.name},
@@ -151,5 +154,58 @@ router.post('/get_grp_data',async (req,res)=>{
         return res.json({status:true,message:"Data found",result:u_data})
     }
 });
+
+router.post('/edit_product_group',async (req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    let id = req.body.id?req.body.id:"";
+    let updated_grp = {};
+    if(req.body.grp_name){
+        updated_grp.grp_name = req.body.grp_name;
+    }
+    if(req.body.grp_description){
+        updated_grp.grp_description = req.body.grp_description;
+    }
+    updated_grp.Updated_date = get_current_date();
+    await ProductGroup.findByIdAndUpdate({_id:id},updated_grp,{new:true});
+    await ProductGrouping.deleteMany({grp_id:id});
+    var productIdStr = req.body.productIdStr?req.body.productIdStr:"";
+    var productIdArr = productIdStr.split(",");
+    console.log(productIdArr.length);
+    if(productIdArr.length<1){
+        console.log("inside if");
+        return res.json({status:true,message:"Updated successfully",result:updated_grp})
+    }else{
+        console.log(productIdArr);
+        console.log("inside else");
+        for(let i= 0;i<productIdArr.length;i++){
+            let product_data = await Product.findOne({_id:productIdArr[i]});
+            let new_product_grouping = new ProductGrouping({
+                grp_id:save_product_grp._id,
+                product_id:product_data._id,
+                company_id:company_id,
+                productName:product_data.productName,
+                Created_date:get_current_date(),
+                Updated_date:get_current_date(),
+                status:"Active",
+            })
+            var save_new_product_grouping = await new_product_grouping.save();
+        }
+        return res.json({status:true,message:"Updated successfully",result:[updated_grp,save_new_product_grouping]})
+    }
+});
+
+router.delete('/delete_product_grp',async (req,res)=>{
+    let id = req.body.id?req.body.id:"";
+    if(id=="") return res.json({status:false,message:"Please give the id"})
+    await ProductGrouping.deleteMany({grp_id:id});
+    await ProductGroup.deleteOne({_id:id});
+    return res.json({status:true,message:"Deleted successfully"})
+})
 
 module.exports = router;

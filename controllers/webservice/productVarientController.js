@@ -17,6 +17,15 @@ function get_current_date() {
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
 
+function randomStr(len, arr) {
+    var ans = '';
+    for (var i = len; i > 0; i--) {
+        ans += 
+          arr[Math.floor(Math.random() * arr.length)];
+    }
+    return ans;
+}
+
 const imageStorage = multer.diskStorage({
   destination: "images/product_varient_image",
   filename: (req, file, cb) => {
@@ -42,14 +51,17 @@ router.post('/add_product_varient',(req,res)=>{
         let varient_name = req.body.varient_name?req.body.varient_name:"";
         let mrp = req.body.mrp?req.body.mrp:"";
         let price = req.body.price?req.body.price:"";
+        let packing_details = req.body.packing_details?req.body.packing_details:null;
         if(product_id=="") return res.json({status:false,message:"Product name is required"})
         if(varient_name=="") return res.json({status:false,message:"Varient name is required"})
-        if(mrp=="") return res.json({status:false,message:"Mrp is required"})
+        if(mrp=="") return res.json({status:false,message:"Mrp is required"});
         let new_product_varient = new ProductVarient({
             product_id:product_id,
             mrp:mrp,
             price:price,
             varient_name:varient_name,
+            packing_details:packing_details,
+            sku_id:randomStr(8,'123456789abcdefghijklmnopqrstufwxyz'),
             company_id:company_id,
             display_image:`${base_url}${req.file.path}`,
             Created_date:get_current_date(),
@@ -74,6 +86,9 @@ router.post('/edit_product_varient',async (req,res)=>{
         }
         if(req.body.mrp){
             updated_product_varient.mrp = req.body.mrp;
+        }
+        if(req.body.packing_details){
+            updated_product_varient.packing_details = req.body.packing_details;
         }
         if(req.body.price){
             updated_product_varient.price = req.body.price;
@@ -124,6 +139,8 @@ router.post('/get_all_product_varients',async (req,res)=>{
                 varient_name:rowData.varient_name,
                 product_name:product_data.productName,
                 mrp:rowData.mrp,
+                packing_details:rowData.packing_details,
+                sku_id:rowData.sku_id,
                 price:rowData.price,
                 image:rowData.display_image,
                 status:rowData.status,

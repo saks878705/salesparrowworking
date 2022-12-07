@@ -40,7 +40,6 @@ app.use("/auth_api", require("./controllers/webservice/goodDetailsController"));
 app.use("/auth_api", require("./controllers/webservice/empGrpController"));
 app.use("/auth_api", require("./controllers/webservice/leadController"));
 app.use("/auth_api", require("./controllers/webservice/bannerController"));
-app.use("/auth_api", require("./controllers/webservice/unitController"));
 app.use("/auth_api", require("./controllers/webservice/productCatagoryController"));
 app.use("/auth_api", require("./controllers/webservice/productController"));
 app.use("/auth_api", require("./controllers/webservice/routeController"));
@@ -53,12 +52,15 @@ app.use("/auth_api", require("./controllers/webservice/partytypeController"));
 app.use("/auth_api", require("./controllers/webservice/productVarientController"));
 app.use("/auth_api", require("./controllers/webservice/brandController"));
 app.use("/auth_api", require("./controllers/webservice/productgrpController"));
+app.use("/auth_api", require("./controllers/webservice/productUnitController"));
 
 app.use("/app_api", require("./controller/appservices/empController"));
 app.use("/app_api", require("./controller/appservices/changeBeatController"));
 app.use("/app_api", require("./controller/appservices/attendanceController"));
 app.use("/app_api", require("./controller/appservices/retailerController"));
 app.use("/app_api", require("./controller/appservices/checkinController"));
+app.use("/app_api", require("./controller/appservices/marketVisitController"));
+app.use("/app_api", require("./controller/appservices/orderController"));
 
 app.listen(PORT, () => {
   console.log(`Express server started at port : ${PORT}`);

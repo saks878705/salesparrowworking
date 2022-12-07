@@ -14,6 +14,12 @@ const product_varient_model = new Schema({
     price:{
         type:String
     },
+    packing_details:{
+            type:Array
+    },
+    sku_id:{
+        type:String
+    },
     display_image:{
         type:String
     },

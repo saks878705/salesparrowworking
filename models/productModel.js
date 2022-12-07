@@ -13,6 +13,9 @@ const product_model = new Schema({
     productName:{
         type:String
     },
+    hsn_code:{
+        type:String
+    },
     description:{
         type:String
     },
