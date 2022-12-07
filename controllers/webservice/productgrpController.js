@@ -164,6 +164,7 @@ router.post('/edit_product_group',async (req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     let id = req.body.id?req.body.id:"";
+    let data = await ProductGroup.findOne({_id:id});
     let updated_grp = {};
     if(req.body.grp_name){
         updated_grp.grp_name = req.body.grp_name;
@@ -173,10 +174,12 @@ router.post('/edit_product_group',async (req,res)=>{
     }
     updated_grp.Updated_date = get_current_date();
     await ProductGroup.findByIdAndUpdate({_id:id},updated_grp,{new:true});
-    await ProductGrouping.deleteMany({grp_id:id});
+    if(req.body.productIdStr!=""){
+        await ProductGrouping.deleteMany({grp_id:id});
     var productIdStr = req.body.productIdStr?req.body.productIdStr:"";
     var productIdArr = productIdStr.split(",");
     console.log(productIdArr.length);
+    var list = []
     if(productIdArr.length<1){
         console.log("inside if");
         return res.json({status:true,message:"Updated successfully",result:updated_grp})
@@ -186,7 +189,7 @@ router.post('/edit_product_group',async (req,res)=>{
         for(let i= 0;i<productIdArr.length;i++){
             let product_data = await Product.findOne({_id:productIdArr[i]});
             let new_product_grouping = new ProductGrouping({
-                grp_id:save_product_grp._id,
+                grp_id:data._id,
                 product_id:product_data._id,
                 company_id:company_id,
                 productName:product_data.productName,
@@ -195,8 +198,14 @@ router.post('/edit_product_group',async (req,res)=>{
                 status:"Active",
             })
             var save_new_product_grouping = await new_product_grouping.save();
+            list.push(new_product_grouping)
         }
-        return res.json({status:true,message:"Updated successfully",result:[updated_grp,save_new_product_grouping]})
+        console.log(list);
+        return res.json({status:true,message:"Updated successfully",result:[updated_grp,list]})
+    }
+    }else{
+        await ProductGrouping.deleteMany({grp_id:id});
+        return res.json({status:true,message:"Updated successfully",result:updated_grp})
     }
 });
 
