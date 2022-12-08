@@ -95,7 +95,7 @@ router.post("/get_all_brands", async (req, res) => {
   }
 });
 
-router.get("/brand_search", async (req, res) => {
+router.post("/brand_search", async (req, res) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (!token) return res.json({ status: false, message: "Token is required" });

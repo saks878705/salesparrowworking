@@ -255,7 +255,7 @@ router.post("/bulk_import_products",(req, res) => {
     })
 });
 
-router.get("/product_search", async (req, res) => {
+router.post("/product_search", async (req, res) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if (!token) return res.json({ status: false, message: "Token is required" });
