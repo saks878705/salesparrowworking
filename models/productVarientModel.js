@@ -18,7 +18,8 @@ const product_varient_model = new Schema({
             type:Array
     },
     sku_id:{
-        type:String
+        type:String,
+        default: ""
     },
     display_image:{
         type:String

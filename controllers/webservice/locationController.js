@@ -16,6 +16,7 @@ function get_current_date() {
 router.post('/addLocation',(req,res)=>{
     var name = req.body.name?req.body.name:"";
     var p_id = req.body.p_id?req.body.p_id:"";
+    // var superp_id = req.body.superp_id?req.body.superp_id:"";
     var subp_id = req.body.subp_id?req.body.subp_id:"";
     if(name!=""){
         Location.find({$and:[{name:name},{P_id:p_id},{subP_id:subp_id}]}).exec().then(location_data=>{
@@ -24,6 +25,7 @@ router.post('/addLocation',(req,res)=>{
                     name:name,
                     P_id:p_id,
                     subP_id:subp_id,
+                    // superp_id:superp_id,
                     status:"Active",
                     Created_date:get_current_date(),
                     Updated_date:get_current_date()
@@ -81,6 +83,49 @@ router.get('/getLocation',(req,res)=>{
         });
     }
 });
+// router.get('/getLocation',(req,res)=>{
+//     console.log(req.query);
+//     var p_id = req.query.p_id?req.query.p_id:"";
+//     var subp_id = req.query.subp_id?req.query.subp_id:"";
+//     var superp_id = req.query.superp_id?req.query.superp_id:"";
+//     let arr = []
+//     if(p_id) arr.push({P_id:p_id})
+//     if(subp_id) arr.push({subP_id:subp_id})
+//     if(superp_id) arr.push({superp_id:superp_id})
+//     let location_data = await 
+//     Location.find({$and:arr}).exec().then(location_data=>{
+//         res.json({
+//             status:true,
+//             message:"Location get successfully",
+//             result:location_data
+//         });
+//     });
+//     if(p_id=="" && subp_id==""){
+//         Location.find({$and:[{P_id:""},{subP_id:""}]}).exec().then(state_data=>{
+//             res.json({
+//                 status:true,
+//                 message:"States get successfully",
+//                 result:state_data
+//             });
+//         });
+//     }else if(p_id!="" && subp_id==""){
+//         Location.find({$and:[{P_id:p_id},{subP_id:""}]}).exec().then(city_data=>{
+//             res.json({
+//                 status:true,
+//                 message:"City data fetch successfully",
+//                 result:city_data
+//             });
+//         });
+//     }else if(p_id!="" && subp_id!=""){
+//         Location.find({$and:[{P_id:p_id},{subP_id:subp_id}]}).exec().then(area_data=>{
+//             res.json({
+//                 status:true,
+//                 message:"Area data fetch successfully",
+//                 result:area_data
+//             });
+//         });
+//     }
+// });
 
 
 

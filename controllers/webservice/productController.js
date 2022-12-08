@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 const Product = mongoose.model("Product");
 const Brand = mongoose.model("Brand");
 const ProductCatagory = mongoose.model("ProductCatagory");
+const ProductVarient = mongoose.model("ProductVarient");
 const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
 const multer = require("multer");
 const jwt = require('jsonwebtoken');
 const XLSX = require("xlsx");
+const { RateLimitList } = require("twilio/lib/rest/verify/v2/service/rateLimit");
 
 const imageStorage = multer.diskStorage({
   destination: "images/Product_img",
@@ -204,11 +206,11 @@ router.post('/get_all_products',async (req,res)=>{
     }
 })
 
-router.delete('/delete_product',(req,res)=>{
+router.delete('/delete_product',async (req,res)=>{
     let id = req.body.id ? req.body.id : "";
-  if (id == "")
-    return res.json({ status: false, message: "Please provide Id" });
-  Product.deleteOne({ _id: id }).exec().then(() => {
+    if (id == "") return res.json({ status: false, message: "Please provide Id" });
+    await ProductVarient.deleteMany({product_id:id})
+    Product.deleteOne({ _id: id }).exec().then(() => {
       return res.json({ status: true, message: "Deleted successfully" });
     });
 })
@@ -251,6 +253,83 @@ router.post("/bulk_import_products",(req, res) => {
         x++;
     });
     })
+});
+
+router.get("/product_search", async (req, res) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    var limit = 10;
+    let list = [];
+    let page = req.body.page?req.body.page:"1";
+    var count = await Product.find({$and: [{productName: { $regex: new RegExp(req.body.search,"i") }},{company_id}]});
+    try {
+        console.log(Math.ceil(count.length));
+        let product_data = await Product.find({$and: [{productName: { $regex: new RegExp(req.body.search,"i") }},{company_id}]}).limit(limit*1).skip((page-1)*RateLimitList);
+        if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
+        let counInfo = 0;
+        for(let i = 0;i<product_data.length;i++){
+            await (async function (rowData) {
+                let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
+                let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
+                if(product_data[i].sub_catagory_id){
+                    let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
+                    if(sub_catagory_data){
+                    var u_data = {
+                        id: rowData._id,
+                        name:rowData.productName,
+                        brand_name:brand_data.name,
+                        hsn_code:rowData.hsn_code,
+                        catagory_name:catagory_data.name,
+                        sub_catagory_name:sub_catagory_data.name,
+                        description:rowData.description,
+                        gst:rowData.gst,
+                        image:rowData.display_image,
+                        status:rowData.status,
+                    };
+                    list.push(u_data);
+                }else{
+                    var u_data = {
+                        id: rowData._id,
+                        name:rowData.productName,
+                        brand_name:brand_data.name,
+                        hsn_code:rowData.hsn_code,
+                        catagory_name:catagory_data.name,
+                        sub_catagory_name:"",
+                        description:rowData.description,
+                        gst:rowData.gst,
+                        image:rowData.display_image,
+                        status:rowData.status,
+                    };
+                    list.push(u_data);
+                }
+            }else{
+                var u_data = {
+                    id: rowData._id,
+                    name:rowData.productName,
+                    brand_name:brand_data.name,
+                    hsn_code:rowData.hsn_code,
+                    catagory_name:catagory_data.name,
+                    sub_catagory_name:"",
+                    description:rowData.description,
+                    gst:rowData.gst,
+                    image:rowData.display_image,
+                    status:rowData.status,
+                };
+                list.push(u_data);
+            }
+        })(product_data[i]);
+        counInfo++;
+        if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+    }
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ status: false, response: error });
+    }
 });
 
 module.exports = router;

@@ -5,6 +5,9 @@ const location_schema = new Schema({
     name:{
         type:String
     },
+    // superp_id:{
+    //     type:String
+    // },
     P_id:{
         type:String
     },

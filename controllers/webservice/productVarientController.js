@@ -51,6 +51,7 @@ router.post('/add_product_varient',(req,res)=>{
         let varient_name = req.body.varient_name?req.body.varient_name:"";
         let mrp = req.body.mrp?req.body.mrp:"";
         let price = req.body.price?req.body.price:"";
+        let sku_id = req.body.sku_id?req.body.sku_id:"";
         let packing_details = req.body.packing_details?req.body.packing_details:null;
         if(product_id=="") return res.json({status:false,message:"Product name is required"})
         if(varient_name=="") return res.json({status:false,message:"Varient name is required"})
@@ -61,7 +62,8 @@ router.post('/add_product_varient',(req,res)=>{
             price:price,
             varient_name:varient_name,
             packing_details:packing_details,
-            sku_id:randomStr(8,'123456789abcdefghijklmnopqrstufwxyz'),
+            //sku_id:randomStr(8,'123456789abcdefghijklmnopqrstufwxyz'),
+            sku_id:sku_id,
             company_id:company_id,
             display_image:`${base_url}${req.file.path}`,
             Created_date:get_current_date(),
@@ -92,6 +94,9 @@ router.post('/edit_product_varient',async (req,res)=>{
         }
         if(req.body.price){
             updated_product_varient.price = req.body.price;
+        }
+        if(req.body.sku_id){
+            updated_product_varient.sku_id = req.body.sku_id;
         }
         if(req.body.status){
             updated_product_varient.status = req.body.status;
