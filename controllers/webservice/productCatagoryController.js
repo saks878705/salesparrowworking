@@ -194,4 +194,47 @@ router.delete('/delete_sub_catagory',async (req,res)=>{
   })
 })
 
+router.post("/catagory_search",async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token)
+    return res.json({ status: false, message: "Token is required" });
+  let x = token.split(".");
+  if (x.length < 3)
+    return res.send({ status: false, message: "Invalid token" });
+  var decodedToken = jwt.verify(token, "test");
+  var company_id = decodedToken.user_id;
+  let p_id = req.body.p_id?req.body.p_id:"";
+  let page = req.body.page?req.body.page:"1";
+  let list = [];
+  let limit = 10;
+  if(p_id!=""){
+      let count = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id},{is_delete:"0"}]});
+      let sub_catagory_data = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+      if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+      let counInfo = 0;
+      for(let i = 0;i<sub_catagory_data.length;i++){
+        let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
+        await (async function (rowData) {
+          var u_data = {
+            id: rowData._id,
+            name: rowData.name,
+            gst: rowData.gst,
+            image: rowData.image,
+            catagory:catagory_data.name,
+            status: rowData.status,
+        };
+        list.push(u_data);
+        })(sub_catagory_data[i]);
+        counInfo++;
+        if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+  }
+}else{
+      let count = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]});
+      let catagory_data = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+      if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
+      if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+  }
+});
+
 module.exports = router;
