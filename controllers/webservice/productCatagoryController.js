@@ -53,7 +53,7 @@ router.post("/addProductCatagory",async (req, res) => {
     var status = req.body.status ? req.body.status : "";
     if (name == "")
       return res.json({ status: false, message: "Name is required" });
-    let catagory_data = await ProductCatagory.find({ name });
+    let catagory_data = await ProductCatagory.find({$and:[{company_id},{ name }]});
     if (catagory_data.length > 0)
       return res.json({
         status: false,
@@ -189,7 +189,7 @@ router.delete('/delete_catagory',async (req,res)=>{
 router.delete('/delete_sub_catagory',async (req,res)=>{
   let id = req.body.id?req.body.id:"";
   if(id=="") return res.json({status:false,message:"Please give id"});
-  ProductCatagory.deleteOne({_id:id}).exec().then(()=>{
+  ProductCatagory.findOneAndUpdate({_id:id},{$set:{is_delete:"1"}}).exec().then(()=>{
     res.json({status:true,message:"Deleted successfully"});
   })
 })

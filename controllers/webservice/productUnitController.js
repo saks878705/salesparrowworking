@@ -26,7 +26,7 @@ router.post('/add_unit',async (req,res)=>{
     let status = req.body.status?req.body.status:"";
     if(unit=="") return res.json({status:false,message:"Please provide the unit name."})
     if(status=="") return res.json({status:false,message:"Please provide the status."})
-    let unit_data = await Unit.findOne({unit});
+    let unit_data = await Unit.findOne({$and:[{company_id},{unit}]});
     if(unit_data) return res.json({status:false,message:"Unit already exists."});
     let new_unit = new Unit({
         company_id:company_id,

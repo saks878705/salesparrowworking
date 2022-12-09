@@ -83,7 +83,8 @@ router.get('/getLocation',(req,res)=>{
         });
     }
 });
-// router.get('/getLocation',(req,res)=>{
+
+// router.get('/getLocation',async (req,res)=>{
 //     console.log(req.query);
 //     var p_id = req.query.p_id?req.query.p_id:"";
 //     var subp_id = req.query.subp_id?req.query.subp_id:"";
@@ -92,39 +93,9 @@ router.get('/getLocation',(req,res)=>{
 //     if(p_id) arr.push({P_id:p_id})
 //     if(subp_id) arr.push({subP_id:subp_id})
 //     if(superp_id) arr.push({superp_id:superp_id})
-//     let location_data = await 
-//     Location.find({$and:arr}).exec().then(location_data=>{
-//         res.json({
-//             status:true,
-//             message:"Location get successfully",
-//             result:location_data
-//         });
-//     });
-//     if(p_id=="" && subp_id==""){
-//         Location.find({$and:[{P_id:""},{subP_id:""}]}).exec().then(state_data=>{
-//             res.json({
-//                 status:true,
-//                 message:"States get successfully",
-//                 result:state_data
-//             });
-//         });
-//     }else if(p_id!="" && subp_id==""){
-//         Location.find({$and:[{P_id:p_id},{subP_id:""}]}).exec().then(city_data=>{
-//             res.json({
-//                 status:true,
-//                 message:"City data fetch successfully",
-//                 result:city_data
-//             });
-//         });
-//     }else if(p_id!="" && subp_id!=""){
-//         Location.find({$and:[{P_id:p_id},{subP_id:subp_id}]}).exec().then(area_data=>{
-//             res.json({
-//                 status:true,
-//                 message:"Area data fetch successfully",
-//                 result:area_data
-//             });
-//         });
-//     }
+//     let location_data = await Location.find({$and:arr});
+//     if(location_data.length<1) return res.json({status:true,message:"No data",result:[]})
+//     if(location_data.length>0) return res.json({status:true,message:"Location get successfully",result:location_data})
 // });
 
 
