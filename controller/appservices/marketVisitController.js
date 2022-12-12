@@ -28,11 +28,16 @@ router.post('/party_acc_to_beat',async (req,res)=>{
       return res.send({ status: false, message: "Invalid token" });
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
-    let emp_data = Employee.findOne({_id:employee_id});
+    let emp_data = await  Employee.findOne({_id:employee_id});
+    // console.log("emp_data",emp_data)
+    if(!emp_data) return res.json({status:false,message:"No employee data"});
     let id = req.body.id?req.body.id:"";
+    if(id=="") return res.json({status:false,message:"Please give id"})
     let beat_data =await Beat.findOne({_id:id});
+    // console.log("beat_data",beat_data)
     if(!beat_data) return res.json({status:false,message:"No beat data. Please check id"});
     let party_data = await Party.find({company_id:emp_data.companyId});
+    // console.log("party_data",party_data.length)
     if(party_data.length<1) return res.json({status:true,message:"No data"});
     let count = 0;
     let list = [];
@@ -40,7 +45,9 @@ router.post('/party_acc_to_beat',async (req,res)=>{
         console.log(party_data[i])
         console.log(party_data[i].route)
         if(party_data[i].route==null){
+          count++
           continue;
+
         }else{
           var arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
           if(arr==""){
@@ -57,11 +64,13 @@ router.post('/party_acc_to_beat',async (req,res)=>{
                 list.push(party_data[i])
               }
             }
-            if(count==party_data.length-1) return res.json({status:true,message:"parties found",result:list})
+            console.log("list",list)
           }
         }
         count++;
+        console.log("count",count)
       }
+      if(count==party_data.length) return res.json({status:true,message:"parties found",result:list})
 });
 
 router.get('/get_todays_beat',async (req,res)=>{
