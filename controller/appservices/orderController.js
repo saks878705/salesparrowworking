@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Product = mongoose.model("Product");
 const Order = mongoose.model("Order");
+const ProductCatagory = mongoose.model("ProductCatagory");
 const OrderItem = mongoose.model("OrderItem");
 const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
@@ -17,6 +18,129 @@ function get_current_date() {
     today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   return (today = yyyy + "-" + mm + "-" + dd + " " + time);
 }
+
+router.post("/get_all_product_catagory",async (req, res) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token)
+      return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3)
+      return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var employee_id = decodedToken.user_id;
+    let emp_data = await Employee.findOne({_id:employee_id})
+    let p_id = req.body.p_id?req.body.p_id:"";
+    let page = req.body.page?req.body.page:"1";
+    let list = [];
+    let limit = 10;
+    if(p_id!=""){
+        let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id},{is_delete:"0"}]});
+        let sub_catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+        if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+        let counInfo = 0;
+        for(let i = 0;i<sub_catagory_data.length;i++){
+          let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
+          await (async function (rowData) {
+            var u_data = {
+              id: rowData._id,
+              name: rowData.name,
+              gst: rowData.gst,
+              image: rowData.image,
+              catagory:catagory_data.name,
+              status: rowData.status,
+          };
+          list.push(u_data);
+          })(sub_catagory_data[i]);
+          counInfo++;
+          if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+    }
+  }else{
+        let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]});
+        let catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+        if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
+        if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+    }
+});
+
+router.post('/get_all_products',async (req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var employee_id = decodedToken.user_id;
+    let emp_data = await Employee.findOne({_id:employee_id})
+    let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
+    let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
+    let limit = 10;
+    let list = [];
+    let page = req.body.page?req.body.page:"1";
+    
+    arr =[{company_id:emp_data.companyId}]
+    if(catagory_id) arr.push({catagory_id})
+    if(sub_catagory_id) arr.push({sub_catagory_id})
+
+    let count = await Product.find({$and:arr});
+    let product_data = await Product.find({$and:arr}).limit(limit*1).sort((page-1)*limit);
+    if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
+    let counInfo = 0;
+    for(let i = 0;i<product_data.length;i++){
+        await (async function (rowData) {
+            let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
+            let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
+            if(product_data[i].sub_catagory_id){
+                let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
+                if(sub_catagory_data){
+                    var u_data = {
+                        id: rowData._id,
+                        name:rowData.productName,
+                        brand_name:brand_data.name,
+                        hsn_code:rowData.hsn_code,
+                        catagory_name:catagory_data.name,
+                        sub_catagory_name:sub_catagory_data.name,
+                        description:rowData.description,
+                        gst:rowData.gst,
+                        image:rowData.display_image,
+                        status:rowData.status,
+                    };
+                    list.push(u_data);
+                }else{
+                    var u_data = {
+                        id: rowData._id,
+                        name:rowData.productName,
+                        brand_name:brand_data.name,
+                        hsn_code:rowData.hsn_code,
+                        catagory_name:catagory_data.name,
+                        sub_catagory_name:"",
+                        description:rowData.description,
+                        gst:rowData.gst,
+                        image:rowData.display_image,
+                        status:rowData.status,
+                    };
+                    list.push(u_data);
+                }
+            }else{
+                var u_data = {
+                    id: rowData._id,
+                    name:rowData.productName,
+                    brand_name:brand_data.name,
+                    hsn_code:rowData.hsn_code,
+                    catagory_name:catagory_data.name,
+                    sub_catagory_name:"",
+                    description:rowData.description,
+                    gst:rowData.gst,
+                    image:rowData.display_image,
+                    status:rowData.status,
+                };
+                list.push(u_data);
+            }
+        })(product_data[i]);
+        counInfo++;
+        if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+    }
+})
 
 router.post('/place_order',async (req,res)=>{
     const authHeader = req.headers["authorization"];
