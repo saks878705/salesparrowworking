@@ -35,7 +35,16 @@ const retailer_schema = new Schema({
     location:{
         type:Array
     },
+    route:{
+        type:Array
+    },
     mobileNo:{
+        type:String
+    },
+    state:{
+        type:String
+    },
+    city:{
         type:String
     },
     DOB:{

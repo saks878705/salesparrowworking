@@ -4,6 +4,7 @@ const Employee = mongoose.model("Employee");
 const Product = mongoose.model("Product");
 const Order = mongoose.model("Order");
 const ProductCatagory = mongoose.model("ProductCatagory");
+const ProductVarient = mongoose.model("ProductVarient");
 const OrderItem = mongoose.model("OrderItem");
 const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
@@ -152,12 +153,12 @@ router.post('/place_order',async (req,res)=>{
     var employee_id = decodedToken.user_id;
     let emp_data = Employee.findOne({_id:employee_id});
     if(!emp_data) return res.json({status:false,message:"Employee not found"})
-    let party_id = req.body.party_id?req.body.party_id:"";
+    let retailer_id = req.body.retailer_id?req.body.retailer_id:"";
     let type = req.body.type?req.body.type:"";
     let orderStatus = req.body.orderStatus?req.body.orderStatus:"";
     let line = req.body.line?req.body.line:"";
     if(emp_data.status=="InActive" || emp_data.status=="UnApproved") return res.json({status:false,message:`You are ${emp_data.status} . Please contact company.`})
-    if(party_id=="") return res.json({status:false,message:"Give party id"});
+    if(retailer_id=="") return res.json({status:false,message:"Give party id"});
     if(type=="") return res.json({status:false,message:"Give type"});
     if(orderStatus=="") return res.json({status:false,message:"Give order status"});
     let date = get_current_date().split(" ")[0];
@@ -169,7 +170,7 @@ router.post('/place_order',async (req,res)=>{
     let new_order = new Order({
         emp_id:employee_id,
         company_id:emp_data.companyId,
-        party_id:party_id,
+        retailer_id:retailer_id,
         order_date:date,
         type:type,
         order_status:orderStatus,
@@ -198,12 +199,28 @@ router.post('/place_order',async (req,res)=>{
     return res.json({status:true,message:"Order placed successfully",result:new_order_data,list})
 });
 
-router.post('/previous_party_orders',async (req,res)=>{
+router.post('/previous_retailer_orders',async (req,res)=>{
     let id = req.body.id?req.body.id:"";
     if(id=="") return res.json({status:false,message:"Please give id ."});
-    let order_data = await Order.find({party_id:id}).sort({Created_date:-1});
+    let arr = [];
+    let order_data = await Order.find({retailer_id:id}).sort({Created_date:-1});
     if(order_data.length<1) return res.json({status:true,message:"No data",result:[]});
-    return res.json({status:true,message:"Found successfully",result:order_data}); 
+    for(let i = 0;i<order_data.length;i++){
+        let sub_arr = [];
+        let order_item_data = await OrderItem.find({order_id:order_data[i]._id});
+        for(let j = 0;j<order_item_data.length;j++){
+            var product_data = await ProductVarient.findOne({_id:order_item_data[j].product_id});
+            await (async function(rowData){
+                let u_data = {
+                product_name:product_data.varient_name,
+                quantity:rowData.quantity
+                }
+                sub_arr.push(u_data)
+            })(order_item_data[j])
+        }
+        arr.push({order_data:order_data[i],line_data:sub_arr})
+    }
+    return res.json({status:true,message:"Found successfully",result:arr}); 
 });
 
 module.exports = router;

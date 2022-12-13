@@ -8,7 +8,7 @@ const new_order_schema = new Schema({
     company_id:{
         type:String,
     },
-    party_id:{
+    retailer_id:{
         type:String,
     },
     order_date:{
