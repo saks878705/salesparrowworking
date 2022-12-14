@@ -48,4 +48,5 @@ require('./productgrpModel');
 require('./orderModel');
 require('./orderItemModel');
 require('./productUnitModel');
+require('./visitModel');
 

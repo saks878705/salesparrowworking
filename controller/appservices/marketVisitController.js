@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Employee = mongoose.model("Employee");
 const Retailer = mongoose.model("Retailer");
+const Visit = mongoose.model("Visit");
 const Beat = mongoose.model("Beat");
 const Order = mongoose.model("Order");
 const Attendance = mongoose.model("Attendance");
@@ -154,6 +155,118 @@ router.get('/get_todays_beat',async (req,res)=>{
     let beat_data = await Beat.findOne({_id:todays_attendance_data.beat_id});
     if(!beat_data) return res.json({status:true,message:"Beat data not found"});
     return res.json({status:true,message:"data found",result:beat_data})
+})
+
+router.post('/create_visit_summary',async (req,res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.json({ status: false, message: "Token is required" });
+  let x = token.split(".");
+  if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+  var decodedToken = jwt.verify(token, "test");
+  var employee_id = decodedToken.user_id;
+  let str = req.body.str?req.body.str:"";
+  let retailer_id = req.body.retailer_id?req.body.retailer_id:"";
+  let reason = req.body.reason?req.body.reason:"";
+  let beat_id = req.body.beat_id?req.body.beat_id:"";
+  if(retailer_id =="") return res.json({status:false,message:"Please provide visit status"})
+  if(str =="") return res.json({status:false,message:"Please provide retailer decision"})
+  if(beat_id =="") return res.json({status:false,message:"Please provide visit status"})
+  let date = get_current_date().split(" ")[0];
+  if(str == "visit_later"){
+    let new_visit = new Visit({
+      emp_id:employee_id,
+      beat_id:beat_id,
+      retailer_id:retailer_id,
+      visit_status:"Progress",
+      visit_date:date,
+      Created_date:get_current_date(),
+      Updated_date:get_current_date(),
+      status:"Active",
+    })
+    let visit_data = await new_visit.save()
+    return res.json({status:true,message:"Pending Visit",result:visit_data})
+
+  }else if(str == "no_order"){
+    let new_visit = new Visit({
+      emp_id:employee_id,
+      beat_id:beat_id,
+      retailer_id:retailer_id,
+      visit_status:"Completed",
+      visit_date:date,
+      no_order_reason:reason,
+      order_status:"Non-Productive",
+      Created_date:get_current_date(),
+      Updated_date:get_current_date(),
+      status:"Active",
+    })
+    let visit_data = await new_visit.save()
+    return res.json({status:true,message:"Completed Visit",result:visit_data})
+
+  }else if(str == "order"){
+    let new_visit = new Visit({
+      emp_id:employee_id,
+      beat_id:beat_id,
+      retailer_id:retailer_id,
+      visit_status:"Completed",
+      visit_date:date,
+      order_status:"Productive",
+      Created_date:get_current_date(),
+      Updated_date:get_current_date(),
+      status:"Active",
+    })
+    let visit_data = await new_visit.save()
+    return res.json({status:true,message:"Completed Visit",result:visit_data})
+  }
+})
+
+router.post('/retailer_acc_to_visit_status',async (req,res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.json({ status: false, message: "Token is required" });
+  let x = token.split(".");
+  if (x.length < 3) return res.json({ status: false, message: "Invalid token" });
+  var decodedToken = jwt.verify(token, "test");
+  var employee_id = decodedToken.user_id;
+  let list = [];
+  visit_status = req.body.visit_status?req.body.visit_status:"";
+  let date = get_current_date().split(" ")[0];
+  if(visit_status =="") return res.json({status:false,message:"Please provide visit status"})
+  let visit_details_data = await Visit.find({$and:[{visit_date:date},{emp_id:employee_id},{visit_status:visit_status}]})
+  if(visit_details_data.length<1) return res.json({ status: true, message: "No data" ,result:[]});
+  let count = 0;
+  if(visit_status == "Complete"){
+    for(let i= 0;i<visit_details_data.length;i++){
+      await (async function(rowData){
+        let retailer_data = await Retailer.findOne({_id:visit_details_data[i].retailer_id});
+        let order_data = await Order.findOne({$and:[{retailer_id:retailer_data._id},{order_date:date}]})
+        let u_data = {
+          retailer_name:retailer_data.customerName,
+          order_value:order_data.total_amount,
+          order_status:rowData.order_status
+        }
+        list.push(u_data);
+      })(visit_details_data[i])
+      count++;
+      if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
+    }
+  }else if(visit_status == "Progress"){
+    for(let i= 0;i<visit_details_data.length;i++){
+      await (async function(rowData){
+        let retailer_data = await Retailer.findOne({_id:visit_details_data[i].retailer_id});
+        let visit_data = await Visit.findOne({$and:[{retailer_id:visit_details_data[i].retailer_id},{emp_id:employee_id}]});
+        let order_data = await Order.findOne({retailer_id:retailer_data._id}).sort({order_date:-1})
+        let u_data = {
+          retailer_name:retailer_data.customerName,
+          last_visit:visit_data.visit_date,
+          order_value:order_data.total_amount,
+        }
+        list.push(u_data);
+      })(visit_details_data[i])
+      count++;
+      if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
+    }
+  }
 })
 
 module.exports = router;
