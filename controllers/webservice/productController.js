@@ -341,7 +341,7 @@ router.post('/products_and_varients',async (req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
-    let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
+    let sub_catagory_id = req.body.sub_catagory_id?req.body.sub_catagory_id:"";
     let brand_id = req.body.brand_id?req.body.brand_id:"";
     let list = [];
     let biglist = [];
@@ -365,6 +365,7 @@ router.post('/products_and_varients',async (req,res)=>{
                 await (async function (rowData) {
                     var u_data1 = {
                         id: rowData._id,
+                        product_name:product_data[i].productName,
                         varient_name:rowData.varient_name,
                         mrp:rowData.mrp,
                         price:rowData.price,

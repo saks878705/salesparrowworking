@@ -143,6 +143,48 @@ router.post('/get_all_products',async (req,res)=>{
     }
 })
 
+router.post('/get_all_product_varients',async (req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var employee_id = decodedToken.user_id;
+    let emp_data = await Employee.findOne({_id:employee_id});
+    let company_id = emp_data.companyId;
+    let product_id = req.body.product_id?req.body.product_id:"";
+    let arr =[];
+    let list = [];
+    if(product_id!=""){
+        arr.push({company_id},{product_id},{is_delete:"0"})
+    }else{
+        arr.push({company_id},{is_delete:"0"})
+    }
+    let product_varient_data = await ProductVarient.find({$and:arr});
+    if(product_varient_data.length<1) return res.json({status:true,message:"No data",result:[]});
+    let counInfo = 0;
+    for(let i = 0;i<product_varient_data.length;i++){
+        await (async function (rowData) {
+            let product_data = await Product.findOne({_id:product_varient_data[i].product_id});
+            var u_data = {
+                id: rowData._id,
+                varient_name:rowData.varient_name,
+                product_name:product_data.productName,
+                mrp:rowData.mrp,
+                packing_details:rowData.packing_details,
+                sku_id:rowData.sku_id,
+                price:rowData.price,
+                image:rowData.display_image,
+                status:rowData.status,
+            };
+            list.push(u_data);
+        })(product_varient_data[i]);
+        counInfo++;
+        if (counInfo == product_varient_data.length) return res.json({status: true,message: "All Products found successfully",result: list});
+    }
+})
+
 router.post('/place_order',async (req,res)=>{
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];

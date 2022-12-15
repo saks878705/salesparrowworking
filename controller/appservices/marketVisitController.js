@@ -174,6 +174,9 @@ router.post('/create_visit_summary',async (req,res)=>{
   if(beat_id =="") return res.json({status:false,message:"Please provide visit status"})
   let date = get_current_date().split(" ")[0];
   if(str == "visit_later"){
+    let existing_visit_data = await Visit.find({$and:[{beat_id:beat_id},{retailer_id:retailer_id},{visit_date:date},{emp_id:employee_id},{visit_status:"Progress"}]});
+    console.log(existing_visit_data)
+    if(existing_visit_data.length>0) return res.json({status:true,message:"Already in progress",result:[]})
     let new_visit = new Visit({
       emp_id:employee_id,
       beat_id:beat_id,
@@ -188,11 +191,14 @@ router.post('/create_visit_summary',async (req,res)=>{
     return res.json({status:true,message:"Pending Visit",result:visit_data})
 
   }else if(str == "no_order"){
+    let existing_visit_data2 = await Visit.find({$and:[{beat_id:beat_id},{retailer_id:retailer_id},{visit_date:date},{emp_id:employee_id},{visit_status:"NPCompleted"}]});
+    console.log(existing_visit_data2)
+    if(existing_visit_data2.length>0) return res.json({status:true,message:"Already completed",result:[]})
     let new_visit = new Visit({
       emp_id:employee_id,
       beat_id:beat_id,
       retailer_id:retailer_id,
-      visit_status:"Completed",
+      visit_status:"NPCompleted",
       visit_date:date,
       no_order_reason:reason,
       order_status:"Non-Productive",
@@ -204,11 +210,14 @@ router.post('/create_visit_summary',async (req,res)=>{
     return res.json({status:true,message:"Completed Visit",result:visit_data})
 
   }else if(str == "order"){
+    let existing_visit_data3 = await Visit.find({$and:[{beat_id:beat_id},{retailer_id:retailer_id},{visit_date:date},{emp_id:employee_id},{visit_status:"PCompleted"}]});
+    console.log(existing_visit_data3)
+    if(existing_visit_data3.length>0) return res.json({status:true,message:"Already completed",result:[]})
     let new_visit = new Visit({
       emp_id:employee_id,
       beat_id:beat_id,
       retailer_id:retailer_id,
-      visit_status:"Completed",
+      visit_status:"PCompleted",
       visit_date:date,
       order_status:"Productive",
       Created_date:get_current_date(),
