@@ -332,4 +332,60 @@ router.post("/product_search", async (req, res) => {
     }
 });
 
+router.post('/products_and_varients',async (req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var company_id = decodedToken.user_id;
+    let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
+    let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
+    let brand_id = req.body.brand_id?req.body.brand_id:"";
+    let list = [];
+    let biglist = [];
+    
+    arr =[{company_id}]
+    if(brand_id) arr.push({brand_id})
+    if(catagory_id) arr.push({catagory_id})
+    if(sub_catagory_id) arr.push({sub_catagory_id})
+
+    let product_data = await Product.find({$and:arr});
+    if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
+    let counInfo = 0;
+    for(let i = 0;i<product_data.length;i++){
+        let product_varient_data = await ProductVarient.find({product_id:product_data[i]._id});
+        console.log("product_varient_data----",product_varient_data)
+        if(product_varient_data.length<1){
+            biglist = [];
+        }else{
+            biglist = [];
+            for(let j = 0 ; j<product_varient_data.length;j++){
+                await (async function (rowData) {
+                    var u_data1 = {
+                        id: rowData._id,
+                        varient_name:rowData.varient_name,
+                        mrp:rowData.mrp,
+                        price:rowData.price,
+                        packing_details:rowData.packing_details,
+                    };
+                    biglist.push(u_data1);
+                })(product_varient_data[j]);
+            }
+            console.log("biglist--------------",biglist)
+        }
+        await (async function (rowData) {
+            var u_data = {
+                id: rowData._id,
+                name:rowData.productName,
+            };
+            list.push({product_details:u_data,varient_details:biglist});
+            console.log("list----------------",list)
+        })(product_data[i]);
+        counInfo++;
+        if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list});
+    }
+})
+
 module.exports = router;
