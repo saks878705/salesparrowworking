@@ -23,13 +23,19 @@ router.post('/add_price_list',async (req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     let price_list_name = req.body.price_list_name?req.body.price_list_name:"";
+    let party_type_one = req.body.party_type_one?req.body.party_type_one:"";
+    let party_type_two = req.body.party_type_two?req.body.party_type_two:"";
     let pricelist_details = req.body.pricelist_details?req.body.pricelist_details:null;
     if(price_list_name=="") return res.json({status:true,message:"Price list name required"})
+    if(party_type_one=="") return res.json({status:true,message:"Party type one name required"})
+    if(party_type_two=="") return res.json({status:true,message:"Party type two name required"})
     if(pricelist_details==null) return res.json({status:true,message:"Price list details required"})
     let price_list_data = await PriceList.find({price_list_name});
     if(price_list_data.length>0) return res.json({status:false,message:"Price list name already exists"});
     let new_price_list = new PriceList({
         price_list_name:price_list_name,
+        party_type_one:party_type_one,
+        party_type_two:party_type_two,
         pricelist_details:pricelist_details,
         company_id:company_id,
         Created_date:get_current_date(),
@@ -48,6 +54,15 @@ router.post('/edit_price_list',async (req,res)=>{
   let updated_price_list = {}
   if(req.body.price_list_name){
     updated_price_list.price_list_name = req.body.price_list_name
+  }
+  if(req.body.party_type_one){
+    updated_price_list.party_type_one = req.body.party_type_one
+  }
+  if(req.body.party_type_two){
+    updated_price_list.party_type_two = req.body.party_type_two
+  }
+  if(req.body.status){
+    updated_price_list.status = req.body.status
   }
   if(req.body.pricelist_details){
     updated_price_list.pricelist_details = req.body.pricelist_details

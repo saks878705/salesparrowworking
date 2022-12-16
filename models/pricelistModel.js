@@ -11,6 +11,12 @@ const pricelist_schema = new Schema({
     company_id:{
         type:String
     },
+    party_type_two:{
+        type:Object
+    },
+    party_type_one:{
+        type:Object
+    },
     Created_date: {
         type: String,
         default: ""
