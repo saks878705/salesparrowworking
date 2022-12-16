@@ -137,4 +137,21 @@ router.post('/attendanceListOfEmployee',async(req,res)=>{
     }
 })
 
+router.get('/get_todays_attendance_data',async (req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var employee_id = decodedToken.user_id;
+    let date = get_current_date().split(" ")[0];
+    let attendance_data = await Attendance.findOne({$and:[{emp_id:employee_id},{date:date}]});
+    if(!attendance_data) return res.json({status:true,message:"Please punch attendance first",result:[]})
+    let beat_data = await Beat.findOne({_id:attendance_data.beat_id});
+    let party_data = await Party.findOne({_id:attendance_data.party_id});
+    let arr = [beat_data,party_data];
+    return res.json({status:true,message:"Attendance marked successfully",result:arr})
+})
+
 module.exports = router;
