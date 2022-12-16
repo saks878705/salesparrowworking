@@ -46,7 +46,7 @@ router.post("/add_brand", async (req, res) => {
     let status = req.body.status ? req.body.status : "";
     if (name == "")
       return res.json({ status: false, message: "Please give brand name" });
-    let brand_data = await Brand.find({ name });
+    let brand_data = await Brand.find({$and:[{company_id},{name}]});
     if (brand_data.length > 0)
       return res.json({
         status: false,

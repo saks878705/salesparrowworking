@@ -30,7 +30,7 @@ router.post("/get_all_product_catagory",async (req, res) => {
       return res.send({ status: false, message: "Invalid token" });
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
-    let emp_data = await Employee.findOne({_id:employee_id})
+    let emp_data = await Employee.findOne({_id:employee_id});
     let p_id = req.body.p_id?req.body.p_id:"";
     let page = req.body.page?req.body.page:"1";
     let list = [];
