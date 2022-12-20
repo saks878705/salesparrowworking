@@ -20,7 +20,10 @@ const party_schema = new Schema({
     state:{
         type:String
     },
-    address:{
+    address1:{
+        type:String
+    },
+    address2:{
         type:String
     },
     city:{

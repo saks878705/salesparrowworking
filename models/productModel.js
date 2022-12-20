@@ -6,10 +6,10 @@ const product_model = new Schema({
         type:String,
         default:""
     },
-    sub_catagory_id:{
-        type:String,
-        default:""
-    },
+    // sub_catagory_id:{
+    //     type:String,
+    //     default:""
+    // },
     productName:{
         type:String
     },
@@ -21,6 +21,19 @@ const product_model = new Schema({
     },
     company_id:{
         type:String
+    },
+    mrp:{
+        type:String
+    },
+    price:{
+        type:String
+    },
+    packing_details:{
+            type:Array
+    },
+    sku_id:{
+        type:String,
+        default: ""
     },
     gst:{
         type:String

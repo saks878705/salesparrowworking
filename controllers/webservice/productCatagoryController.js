@@ -48,7 +48,7 @@ router.post("/addProductCatagory",async (req, res) => {
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     var name = req.body.name ? req.body.name : "";
-    var p_id = req.body.p_id ? req.body.p_id : "";
+    // var p_id = req.body.p_id ? req.body.p_id : "";
     var gst = req.body.gst ? req.body.gst : "";
     var status = req.body.status ? req.body.status : "";
     if (name == "")
@@ -64,7 +64,7 @@ router.post("/addProductCatagory",async (req, res) => {
       gst: gst,
       image: `${base_url}${req.file.path}`,
       company_id: company_id,
-      p_id:p_id,
+      // p_id:p_id,
       Created_date: get_current_date(),
       Updated_date: get_current_date(),
       status: status,
@@ -139,60 +139,64 @@ router.post("/get_all_product_catagory",async (req, res) => {
       return res.send({ status: false, message: "Invalid token" });
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
-    let p_id = req.body.p_id?req.body.p_id:"";
+    // let p_id = req.body.p_id?req.body.p_id:"";
     let page = req.body.page?req.body.page:"1";
-    let list = [];
+    // let list = [];
     let limit = 10;
-    if(p_id!=""){
-        let count = await ProductCatagory.find({$and:[{company_id},{p_id},{is_delete:"0"}]});
-        let sub_catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
-        if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
-        let counInfo = 0;
-        for(let i = 0;i<sub_catagory_data.length;i++){
-          let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
-          await (async function (rowData) {
-            var u_data = {
-              id: rowData._id,
-              name: rowData.name,
-              gst: rowData.gst,
-              image: rowData.image,
-              catagory:catagory_data.name,
-              status: rowData.status,
-          };
-          list.push(u_data);
-          })(sub_catagory_data[i]);
-          counInfo++;
-          if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
-    }
-  }else{
-        let count = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]});
-        let catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
-        if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
-        if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
-    }
+  //   if(p_id!=""){
+  //       let count = await ProductCatagory.find({$and:[{company_id},{p_id},{is_delete:"0"}]});
+  //       let sub_catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+  //       if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+  //       let counInfo = 0;
+  //       for(let i = 0;i<sub_catagory_data.length;i++){
+  //         let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
+  //         await (async function (rowData) {
+  //           var u_data = {
+  //             id: rowData._id,
+  //             name: rowData.name,
+  //             gst: rowData.gst,
+  //             image: rowData.image,
+  //             catagory:catagory_data.name,
+  //             status: rowData.status,
+  //         };
+  //         list.push(u_data);
+  //         })(sub_catagory_data[i]);
+  //         counInfo++;
+  //         if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+  //   }
+  // }else{
+  //       let count = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]});
+  //       let catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+  //       if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
+  //       if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+  //   }
+  let count = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]});
+  let catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+  if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
+  if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
 });
 
 router.delete('/delete_catagory',async (req,res)=>{
   let id = req.body.id?req.body.id:"";
   if(id=="") return res.json({status:false,message:"Please give id"});
-  let sub_catagory_data = await ProductCatagory.find({p_id:id});
-  console.log(sub_catagory_data);
-  for(let i = 0;i<sub_catagory_data.length;i++){
-    console.log(i);
-    await ProductCatagory.findOneAndUpdate({_id:sub_catagory_data[i]._id},{$set:{is_delete:"1"}});
-  }
+  // let sub_catagory_data = await ProductCatagory.find({p_id:id});
+  // console.log(sub_catagory_data);
+  // for(let i = 0;i<sub_catagory_data.length;i++){
+  //   console.log(i);
+  //   await ProductCatagory.findOneAndUpdate({_id:sub_catagory_data[i]._id},{$set:{is_delete:"1"}});
+  // }
   ProductCatagory.findOneAndUpdate({_id:id},{$set:{is_delete:"1"}}).exec().then(()=>{
     res.json({status:true,message:"Deleted successfully"});
   })
 })
 
-router.delete('/delete_sub_catagory',async (req,res)=>{
-  let id = req.body.id?req.body.id:"";
-  if(id=="") return res.json({status:false,message:"Please give id"});
-  ProductCatagory.findOneAndUpdate({_id:id},{$set:{is_delete:"1"}}).exec().then(()=>{
-    res.json({status:true,message:"Deleted successfully"});
-  })
-})
+// router.delete('/delete_sub_catagory',async (req,res)=>{
+//   let id = req.body.id?req.body.id:"";
+//   if(id=="") return res.json({status:false,message:"Please give id"});
+//   ProductCatagory.findOneAndUpdate({_id:id},{$set:{is_delete:"1"}}).exec().then(()=>{
+//     res.json({status:true,message:"Deleted successfully"});
+//   })
+// })
 
 router.post("/catagory_search",async (req, res) => {
   const authHeader = req.headers["authorization"];
@@ -204,37 +208,41 @@ router.post("/catagory_search",async (req, res) => {
     return res.send({ status: false, message: "Invalid token" });
   var decodedToken = jwt.verify(token, "test");
   var company_id = decodedToken.user_id;
-  let p_id = req.body.p_id?req.body.p_id:"";
+  // let p_id = req.body.p_id?req.body.p_id:"";
   let page = req.body.page?req.body.page:"1";
-  let list = [];
+  // let list = [];
   let limit = 10;
-  if(p_id!=""){
-      let count = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id},{is_delete:"0"}]});
-      let sub_catagory_data = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
-      if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
-      let counInfo = 0;
-      for(let i = 0;i<sub_catagory_data.length;i++){
-        let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
-        await (async function (rowData) {
-          var u_data = {
-            id: rowData._id,
-            name: rowData.name,
-            gst: rowData.gst,
-            image: rowData.image,
-            catagory:catagory_data.name,
-            status: rowData.status,
-        };
-        list.push(u_data);
-        })(sub_catagory_data[i]);
-        counInfo++;
-        if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
-  }
-}else{
-      let count = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]});
-      let catagory_data = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
-      if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
-      if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
-  }
+//   if(p_id!=""){
+//       let count = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id},{is_delete:"0"}]});
+//       let sub_catagory_data = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+//       if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+//       let counInfo = 0;
+//       for(let i = 0;i<sub_catagory_data.length;i++){
+//         let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
+//         await (async function (rowData) {
+//           var u_data = {
+//             id: rowData._id,
+//             name: rowData.name,
+//             gst: rowData.gst,
+//             image: rowData.image,
+//             catagory:catagory_data.name,
+//             status: rowData.status,
+//         };
+//         list.push(u_data);
+//         })(sub_catagory_data[i]);
+//         counInfo++;
+//         if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+//   }
+// }else{
+//       let count = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]});
+//       let catagory_data = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+//       if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
+//       if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+//   }
+let count = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]});
+let catagory_data = await ProductCatagory.find({$and:[{name:{ $regex: new RegExp(req.body.search,"i") }},{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
+if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
 });
 
 module.exports = router;

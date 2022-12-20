@@ -492,7 +492,8 @@ router.post("/addPartyEmp", (req, res) => {
   var state = req.body.state ? req.body.state : "";
   var city = req.body.city ? req.body.city : "";
   var district = req.body.district ? req.body.district : "";
-  var address = req.body.address ? req.body.address : "";
+  var address1 = req.body.address1 ? req.body.address1 : "";
+  var address2 = req.body.address2 ? req.body.address2 : "";
   var DOB = req.body.DOB ? req.body.DOB : "";
   var DOA = req.body.DOA ? req.body.DOA : "";
   var route = req.body.route ? req.body.route : "";
@@ -503,7 +504,7 @@ router.post("/addPartyEmp", (req, res) => {
           if (city != "") {
             if (state != "") {
               if (district != "") {
-                if (address != "") {
+                if (address1 != "") {
                   Employee.findOne({ _id: employee_id })
                     .exec()
                     .then(async(emp_data) => {
@@ -533,7 +534,8 @@ router.post("/addPartyEmp", (req, res) => {
                         route: route,
                         city: city,
                         district: district,
-                        address: address,
+                        address1: address1,
+                        address2: address2,
                         DOB: DOB,
                         DOA: DOA,
                         Created_date: get_current_date(),
@@ -626,7 +628,8 @@ router.post("/getAllPartyEmp", async (req, res) => {
               district: {name: district_data.name,id: rowData.district,},
               firmName: rowData.firmName,
               party_unique_id:`${rowData.company_code}${rowData.party_code}`,
-              address: rowData.address,
+              address1: rowData.address1,
+              address2: rowData.address2,
               partyType: party_type_data.party_type,
               image: rowData.image,
               pincode: rowData.pincode,
@@ -769,7 +772,8 @@ router.post("/getParty", (req, res) => {
                           },
                           firmName: party_data.firmName,
                           party_unique_id:`${rowData.company_code}${rowData.party_code}`,
-                          address: party_data.address,
+                          address1: party_data.address1,
+                          address2: party_data.address2,
                           partyType: party_type_data.party_type,
                           image: party_data.image,
                           pincode: party_data.pincode,
@@ -818,7 +822,8 @@ router.post("/getParty", (req, res) => {
                                   },
                                   firmName: party_data.firmName,
                                   party_unique_id:`${rowData.company_code}${rowData.party_code}`,
-                                  address: party_data.address,
+                                  address1: party_data.address1,
+                                  address2: party_data.address2,
                                   partyType: party_type_data.party_type,
                                   image: party_data.image,
                                   pincode: party_data.pincode,

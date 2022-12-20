@@ -29,7 +29,7 @@ require('./leadModel');
 require('./bannerModel');
 require('./productCatagoryModel');
 require('./productModel');
-require('./productVarientModel');
+// require('./productVarientModel');
 require('./routeModel');
 require('./pgroupModel');
 require('./partyGrouping');

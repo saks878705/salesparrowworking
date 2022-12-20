@@ -57,7 +57,8 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
     var state = req.body.state ? req.body.state : "";
     var city = req.body.city ? req.body.city : "";
     var district = req.body.district ? req.body.district : "";
-    var address = req.body.address ? req.body.address : "";
+    var address1 = req.body.address1 ? req.body.address1 : "";
+    var address2 = req.body.address2 ? req.body.address2 : "";
     var DOB = req.body.DOB ? req.body.DOB : "";
     var DOA = req.body.DOA ? req.body.DOA : "";
     var route = req.body.route ? req.body.route : "";
@@ -68,7 +69,7 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
             if (city != "") {
               if (state != "") {
                 if (district != "") {
-                  if (address != "") {
+                  if (address1 != "") {
                     let company = await Admin.findOne({_id:company_id});
                     var party_data = await Party.findOne({company_id:company._id}).sort({party_code:-1});
                     console.log("party_data------------",party_data)
@@ -95,7 +96,8 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
                       route: route,
                       city: city,
                       district: district,
-                      address: address,
+                      address1: address1,
+                      address2: address2,
                       DOB: DOB,
                       DOA: DOA,
                       Created_date: get_current_date(),
@@ -204,8 +206,11 @@ router.post("/editParty", (req, res) => {
         if (req.body.contactPersonName) {
           updated_party.contactPersonName = req.body.contactPersonName;
         }
-        if (req.body.address) {
-          updated_party.address = req.body.address;
+        if (req.body.address1) {
+          updated_party.address1 = req.body.address1;
+        }
+        if (req.body.address2) {
+          updated_party.address2 = req.body.address2;
         }
         if (req.body.status) {
           updated_party.status = req.body.status;
@@ -438,7 +443,8 @@ router.post("/getParty", (req, res) => {
                           },
                           firmName: party_data.firmName,
                           partyid:`${party_data.company_code}${party_data.party_code}`,
-                          address: party_data.address,
+                          address1: party_data.address1,
+                          address2: party_data.address2,
                           partyType: party_type_data.party_type,
                           image: party_data.image,
                           pincode: party_data.pincode,
@@ -487,7 +493,8 @@ router.post("/getParty", (req, res) => {
                                   },
                                   firmName: party_data.firmName,
                                   partyid:`${party_data.company_code}${party_data.party_code}`,
-                                  address: party_data.address,
+                                  address1: party_data.address1,
+                                  address2: party_data.address2,
                                   partyType: party_type_data.party_type,
                                   image: party_data.image,
                                   pincode: party_data.pincode,
@@ -638,7 +645,8 @@ router.post(
                       state: state_data._id,
                       city: city_data._id,
                       district: area_data._id,
-                      address: xlData[i].Address,
+                      address1: xlData[i].Address_1,
+                      address2: xlData[i].Address_2,
                       DOB: xlData[i].DOB,
                       DOA: xlData[i].DOA,
                       Created_date: get_current_date(),

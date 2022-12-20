@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken");
 const imageStorage = multer.diskStorage({
   destination: "images/Employee_image",
   filename: (req, file, cb) => {
+    // sharp(req.file.path).resize(640,480).toFile(destination)
     cb(null, file.fieldname + "_" + Date.now());
   },
 });

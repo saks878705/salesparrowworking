@@ -5,10 +5,10 @@ const product_catagory_model = new Schema({
     name:{
         type:String
     },
-    p_id:{
-        type:String,
-        default: ""
-    },
+    // p_id:{
+    //     type:String,
+    //     default: ""
+    // },
     gst:{
         type:String
     },

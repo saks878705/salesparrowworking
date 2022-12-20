@@ -49,7 +49,7 @@ app.use("/auth_api", require("./controllers/webservice/PurchaseSubController"));
 app.use("/auth_api", require("./controllers/webservice/customerTypeController"));
 app.use("/auth_api", require("./controllers/webservice/activityController"));
 app.use("/auth_api", require("./controllers/webservice/partytypeController"));
-app.use("/auth_api", require("./controllers/webservice/productVarientController"));
+// app.use("/auth_api", require("./controllers/webservice/productVarientController"));
 app.use("/auth_api", require("./controllers/webservice/brandController"));
 app.use("/auth_api", require("./controllers/webservice/productgrpController"));
 app.use("/auth_api", require("./controllers/webservice/productUnitController"));

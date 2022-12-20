@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Product = mongoose.model("Product");
 const Brand = mongoose.model("Brand");
 const ProductCatagory = mongoose.model("ProductCatagory");
-const ProductVarient = mongoose.model("ProductVarient");
+// const ProductVarient = mongoose.model("ProductVarient");
 const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
 const multer = require("multer");
@@ -55,23 +55,32 @@ router.post('/addProduct',(req,res)=>{
         if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
         var decodedToken = jwt.verify(token, "test");
         var company_id = decodedToken.user_id;
+        let mrp = req.body.mrp?req.body.mrp:"";
+        let price = req.body.price?req.body.price:"";
+        let sku_id = req.body.sku_id?req.body.sku_id:"";
+        let packing_details = req.body.packing_details?req.body.packing_details:null;
         let productName = req.body.productName?req.body.productName:"";
         let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
-        let sub_catagory_id = req.body.sub_catagory_id?req.body.sub_catagory_id:"";
+        // let sub_catagory_id = req.body.sub_catagory_id?req.body.sub_catagory_id:"";
         let description = req.body.description?req.body.description:"";
         let hsn_code = req.body.hsn_code?req.body.hsn_code:"";
         let gst = req.body.gst?req.body.gst:"";
         let brand_id = req.body.brand_id?req.body.brand_id:"";
+        if(mrp=="") return res.json({status:false,message:"Mrp is required"});
         if(productName=="") return res.json({status:false,message:"Product name is required"})
         if(catagory_id=="") return res.json({status:false,message:"catagory is required"})
         if(brand_id=="") return res.json({status:false,message:"Brand is required"})
         let new_product = new Product({
             catagory_id:catagory_id,
-            sub_catagory_id:sub_catagory_id,
+            // sub_catagory_id:sub_catagory_id,
             productName:productName,
             description:description,
             company_id:company_id,
             gst:gst,
+            mrp:mrp,
+            price:price,
+            packing_details:packing_details,
+            sku_id:sku_id,
             hsn_code:hsn_code,
             display_image:`${base_url}${req.file.path}`,
             brand_id:brand_id,
@@ -98,6 +107,18 @@ router.post('/edit_product',async (req,res)=>{
         if(req.body.hsn_code){
             updated_product.hsn_code = req.body.hsn_code;
         }
+        if(req.body.mrp){
+            updated_product_varient.mrp = req.body.mrp;
+        }
+        if(req.body.packing_details){
+            updated_product_varient.packing_details = req.body.packing_details;
+        }
+        if(req.body.price){
+            updated_product_varient.price = req.body.price;
+        }
+        if(req.body.sku_id){
+            updated_product_varient.sku_id = req.body.sku_id;
+        }
         if(req.body.description){
             updated_product.description = req.body.description;
         }
@@ -107,9 +128,9 @@ router.post('/edit_product',async (req,res)=>{
         if(req.body.catagory_id){
             updated_product.catagory_id = req.body.catagory_id;
         }
-        if(req.body.sub_catagory_id){
-            updated_product.sub_catagory_id = req.body.sub_catagory_id;
-        }
+        // if(req.body.sub_catagory_id){
+        //     updated_product.sub_catagory_id = req.body.sub_catagory_id;
+        // }
         if(req.body.gst){
             updated_product.gst = req.body.gst;
         }
@@ -135,7 +156,7 @@ router.post('/get_all_products',async (req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var company_id = decodedToken.user_id;
     let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
-    let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
+    // let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
     let brand_id = req.body.brand_id?req.body.brand_id:"";
     let limit = 10;
     let list = [];
@@ -144,7 +165,7 @@ router.post('/get_all_products',async (req,res)=>{
     arr =[{company_id}]
     if(brand_id) arr.push({brand_id})
     if(catagory_id) arr.push({catagory_id})
-    if(sub_catagory_id) arr.push({sub_catagory_id})
+    // if(sub_catagory_id) arr.push({sub_catagory_id})
 
     let count = await Product.find({$and:arr});
     let product_data = await Product.find({$and:arr}).limit(limit*1).sort((page-1)*limit);
@@ -154,52 +175,69 @@ router.post('/get_all_products',async (req,res)=>{
         await (async function (rowData) {
             let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
             let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
-            if(product_data[i].sub_catagory_id){
-                let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
-                if(sub_catagory_data){
-                    var u_data = {
-                        id: rowData._id,
-                        name:rowData.productName,
-                        brand_name:brand_data.name,
-                        hsn_code:rowData.hsn_code,
-                        catagory_name:catagory_data.name,
-                        sub_catagory_name:sub_catagory_data.name,
-                        description:rowData.description,
-                        gst:rowData.gst,
-                        image:rowData.display_image,
-                        status:rowData.status,
-                    };
-                    list.push(u_data);
-                }else{
-                    var u_data = {
-                        id: rowData._id,
-                        name:rowData.productName,
-                        brand_name:brand_data.name,
-                        hsn_code:rowData.hsn_code,
-                        catagory_name:catagory_data.name,
-                        sub_catagory_name:"",
-                        description:rowData.description,
-                        gst:rowData.gst,
-                        image:rowData.display_image,
-                        status:rowData.status,
-                    };
-                    list.push(u_data);
-                }
-            }else{
-                var u_data = {
-                    id: rowData._id,
-                    name:rowData.productName,
-                    brand_name:brand_data.name,
-                    hsn_code:rowData.hsn_code,
-                    catagory_name:catagory_data.name,
-                    sub_catagory_name:"",
-                    description:rowData.description,
-                    gst:rowData.gst,
-                    image:rowData.display_image,
-                    status:rowData.status,
-                };
-                list.push(u_data);
-            }
+            var u_data = {
+                id: rowData._id,
+                name:rowData.productName,
+                brand_name:brand_data.name,
+                mrp:rowData.mrp,
+                packing_details:rowData.packing_details || [],
+                sku_id:rowData.sku_id,
+                price:rowData.price,
+                hsn_code:rowData.hsn_code,
+                catagory_name:catagory_data.name,
+                sub_catagory_name:sub_catagory_data.name,
+                description:rowData.description,
+                gst:rowData.gst,
+                image:rowData.display_image,
+                status:rowData.status,
+            };
+            list.push(u_data);
+            // if(product_data[i].sub_catagory_id){
+            //     let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
+            //     if(sub_catagory_data){
+            //         var u_data = {
+            //             id: rowData._id,
+            //             name:rowData.productName,
+            //             brand_name:brand_data.name,
+            //             hsn_code:rowData.hsn_code,
+            //             catagory_name:catagory_data.name,
+            //             sub_catagory_name:sub_catagory_data.name,
+            //             description:rowData.description,
+            //             gst:rowData.gst,
+            //             image:rowData.display_image,
+            //             status:rowData.status,
+            //         };
+            //         list.push(u_data);
+            //     }else{
+            //         var u_data = {
+            //             id: rowData._id,
+            //             name:rowData.productName,
+            //             brand_name:brand_data.name,
+            //             hsn_code:rowData.hsn_code,
+            //             catagory_name:catagory_data.name,
+            //             sub_catagory_name:"",
+            //             description:rowData.description,
+            //             gst:rowData.gst,
+            //             image:rowData.display_image,
+            //             status:rowData.status,
+            //         };
+            //         list.push(u_data);
+            //     }
+            // }else{
+            //     var u_data = {
+            //         id: rowData._id,
+            //         name:rowData.productName,
+            //         brand_name:brand_data.name,
+            //         hsn_code:rowData.hsn_code,
+            //         catagory_name:catagory_data.name,
+            //         sub_catagory_name:"",
+            //         description:rowData.description,
+            //         gst:rowData.gst,
+            //         image:rowData.display_image,
+            //         status:rowData.status,
+            //     };
+            //     list.push(u_data);
+            // }
         })(product_data[i]);
         counInfo++;
         if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
@@ -238,6 +276,9 @@ router.post("/bulk_import_products",(req, res) => {
             productName:xlData[i].Product_Name,
             description:xlData[i].Description,
             hsn_code:xlData[i].hsn_code,
+            mrp:xlData[i].mrp,
+            sku_id:xlData[i].sku_id,
+            price:xlData[i].price,
             company_id:company_id,
             gst:xlData[i].GST,
             display_image:xlData[i].Image,
@@ -276,52 +317,69 @@ router.post("/product_search", async (req, res) => {
             await (async function (rowData) {
                 let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
                 let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
-                if(product_data[i].sub_catagory_id){
-                    let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
-                    if(sub_catagory_data){
-                    var u_data = {
-                        id: rowData._id,
-                        name:rowData.productName,
-                        brand_name:brand_data.name,
-                        hsn_code:rowData.hsn_code,
-                        catagory_name:catagory_data.name,
-                        sub_catagory_name:sub_catagory_data.name,
-                        description:rowData.description,
-                        gst:rowData.gst,
-                        image:rowData.display_image,
-                        status:rowData.status,
-                    };
-                    list.push(u_data);
-                }else{
-                    var u_data = {
-                        id: rowData._id,
-                        name:rowData.productName,
-                        brand_name:brand_data.name,
-                        hsn_code:rowData.hsn_code,
-                        catagory_name:catagory_data.name,
-                        sub_catagory_name:"",
-                        description:rowData.description,
-                        gst:rowData.gst,
-                        image:rowData.display_image,
-                        status:rowData.status,
-                    };
-                    list.push(u_data);
-                }
-            }else{
                 var u_data = {
                     id: rowData._id,
                     name:rowData.productName,
                     brand_name:brand_data.name,
                     hsn_code:rowData.hsn_code,
+                    mrp:rowData.mrp,
+                    packing_details:rowData.packing_details,
+                    sku_id:rowData.sku_id,
+                    price:rowData.price,
                     catagory_name:catagory_data.name,
-                    sub_catagory_name:"",
+                    sub_catagory_name:sub_catagory_data.name,
                     description:rowData.description,
                     gst:rowData.gst,
                     image:rowData.display_image,
                     status:rowData.status,
                 };
                 list.push(u_data);
-            }
+            //     if(product_data[i].sub_catagory_id){
+            //         let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
+            //         if(sub_catagory_data){
+            //         var u_data = {
+            //             id: rowData._id,
+            //             name:rowData.productName,
+            //             brand_name:brand_data.name,
+            //             hsn_code:rowData.hsn_code,
+            //             catagory_name:catagory_data.name,
+            //             sub_catagory_name:sub_catagory_data.name,
+            //             description:rowData.description,
+            //             gst:rowData.gst,
+            //             image:rowData.display_image,
+            //             status:rowData.status,
+            //         };
+            //         list.push(u_data);
+            //     }else{
+            //         var u_data = {
+            //             id: rowData._id,
+            //             name:rowData.productName,
+            //             brand_name:brand_data.name,
+            //             hsn_code:rowData.hsn_code,
+            //             catagory_name:catagory_data.name,
+            //             sub_catagory_name:"",
+            //             description:rowData.description,
+            //             gst:rowData.gst,
+            //             image:rowData.display_image,
+            //             status:rowData.status,
+            //         };
+            //         list.push(u_data);
+            //     }
+            // }else{
+            //     var u_data = {
+            //         id: rowData._id,
+            //         name:rowData.productName,
+            //         brand_name:brand_data.name,
+            //         hsn_code:rowData.hsn_code,
+            //         catagory_name:catagory_data.name,
+            //         sub_catagory_name:"",
+            //         description:rowData.description,
+            //         gst:rowData.gst,
+            //         image:rowData.display_image,
+            //         status:rowData.status,
+            //     };
+            //     list.push(u_data);
+            // }
         })(product_data[i]);
         counInfo++;
         if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
@@ -332,61 +390,61 @@ router.post("/product_search", async (req, res) => {
     }
 });
 
-router.post('/products_and_varients',async (req,res)=>{
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    if (!token) return res.json({ status: false, message: "Token is required" });
-    let x = token.split(".");
-    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
-    var decodedToken = jwt.verify(token, "test");
-    var company_id = decodedToken.user_id;
-    let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
-    let sub_catagory_id = req.body.sub_catagory_id?req.body.sub_catagory_id:"";
-    let brand_id = req.body.brand_id?req.body.brand_id:"";
-    let list = [];
-    let biglist = [];
+// router.post('/products_and_varients',async (req,res)=>{
+//     const authHeader = req.headers["authorization"];
+//     const token = authHeader && authHeader.split(" ")[1];
+//     if (!token) return res.json({ status: false, message: "Token is required" });
+//     let x = token.split(".");
+//     if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+//     var decodedToken = jwt.verify(token, "test");
+//     var company_id = decodedToken.user_id;
+//     let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
+//     // let sub_catagory_id = req.body.sub_catagory_id?req.body.sub_catagory_id:"";
+//     let brand_id = req.body.brand_id?req.body.brand_id:"";
+//     let list = [];
+//     let biglist = [];
     
-    arr =[{company_id}]
-    if(brand_id) arr.push({brand_id})
-    if(catagory_id) arr.push({catagory_id})
-    if(sub_catagory_id) arr.push({sub_catagory_id})
+//     arr =[{company_id}]
+//     if(brand_id) arr.push({brand_id})
+//     if(catagory_id) arr.push({catagory_id})
+//     // if(sub_catagory_id) arr.push({sub_catagory_id})
 
-    let product_data = await Product.find({$and:arr});
-    if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
-    let counInfo = 0;
-    for(let i = 0;i<product_data.length;i++){
-        let product_varient_data = await ProductVarient.find({product_id:product_data[i]._id});
-        console.log("product_varient_data----",product_varient_data)
-        if(product_varient_data.length<1){
-            biglist = [];
-        }else{
-            biglist = [];
-            for(let j = 0 ; j<product_varient_data.length;j++){
-                await (async function (rowData) {
-                    var u_data1 = {
-                        id: rowData._id,
-                        product_name:product_data[i].productName,
-                        varient_name:rowData.varient_name,
-                        mrp:rowData.mrp,
-                        price:rowData.price,
-                        packing_details:rowData.packing_details,
-                    };
-                    biglist.push(u_data1);
-                })(product_varient_data[j]);
-            }
-            console.log("biglist--------------",biglist)
-        }
-        await (async function (rowData) {
-            var u_data = {
-                id: rowData._id,
-                name:rowData.productName,
-            };
-            list.push({product_details:u_data,varient_details:biglist});
-            console.log("list----------------",list)
-        })(product_data[i]);
-        counInfo++;
-        if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list});
-    }
-})
+//     let product_data = await Product.find({$and:arr});
+//     if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
+//     let counInfo = 0;
+//     for(let i = 0;i<product_data.length;i++){
+//         let product_varient_data = await ProductVarient.find({product_id:product_data[i]._id});
+//         console.log("product_varient_data----",product_varient_data)
+//         if(product_varient_data.length<1){
+//             biglist = [];
+//         }else{
+//             biglist = [];
+//             for(let j = 0 ; j<product_varient_data.length;j++){
+//                 await (async function (rowData) {
+//                     var u_data1 = {
+//                         id: rowData._id,
+//                         product_name:product_data[i].productName,
+//                         varient_name:rowData.varient_name,
+//                         mrp:rowData.mrp,
+//                         price:rowData.price,
+//                         packing_details:rowData.packing_details,
+//                     };
+//                     biglist.push(u_data1);
+//                 })(product_varient_data[j]);
+//             }
+//             console.log("biglist--------------",biglist)
+//         }
+//         await (async function (rowData) {
+//             var u_data = {
+//                 id: rowData._id,
+//                 name:rowData.productName,
+//             };
+//             list.push({product_details:u_data,varient_details:biglist});
+//             console.log("list----------------",list)
+//         })(product_data[i]);
+//         counInfo++;
+//         if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list});
+//     }
+// })
 
 module.exports = router;
