@@ -29,7 +29,7 @@ router.post('/partyGrpList',async (req,res)=>{
     var limit = 10;
     if(state!=""){
         var list = [];
-        PGroup.find({$and:[{state},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+        PGroup.find({$and:[{is_delete:"0"},{state},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
             let counInfo = 0;
             if(group_data.length>0){
                 for(let i = 0;i<group_data.length;i++){
@@ -65,7 +65,7 @@ router.post('/partyGrpList',async (req,res)=>{
         })
     }else{
         var list = [];
-        PGroup.find({company_id}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
+        PGroup.find({$and:[{is_delete:"0"},{company_id}]}).limit( limit * 1).skip( (page - 1) * limit).exec().then(group_data=>{
             let counInfo = 0;
             console.log(group_data);
             if(group_data.length>0){
@@ -254,9 +254,9 @@ router.post('/edit_party_grp',(req,res)=>{
 
 router.post('/getGrpWisePartyList',(req,res)=>{
     var id = req.body.id?req.body.id:"";
-    PGroup.find({_id:id}).exec().then(grp_data=>{
+    PGroup.find({$and:[{is_delete:"0"},{_id:id}]}).exec().then(grp_data=>{
         Location.find({_id:grp_data[0].state}).exec().then(state_data=>{
-            PartyGrouping.find({grp_id:id}).exec().then(party_grp_data=>{
+            PartyGrouping.find({$and:[{is_delete:"0"},{grp_id:id}]}).exec().then(party_grp_data=>{
                 var u_data = {
                     id:grp_data[0]._id,
                     grp_name:grp_data[0].grp_name,
@@ -277,9 +277,9 @@ router.post('/getGrpWisePartyList',(req,res)=>{
 
 router.delete('/deletePartyGrp',(req,res)=>{
     var id = req.body.id?req.body.id:"";
-    PartyGrouping.deleteMany({grp_id:id}).exec().then(doc=>{
+    PartyGrouping.findOneAndUpdate({grp_id:id},{$set:{is_delete:"1"}}).exec().then(doc=>{
         if(doc){
-            PGroup.deleteOne({_id:id}).exec().then(doc2=>{
+            PGroup.findOneAndUpdate({_id:id},{$set:{is_delete:"1"}}).exec().then(doc2=>{
                 res.json({
                     status:true,
                     message:"group deleted successfully"

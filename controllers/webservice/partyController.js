@@ -5,6 +5,7 @@ const Location = mongoose.model("Location");
 const Route = mongoose.model("Route");
 const Admin = mongoose.model("AdminInfo");
 const PartyType = mongoose.model("PartyType");
+const PartyGrouping = mongoose.model("PartyGrouping");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const base_url = "https://salesparrow.teknikoglobal.com/";
@@ -257,7 +258,7 @@ router.post("/getAllParty", async (req, res) => {
   var list2 = [];
   var state = req.body.state ? req.body.state : "";
   var partyType = req.body.partyType ? req.body.partyType : "";
-  let obj1 = [];
+  let obj1 = [{is_delete:"0"}];
   if (company_id != "" && state == "" && partyType == "") {
     obj1 = [{ company_id }];
   } else if (company_id != "" && state != "" && partyType == "") {
@@ -587,10 +588,14 @@ router.post(
   }
 );
 
-router.delete("/deleteParty", (req, res) => {
+router.delete("/deleteParty",async (req, res) => {
   var id = req.body.id ? req.body.id : "";
   if (id != "") {
-    Party.findOneAndDelete({ _id: id }).exec().then(() => {
+    let party_gruping_data = await PartyGrouping.find({party_id:id});
+    for(let i = 0;i<party_gruping_data.length;i++){
+      await PartyGrouping.findOneAndUpdate({party_id:id},{$set:{is_deleted:"1"}})
+    }
+    Party.findOneAndUpdate({ _id: id },{$set:{is_deleted:"1"}}).exec().then(() => {
       res.status(200).json({
         status: true,
         message: "Deleted successfully",
