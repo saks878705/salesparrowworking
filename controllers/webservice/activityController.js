@@ -27,10 +27,14 @@ router.post('/addActivity',(req,res)=>{
         })
 })
 
-router.get('/getActivity',(req,res)=>{
-    Activity.find().exec().then(activity_data=>{
+router.get('/getActivity', async (req,res)=>{
+    try {
+       let activity_data = await Activity.find()
         res.json({status:true,message:"Found successfully",result:activity_data})
-    })
+    } catch (error) {
+        console.log(error);
+    }
+   
 })
 
 module.exports = router;

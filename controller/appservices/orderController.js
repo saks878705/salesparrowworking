@@ -251,14 +251,18 @@ router.post('/previous_retailer_orders',async (req,res)=>{
         let sub_arr = [];
         let order_item_data = await OrderItem.find({order_id:order_data[i]._id});
         for(let j = 0;j<order_item_data.length;j++){
-            var product_data = await ProductVarient.findOne({_id:order_item_data[j].product_id});
-            await (async function(rowData){
-                let u_data = {
-                product_name:product_data.varient_name,
-                quantity:rowData.quantity
-                }
-                sub_arr.push(u_data)
-            })(order_item_data[j])
+            var product_data = await Product.findOne({_id:order_item_data[j].product_id});
+            if(product_data){
+                await (async function(rowData){
+                    let u_data = {
+                    product_name:product_data.productName,
+                    quantity:rowData.quantity
+                    }
+                    sub_arr.push(u_data)
+                })(order_item_data[j])
+            }else{
+                sub_arr.push([])
+            }
         }
         arr.push({order_data:order_data[i],line_data:sub_arr})
     }
