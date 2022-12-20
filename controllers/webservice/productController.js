@@ -108,16 +108,16 @@ router.post('/edit_product',async (req,res)=>{
             updated_product.hsn_code = req.body.hsn_code;
         }
         if(req.body.mrp){
-            updated_product_varient.mrp = req.body.mrp;
+            updated_product.mrp = req.body.mrp;
         }
         if(req.body.packing_details){
-            updated_product_varient.packing_details = req.body.packing_details;
+            updated_product.packing_details = req.body.packing_details;
         }
         if(req.body.price){
-            updated_product_varient.price = req.body.price;
+            updated_product.price = req.body.price;
         }
         if(req.body.sku_id){
-            updated_product_varient.sku_id = req.body.sku_id;
+            updated_product.sku_id = req.body.sku_id;
         }
         if(req.body.description){
             updated_product.description = req.body.description;
@@ -246,7 +246,6 @@ router.post('/get_all_products',async (req,res)=>{
 router.delete('/delete_product',async (req,res)=>{
     let id = req.body.id ? req.body.id : "";
     if (id == "") return res.json({ status: false, message: "Please provide Id" });
-    await ProductVarient.deleteMany({product_id:id})
     Product.deleteOne({ _id: id }).exec().then(() => {
       return res.json({ status: true, message: "Deleted successfully" });
     });
