@@ -53,15 +53,16 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
       if (phone != "") {
         if (companyShortCode != "") {
           Admin.findOne({ companyShortCode }).exec().then(async (admin_info) => {
+            if (admin_info) {
               console.log(admin_info);
               let company = await Admin.findOne({companyShortCode});
+              console.log(company)
               var emp_data = await Employee.findOne({companyId:company._id}).sort({employee_code:-1});
               if(emp_data){
                 var employee_code = emp_data.employee_code + 1;
               }else{
                 var employee_code = 1;
               }
-              if (admin_info) {
                 var employee_data = await Employee.find({$and:[{companyId:company._id},{phone}]});
                 if(employee_data.length>0){
                   return res.json({status:false,message:"Phone number already exists"})
@@ -95,7 +96,6 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
                 return res.json({
                   status: false,
                   message: "Company short code is wrong",
-                  result: null,
                 });
               }
             });
