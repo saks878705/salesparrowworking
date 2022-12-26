@@ -198,7 +198,7 @@ router.post('/create_visit_summary',async (req,res)=>{
       emp_id:employee_id,
       beat_id:beat_id,
       retailer_id:retailer_id,
-      visit_status:"NPCompleted",
+      visit_status:"Completed",
       visit_date:date,
       no_order_reason:reason,
       order_status:"Non-Productive",
@@ -217,7 +217,7 @@ router.post('/create_visit_summary',async (req,res)=>{
       emp_id:employee_id,
       beat_id:beat_id,
       retailer_id:retailer_id,
-      visit_status:"PCompleted",
+      visit_status:"Completed",
       visit_date:date,
       order_status:"Productive",
       Created_date:get_current_date(),
@@ -237,44 +237,55 @@ router.post('/retailer_acc_to_visit_status',async (req,res)=>{
   if (x.length < 3) return res.json({ status: false, message: "Invalid token" });
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
-  let list = [];
   visit_status = req.body.visit_status?req.body.visit_status:"";
   let date = get_current_date().split(" ")[0];
   if(visit_status =="") return res.json({status:false,message:"Please provide visit status"})
   let visit_details_data = await Visit.find({$and:[{visit_date:date},{emp_id:employee_id},{visit_status:visit_status}]})
+  console.log(visit_details_data);
   if(visit_details_data.length<1) return res.json({ status: true, message: "No data" ,result:[]});
   let count = 0;
-  if(visit_status == "Complete"){
-    for(let i= 0;i<visit_details_data.length;i++){
-      await (async function(rowData){
-        let retailer_data = await Retailer.findOne({_id:visit_details_data[i].retailer_id});
+  let final_list =[]
+  for(let j = 0;j<visit_details_data.length;j++){
+    if(visit_status == "Completed"){
+      console.log("Hello 1");
+      if(visit_details_data[j].order_status=="Productive"){
+        let retailer_data = await Retailer.findOne({_id:visit_details_data[j].retailer_id});
         let order_data = await Order.findOne({$and:[{retailer_id:retailer_data._id},{order_date:date}]})
         let u_data = {
           retailer_name:retailer_data.customerName,
           order_value:order_data.total_amount,
-          order_status:rowData.order_status
+          order_status:visit_details_data[j].order_status
         }
-        list.push(u_data);
-      })(visit_details_data[i])
-      count++;
-      if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
-    }
-  }else if(visit_status == "Progress"){
-    for(let i= 0;i<visit_details_data.length;i++){
-      await (async function(rowData){
-        let retailer_data = await Retailer.findOne({_id:visit_details_data[i].retailer_id});
-        let visit_data = await Visit.findOne({$and:[{retailer_id:visit_details_data[i].retailer_id},{emp_id:employee_id}]});
-        let order_data = await Order.findOne({retailer_id:retailer_data._id}).sort({order_date:-1})
+        final_list.push(u_data);
+          // count++;
+          // if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
+      }else if(visit_details_data[j].order_status=="Non-Productive"){
+        console.log("Hello 1");
+        let retailer_data = await Retailer.findOne({_id:visit_details_data[j].retailer_id});
         let u_data = {
           retailer_name:retailer_data.customerName,
-          last_visit:visit_data.visit_date,
-          order_value:order_data.total_amount,
+          reason:visit_details_data[j].no_order_reason,
+          order_status:visit_details_data[j].order_status
         }
-        list.push(u_data);
-      })(visit_details_data[i])
-      count++;
-      if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
+        final_list.push(u_data);
+          // count++;
+          // if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
+      }
+    }else if(visit_status == "Progress"){
+      let retailer_data = await Retailer.findOne({_id:visit_details_data[j].retailer_id});
+          let visit_data = await Visit.findOne({$and:[{retailer_id:visit_details_data[j].retailer_id},{emp_id:employee_id}]});
+          let order_data = await Order.findOne({retailer_id:retailer_data._id}).sort({order_date:-1})
+          let u_data = {
+            retailer_name:retailer_data.customerName,
+            last_visit:visit_data.visit_date,
+            order_value:order_data.total_amount,
+          }
+          final_list.push(u_data);
+        // count++;
+        // if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
     }
+    count++
+    if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:final_list})
   }
 })
 
