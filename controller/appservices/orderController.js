@@ -4,6 +4,7 @@ const Employee = mongoose.model("Employee");
 const Product = mongoose.model("Product");
 const Order = mongoose.model("Order");
 const ProductCatagory = mongoose.model("ProductCatagory");
+const Brand = mongoose.model("Brand");
 // const ProductVarient = mongoose.model("ProductVarient");
 const OrderItem = mongoose.model("OrderItem");
 const router = express.Router();
@@ -31,37 +32,76 @@ router.post("/get_all_product_catagory",async (req, res) => {
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     let emp_data = await Employee.findOne({_id:employee_id});
-    let p_id = req.body.p_id?req.body.p_id:"";
+    // let p_id = req.body.p_id?req.body.p_id:"";
     let page = req.body.page?req.body.page:"1";
-    let list = [];
+    let final_list = [];
     let limit = 10;
-    if(p_id!=""){
-        let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id},{is_delete:"0"}]});
-        let sub_catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
-        if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
-        let counInfo = 0;
-        for(let i = 0;i<sub_catagory_data.length;i++){
-          let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
-          await (async function (rowData) {
-            var u_data = {
-              id: rowData._id,
-              name: rowData.name,
-              gst: rowData.gst,
-              image: rowData.image,
-              catagory:catagory_data.name,
-              status: rowData.status,
-          };
-          list.push(u_data);
-          })(sub_catagory_data[i]);
-          counInfo++;
-          if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+    let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]});
+    let catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+    if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+    let countInfo = 0;
+    for(let j = 0;j<catagory_data.length;j++){
+        let list = [];
+        arr =[{company_id:emp_data.companyId},{catagory_id:catagory_data[j]._id}]
+        let product_data = await Product.find({$and:arr});
+        if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
+        for(let i = 0;i<product_data.length;i++){
+            await (async function (rowData) {
+                let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
+                let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
+                var u_data1 = {
+                    id: rowData._id,
+                    name:rowData.productName,
+                    brand_name:brand_data.name,
+                    hsn_code:rowData.hsn_code,
+                    catagory_name:catagory_data.name,
+                    description:rowData.description,
+                    gst:rowData.gst,
+                    image:rowData.display_image,
+                    status:rowData.status,
+                };
+                list.push(u_data1);
+            })(product_data[i]);
+        }
+        var u_data2= {
+            catagory_id: catagory_data[j]._id,
+            catagory_name:catagory_data[j].name,
+            product_details:list
+        };
+        final_list.push(u_data2)
+        console.log("final_list----------",final_list);
+        countInfo++
+        if(countInfo==catagory_data.length) return res.json({status:true,message:"Catagories found.",result:final_list,pagelength:Math.ceil(count.length/limit)})
+        
     }
-  }else{
-        let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]});
-        let catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
-        if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
-        if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
-    }
+
+//     if(p_id!=""){
+//         let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id},{is_delete:"0"}]});
+//         let sub_catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+//         if(sub_catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+//         let counInfo = 0;
+//         for(let i = 0;i<sub_catagory_data.length;i++){
+//           let catagory_data  = await ProductCatagory.findOne({_id:sub_catagory_data[i].p_id});
+//           await (async function (rowData) {
+//             var u_data = {
+//               id: rowData._id,
+//               name: rowData.name,
+//               gst: rowData.gst,
+//               image: rowData.image,
+//               catagory:catagory_data.name,
+//               status: rowData.status,
+//           };
+//           list.push(u_data);
+//           })(sub_catagory_data[i]);
+//           counInfo++;
+//           if(counInfo==sub_catagory_data.length) return res.json({status: true,message: "All sub catagories found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
+//     }
+//   }else{
+//         let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]});
+//         let catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+//         if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
+//         if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
+//     }
 });
 
 router.post('/get_all_products',async (req,res)=>{
@@ -74,14 +114,14 @@ router.post('/get_all_products',async (req,res)=>{
     var employee_id = decodedToken.user_id;
     let emp_data = await Employee.findOne({_id:employee_id})
     let catagory_id = req.body.catagory_id?req.body.catagory_id:"";
-    let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
+    // let sub_catagory_id = req.body.catagory_id?req.body.sub_catagory_id:"";
     let limit = 10;
     let list = [];
     let page = req.body.page?req.body.page:"1";
     
     arr =[{company_id:emp_data.companyId}]
     if(catagory_id) arr.push({catagory_id})
-    if(sub_catagory_id) arr.push({sub_catagory_id})
+    // if(sub_catagory_id) arr.push({sub_catagory_id})
 
     let count = await Product.find({$and:arr});
     let product_data = await Product.find({$and:arr}).limit(limit*1).sort((page-1)*limit);
@@ -91,52 +131,64 @@ router.post('/get_all_products',async (req,res)=>{
         await (async function (rowData) {
             let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
             let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
-            if(product_data[i].sub_catagory_id){
-                let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
-                if(sub_catagory_data){
-                    var u_data = {
-                        id: rowData._id,
-                        name:rowData.productName,
-                        brand_name:brand_data.name,
-                        hsn_code:rowData.hsn_code,
-                        catagory_name:catagory_data.name,
-                        sub_catagory_name:sub_catagory_data.name,
-                        description:rowData.description,
-                        gst:rowData.gst,
-                        image:rowData.display_image,
-                        status:rowData.status,
-                    };
-                    list.push(u_data);
-                }else{
-                    var u_data = {
-                        id: rowData._id,
-                        name:rowData.productName,
-                        brand_name:brand_data.name,
-                        hsn_code:rowData.hsn_code,
-                        catagory_name:catagory_data.name,
-                        sub_catagory_name:"",
-                        description:rowData.description,
-                        gst:rowData.gst,
-                        image:rowData.display_image,
-                        status:rowData.status,
-                    };
-                    list.push(u_data);
-                }
-            }else{
-                var u_data = {
-                    id: rowData._id,
-                    name:rowData.productName,
-                    brand_name:brand_data.name,
-                    hsn_code:rowData.hsn_code,
-                    catagory_name:catagory_data.name,
-                    sub_catagory_name:"",
-                    description:rowData.description,
-                    gst:rowData.gst,
-                    image:rowData.display_image,
-                    status:rowData.status,
-                };
-                list.push(u_data);
-            }
+            var u_data = {
+                id: rowData._id,
+                name:rowData.productName,
+                brand_name:brand_data.name,
+                hsn_code:rowData.hsn_code,
+                catagory_name:catagory_data.name,
+                description:rowData.description,
+                gst:rowData.gst,
+                image:rowData.display_image,
+                status:rowData.status,
+            };
+            list.push(u_data);
+        //     if(product_data[i].sub_catagory_id){
+        //         let sub_catagory_data = await ProductCatagory.findOne({_id:product_data[i].sub_catagory_id});
+        //         if(sub_catagory_data){
+        //             var u_data = {
+        //                 id: rowData._id,
+        //                 name:rowData.productName,
+        //                 brand_name:brand_data.name,
+        //                 hsn_code:rowData.hsn_code,
+        //                 catagory_name:catagory_data.name,
+        //                 sub_catagory_name:sub_catagory_data.name,
+        //                 description:rowData.description,
+        //                 gst:rowData.gst,
+        //                 image:rowData.display_image,
+        //                 status:rowData.status,
+        //             };
+        //             list.push(u_data);
+        //         }else{
+        //             var u_data = {
+        //                 id: rowData._id,
+        //                 name:rowData.productName,
+        //                 brand_name:brand_data.name,
+        //                 hsn_code:rowData.hsn_code,
+        //                 catagory_name:catagory_data.name,
+        //                 sub_catagory_name:"",
+        //                 description:rowData.description,
+        //                 gst:rowData.gst,
+        //                 image:rowData.display_image,
+        //                 status:rowData.status,
+        //             };
+        //             list.push(u_data);
+        //         }
+        //     }else{
+        //         var u_data = {
+        //             id: rowData._id,
+        //             name:rowData.productName,
+        //             brand_name:brand_data.name,
+        //             hsn_code:rowData.hsn_code,
+        //             catagory_name:catagory_data.name,
+        //             sub_catagory_name:"",
+        //             description:rowData.description,
+        //             gst:rowData.gst,
+        //             image:rowData.display_image,
+        //             status:rowData.status,
+        //         };
+        //         list.push(u_data);
+            // }
         })(product_data[i]);
         counInfo++;
         if(counInfo==product_data.length) return res.json({status: true,message: "All Products found successfully",result: list,pageLength: Math.ceil(count.length / limit),});
@@ -275,5 +327,21 @@ router.post('/previous_retailer_orders',async (req,res)=>{
     }
     return res.json({status:true,message:"Found successfully",result:arr}); 
 });
+
+// router.post('/view_retailer_todays_order',async (req,res)=>{
+//     const authHeader = req.headers["authorization"];
+//     const token = authHeader && authHeader.split(" ")[1];
+//     if (!token) return res.json({ status: false, message: "Token is required" });
+//     let x = token.split(".");
+//     if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+//     var decodedToken = jwt.verify(token, "test");
+//     var employee_id = decodedToken.user_id;
+//     let id = req.body.id?req.body.id:"";
+//     if(id == "") return res.json({status:false,message:"Please provide the retailer id"});
+//     let date = get_current_date().split(" ")[0];
+//     let retailer_todays_order_data = await Order.findOne({$and:[{emp_id:employee_id},{retailer_id:id},{order_date:date}]});
+//     if(!retailer_todays_order_data) return res.json({status:false,message:"First place order",result:[]})
+//     return res.json({status:true,message:"Order data",result:retailer_todays_order_data})
+// })
 
 module.exports = router;
