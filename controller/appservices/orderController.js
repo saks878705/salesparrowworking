@@ -58,6 +58,9 @@ router.post("/get_all_product_catagory",async (req, res) => {
                     description:rowData.description,
                     gst:rowData.gst,
                     image:rowData.display_image,
+                    mrp:rowData.mrp,
+                    price:rowData.price,
+                    packing_details:rowData.packing_details,
                     status:rowData.status,
                 };
                 list.push(u_data1);
@@ -140,6 +143,9 @@ router.post('/get_all_products',async (req,res)=>{
                 description:rowData.description,
                 gst:rowData.gst,
                 image:rowData.display_image,
+                mrp:rowData.mrp,
+                price:rowData.price,
+                packing_details:rowData.packing_details,
                 status:rowData.status,
             };
             list.push(u_data);
