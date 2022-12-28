@@ -38,7 +38,8 @@ router.post('/addRetailer',(req,res)=>{
    let customerName= req.body.customerName?req.body.customerName:""
 //    let state= req.body.state?req.body.state:""
 //    let city= req.body.city?req.body.city:""
-   let location= req.body.location?req.body.location:""
+   let lat= req.body.lat?req.body.lat:""
+   let long= req.body.long?req.body.long:""
 //    let route= req.body.route?req.body.route:""
    let mobileNo= req.body.mobileNo?req.body.mobileNo:""
    let DOB= req.body.DOB?req.body.DOB:""
@@ -47,55 +48,63 @@ router.post('/addRetailer',(req,res)=>{
     if(customer_type!=""){
         if(firmName!=""){
             if(customerName!=""){
-                if(location!=""){
-                    if(mobileNo!=""){
-                                Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
-                                    if(emp_data.status=="InActive" || emp_data.status=="UnApproved"){
-                                        return res.json({
-                                            status:false,
-                                            message:"You are Inactive. Please contact company."
-                                            }) 
-                                    }else{
-                                        let new_retailer = new Retailer({
-                                            beat_id:beat_id,
-                                            customer_type:customer_type,
-                                            company_id:emp_data.companyId,
-                                            employee_id:emp_data._id,
-                                            pincode:pincode,
-                                            address:address,
-                                            firmName:firmName,
-                                            GSTNo:GSTNo,
-                                            customerName:customerName,
-                                            // city:city,
-                                            // state:state,
-                                            location:location,
-                                            // route:route,
-                                            mobileNo:mobileNo,
-                                            DOB:DOB,
-                                            DOA:DOA,
-                                            Created_date:get_current_date(),
-                                            Updated_date:get_current_date(),
-                                            status:"Active"
-                                        });
-                                        new_retailer.save().then(data=>{
-                                            res.json({
-                                                status:true,
-                                                message:"Retailer created successfully",
-                                                result:data
-                                            })
+                if(lat!=""){
+                    if(long!=""){
+                        if(mobileNo!=""){
+                            Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
+                                if(emp_data.status=="InActive" || emp_data.status=="UnApproved"){
+                                    return res.json({
+                                        status:false,
+                                        message:"You are Inactive. Please contact company."
+                                        }) 
+                                }else{
+                                    let new_retailer = new Retailer({
+                                        beat_id:beat_id,
+                                        customer_type:customer_type,
+                                        company_id:emp_data.companyId,
+                                        employee_id:emp_data._id,
+                                        pincode:pincode,
+                                        address:address,
+                                        firmName:firmName,
+                                        GSTNo:GSTNo,
+                                        customerName:customerName,
+                                        // city:city,
+                                        // state:state,
+                                        lat:lat,
+                                        long:long,
+                                        // route:route,
+                                        mobileNo:mobileNo,
+                                        DOB:DOB,
+                                        DOA:DOA,
+                                        Created_date:get_current_date(),
+                                        Updated_date:get_current_date(),
+                                        status:"Active"
+                                    });
+                                    new_retailer.save().then(data=>{
+                                        res.json({
+                                            status:true,
+                                            message:"Retailer created successfully",
+                                            result:data
                                         })
-                                    }
-                                })
+                                    })
+                                }
+                            })
+                }else{
+                     res.json({
+                         status:false,
+                         message:"Mobile number must be given"
+                     })
+                }
                     }else{
-                         res.json({
-                             status:false,
-                             message:"Mobile number must be given"
-                         })
+                        res.json({
+                            status:false,
+                            message:"longitude must be selected"
+                        })
                     }
                 }else{
                      res.json({
                          status:false,
-                         message:"Location must be selected"
+                         message:"Latitude must be selected"
                      })
                 }
             }else{
@@ -177,7 +186,8 @@ router.post('/getAllRetailers',async (req,res)=>{
                                 firmName:rowData.firmName,
                                 GSTNo:rowData.GSTNo,
                                 customerName:rowData.customerName,
-                                location:rowData.location,
+                                lat:rowData.lat,
+                                long:rowData.long,
                                 // state:state_data.name,
                                 // city:city_data.name,
                                 // route:list2,

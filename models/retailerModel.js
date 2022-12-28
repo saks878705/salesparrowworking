@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { DependentPhoneNumberList } = require("twilio/lib/rest/api/v2010/account/address/dependentPhoneNumber");
 const Schema = mongoose.Schema;
 
 const retailer_schema = new Schema({
@@ -32,12 +33,15 @@ const retailer_schema = new Schema({
     area:{
         type:String
     },
-    location:{
-        type:Array
+    lat:{
+        type:Number,
     },
-    route:{
-        type:Array
+    long:{
+        type:Number,
     },
+    // route:{
+    //     type:Array
+    // },
     mobileNo:{
         type:String
     },
