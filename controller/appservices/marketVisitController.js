@@ -94,49 +94,51 @@ router.post('/retailer_acc_to_beat',async (req,res)=>{
     let beat_data =await Beat.findOne({_id:id});
     // console.log("beat_data",beat_data)
     if(!beat_data) return res.json({status:false,message:"No beat data. Please check id"});
-    let retailer_data = await Retailer.find({company_id:emp_data.companyId});
+    let retailer_data = await Retailer.find({$and:[{beat_id:id},{company_id:emp_data.companyId}]});
     // console.log("party_data",party_data.length)
     if(retailer_data.length<1) return res.json({status:true,message:"No data"});
-    let count = 0;
-    let list = [];
-    for(let i = 0;i<retailer_data.length;i++){
-        console.log(retailer_data[i])
-        console.log(retailer_data[i].route)
-        if(retailer_data[i].route==null){
-          count++
-          continue;
+    return res.json({status:true,message:"Retailers found",result:retailer_data})
+    // let count = 0;
+    // let list = [];
+    // for(let i = 0;i<retailer_data.length;i++){
+    //     console.log(retailer_data[i])
+    //     console.log(retailer_data[i].route)
+    //     if(retailer_data[i].route==null){
+    //       count++
+    //       continue;
 
-        }else{
-          var arr = retailer_data[i].route[0]?retailer_data[i].route[0].split(","):"";
-          console.log("arr",arr)
-          if(arr==""){
-            console.log("inside first if")
-            if(count==retailer_data.length-1 && list == []) return res.json({status:true,message:"No parties found",result:[]})
-            if(count==retailer_data.length-1 && list != []) return res.json({status:true,message:"Retailers found",result:list})
-          }else{
-            console.log("insidde else");
-            console.log(arr.length);
-            for(let j = 0;j<arr.length;j++){
-              console.log("inside for");
-              if(arr[j]==beat_data.route_id){
-                // let order_details = await Order.find({retailer_id:retailer_data[i]._id})
-                let order_detail = await Order.findOne({retailer_id:retailer_data[i]._id}).sort({order_date:-1})
-                if(order_detail){
-                  console.log("insidde if");
-                  list.push({retailer_data:retailer_data[i],last_visit:order_detail.order_date,total_order_amount:order_detail.total_amount})
-                }else{
-                  list.push({retailer_data:retailer_data[i],last_visit:"NA",total_order_amount:"NA"})
+    //     }else{
+    //       var arr = retailer_data[i].route[0]?retailer_data[i].route[0].split(","):"";
+    //       console.log("arr",arr)
+    //       if(arr==""){
+    //         console.log("inside first if")
+    //         if(count==retailer_data.length-1 && list == []) return res.json({status:true,message:"No parties found",result:[]})
+    //         if(count==retailer_data.length-1 && list != []) return res.json({status:true,message:"Retailers found",result:list})
+    //       }else{
+    //         console.log("insidde else");
+    //         console.log(arr.length);
+    //         for(let j = 0;j<arr.length;j++){
+    //           console.log("inside for");
+    //           if(arr[j]==beat_data.route_id){
+    //             // let order_details = await Order.find({retailer_id:retailer_data[i]._id})
+    //             let order_detail = await Order.findOne({retailer_id:retailer_data[i]._id}).sort({order_date:-1})
+    //             if(order_detail){
+    //               console.log("insidde if");
+    //               list.push({retailer_data:retailer_data[i],last_visit:order_detail.order_date,total_order_amount:order_detail.total_amount})
+    //             }else{
+    //               list.push({retailer_data:retailer_data[i],last_visit:"NA",total_order_amount:"NA"})
 
-                }
-              }
-            }
-            console.log("list",list)
-          }
-        }
-        count++;
-        console.log("count",count)
-      }
-      if(count==retailer_data.length) return res.json({status:true,message:"Retailers found",result:list})
+    //             }
+    //           }
+    //         }
+    //         console.log("list",list)
+    //       }
+    //     }
+    //     count++;
+    //     console.log("count",count)
+    //   }
+      // if(count==retailer_data.length) return res.json({status:true,message:"Retailers found",result:list})
+
 });
 
 router.get('/get_todays_beat',async (req,res)=>{

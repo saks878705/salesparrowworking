@@ -36,10 +36,10 @@ router.post('/addRetailer',(req,res)=>{
    let firmName= req.body.firmName?req.body.firmName:""
    let GSTNo= req.body.GSTNo?req.body.GSTNo:""
    let customerName= req.body.customerName?req.body.customerName:""
-   let state= req.body.state?req.body.state:""
-   let city= req.body.city?req.body.city:""
+//    let state= req.body.state?req.body.state:""
+//    let city= req.body.city?req.body.city:""
    let location= req.body.location?req.body.location:""
-   let route= req.body.route?req.body.route:""
+//    let route= req.body.route?req.body.route:""
    let mobileNo= req.body.mobileNo?req.body.mobileNo:""
    let DOB= req.body.DOB?req.body.DOB:""
    let DOA= req.body.DOA?req.body.DOA:""
@@ -66,10 +66,10 @@ router.post('/addRetailer',(req,res)=>{
                                             firmName:firmName,
                                             GSTNo:GSTNo,
                                             customerName:customerName,
-                                            city:city,
-                                            state:state,
+                                            // city:city,
+                                            // state:state,
                                             location:location,
-                                            route:route,
+                                            // route:route,
                                             mobileNo:mobileNo,
                                             DOB:DOB,
                                             DOA:DOA,
@@ -127,7 +127,7 @@ router.post('/addRetailer',(req,res)=>{
 router.post('/getAllRetailers',async (req,res)=>{
     let beat = req.body.beat?req.body.beat:"";
     let arr = [];
-    let list2 = [];
+    // let list2 = [];
     let limit = 10;
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -165,11 +165,7 @@ router.post('/getAllRetailers',async (req,res)=>{
             let list = [];
             let countInfo = 0;
             for(let i = 0;i<retailer_data.length;i++){
-                var arr = retailer_data[i].route? retailer_data[i].route[0].split(","): "";
-                if(arr == ""){
-                    let beat_data = await Beat.findOne({_id:retailer_data[i].beat_id})
-                    let state_data = await Location.findOne({_id:retailer_data[i].state})
-                    let city_data = await Location.findOne({_id:retailer_data[i].city})
+                let beat_data = await Beat.findOne({_id:retailer_data[i].beat_id})
                         await (async function(rowData){
                             let data ={
                                 beat_id:beat_data.beatName,
@@ -182,9 +178,9 @@ router.post('/getAllRetailers',async (req,res)=>{
                                 GSTNo:rowData.GSTNo,
                                 customerName:rowData.customerName,
                                 location:rowData.location,
-                                state:state_data.name,
-                                city:city_data.name,
-                                route:list2,
+                                // state:state_data.name,
+                                // city:city_data.name,
+                                // route:list2,
                                 mobileNo:rowData.mobileNo,
                                 DOB:rowData.DOB,
                                 DOA:rowData.DOA,
@@ -192,46 +188,73 @@ router.post('/getAllRetailers',async (req,res)=>{
                             }
                             list.push(data)
                         })(retailer_data[i])
-                    }else{
-                        for (let j = 0; j < arr.length; j++) {
-                            var route_data = await Route.findOne({ _id: arr[j] })
-                            console.log("routedata", route_data);
-                            let data = {
-                                start_point: route_data.start_point,
-                                end_point: route_data.end_point,
-                                id: route_data._id,
-                            };
-                            list2.push(data);
-                            console.log(list2);
-                            if(arr.length == j+1){
-                                let state_data = await Location.findOne({_id:retailer_data[i].state})
-                                let city_data = await Location.findOne({_id:retailer_data[i].city})
-                                let beat_data = await Beat.findOne({_id:retailer_data[i].beat_id})
-                                await (async function(rowData){
-                                    let data ={
-                                        beat_id:beat_data.beatName,
-                                        customer_type:rowData.customer_type,
-                                        employee_id:emp_data.employeeName,
-                                        company_id:rowData.company_id,
-                                        pincode:rowData.pincode,
-                                        address:rowData.address,
-                                        firmName:rowData.firmName,
-                                        GSTNo:rowData.GSTNo,
-                                        customerName:rowData.customerName,
-                                        location:rowData.location,
-                                        state:state_data.name,
-                                        city:city_data.name,
-                                        route:list2,
-                                        mobileNo:rowData.mobileNo,
-                                        DOB:rowData.DOB,
-                                        DOA:rowData.DOA,
-                                        status:rowData.status,
-                                    }
-                                    list.push(data)
-                                })(retailer_data[i])
-                            }
-                        }
-                    }
+                // var arr = retailer_data[i].route? retailer_data[i].route[0].split(","): "";
+                // if(arr == ""){
+                //     let beat_data = await Beat.findOne({_id:retailer_data[i].beat_id})
+                //     // let state_data = await Location.findOne({_id:retailer_data[i].state})
+                //     // let city_data = await Location.findOne({_id:retailer_data[i].city})
+                //         await (async function(rowData){
+                //             let data ={
+                //                 beat_id:beat_data.beatName,
+                //                 customer_type:rowData.customer_type,
+                //                 employee_id:emp_data.employeeName,
+                //                 company_id:rowData.company_id,
+                //                 pincode:rowData.pincode,
+                //                 address:rowData.address,
+                //                 firmName:rowData.firmName,
+                //                 GSTNo:rowData.GSTNo,
+                //                 customerName:rowData.customerName,
+                //                 location:rowData.location,
+                //                 // state:state_data.name,
+                //                 // city:city_data.name,
+                //                 // route:list2,
+                //                 mobileNo:rowData.mobileNo,
+                //                 DOB:rowData.DOB,
+                //                 DOA:rowData.DOA,
+                //                 status:rowData.status,
+                //             }
+                //             list.push(data)
+                //         })(retailer_data[i])
+                //     }else{
+                //         for (let j = 0; j < arr.length; j++) {
+                //             var route_data = await Route.findOne({ _id: arr[j] })
+                //             console.log("routedata", route_data);
+                //             let data = {
+                //                 start_point: route_data.start_point,
+                //                 end_point: route_data.end_point,
+                //                 id: route_data._id,
+                //             };
+                //             list2.push(data);
+                //             console.log(list2);
+                //             if(arr.length == j+1){
+                //                 let state_data = await Location.findOne({_id:retailer_data[i].state})
+                //                 let city_data = await Location.findOne({_id:retailer_data[i].city})
+                //                 let beat_data = await Beat.findOne({_id:retailer_data[i].beat_id})
+                //                 await (async function(rowData){
+                //                     let data ={
+                //                         beat_id:beat_data.beatName,
+                //                         customer_type:rowData.customer_type,
+                //                         employee_id:emp_data.employeeName,
+                //                         company_id:rowData.company_id,
+                //                         pincode:rowData.pincode,
+                //                         address:rowData.address,
+                //                         firmName:rowData.firmName,
+                //                         GSTNo:rowData.GSTNo,
+                //                         customerName:rowData.customerName,
+                //                         location:rowData.location,
+                //                         state:state_data.name,
+                //                         city:city_data.name,
+                //                         route:list2,
+                //                         mobileNo:rowData.mobileNo,
+                //                         DOB:rowData.DOB,
+                //                         DOA:rowData.DOA,
+                //                         status:rowData.status,
+                //                     }
+                //                     list.push(data)
+                //                 })(retailer_data[i])
+                //             }
+                //         }
+                //     }
                     countInfo++
                     if(countInfo==retailer_data.length){
                         return res.json({status:true,message:"Retailers found successfully",result:list,pageLength:Math.ceil(count.length/limit)})
