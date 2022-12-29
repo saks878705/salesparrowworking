@@ -45,12 +45,12 @@ const retailer_schema = new Schema({
     mobileNo:{
         type:String
     },
-    state:{
-        type:String
-    },
-    city:{
-        type:String
-    },
+    // state:{
+    //     type:String
+    // },
+    // city:{
+    //     type:String
+    // },
     DOB:{
         type:String
     },
