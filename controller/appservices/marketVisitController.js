@@ -248,22 +248,9 @@ router.post("/create_visit_summary", async (req, res) => {
       result: visit_data,
     });
   } else if (str == "no_order") {
-    let existing_visit_data2 = await Visit.find({
-      $and: [
-        { beat_id: beat_id },
-        { retailer_id: retailer_id },
-        { visit_date: date },
-        { emp_id: employee_id },
-        { visit_status: "NPCompleted" },
-      ],
-    });
+    let existing_visit_data2 = await Visit.find({$and: [{ beat_id: beat_id },{ retailer_id: retailer_id },{ visit_date: date },{ emp_id: employee_id },{ visit_status: "NPCompleted" },],});
     console.log(existing_visit_data2);
-    if (existing_visit_data2.length > 0)
-      return res.json({
-        status: true,
-        message: "Already completed",
-        result: [],
-      });
+    if (existing_visit_data2.length > 0) return res.json({status: true,message: "Already completed",result: [],});
     let new_visit = new Visit({
       emp_id: employee_id,
       beat_id: beat_id,
@@ -389,12 +376,21 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
       let order_data = await Order.findOne({
         retailer_id: retailer_data._id,
       }).sort({ order_date: -1 });
-      let u_data = {
-        retailer_name: retailer_data.customerName,
-        last_visit: visit_data.visit_date,
-        order_value: order_data.total_amount,
-      };
-      final_list.push(u_data);
+      if(order_data){
+        let u_data = {
+          retailer_name: retailer_data.customerName,
+          last_visit: visit_data.visit_date,
+          order_value: order_data.total_amount,
+        };
+        final_list.push(u_data);
+      }else{
+        let u_data = {
+          retailer_name: retailer_data.customerName,
+          last_visit: "NA",
+          order_value: "0",
+        };
+        final_list.push(u_data);
+      }
       // count++;
       // if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
     }
