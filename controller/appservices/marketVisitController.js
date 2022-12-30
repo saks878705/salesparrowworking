@@ -369,6 +369,9 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
           retailer_name: retailer_data.customerName,
           order_value: order_data.total_amount,
           order_status: visit_details_data[j].order_status,
+          phone:retailer_data.mobileNo,
+          lat:retailer_data.lat,
+          long:retailer_data.long,
         };
         final_list.push(u_data);
         // count++;
@@ -382,6 +385,9 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
           retailer_name: retailer_data.customerName,
           reason: visit_details_data[j].no_order_reason,
           order_status: visit_details_data[j].order_status,
+          phone:retailer_data.mobileNo,
+          lat:retailer_data.lat,
+          long:retailer_data.long,
         };
         final_list.push(u_data);
         // count++;
@@ -400,11 +406,25 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
       let order_data = await Order.findOne({
         retailer_id: retailer_data._id,
       }).sort({ order_date: -1 });
+      let total_num_of_orders =0;
+      let total_order_sum =0;
+      let average_order_value = 0
+      let all_order_details = await Order.find({retailer_id: retailer_data._id,});
+      total_num_of_orders = all_order_details.length;
+      for(let a = 0;a<all_order_details.length;a++){
+        total_order_sum += parseInt(all_order_details[a].total_amount);
+      }
+      average_order_value = Math.ceil(total_order_sum/total_num_of_orders)
       if(order_data){
         let u_data = {
           retailer_name: retailer_data.customerName,
           last_visit: visit_data.visit_date,
           order_value: order_data.total_amount,
+          last_order_date: order_data.order_date,
+          avg_amount:average_order_value,
+          phone:retailer_data.mobileNo,
+          lat:retailer_data.lat,
+          long:retailer_data.long,
         };
         final_list.push(u_data);
       }else{
@@ -418,21 +438,34 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
       // count++;
       // if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
     }else if (visit_status == "Pending") {
+      let total_num_of_orders =0;
+      let total_order_sum =0;
+      let average_order_value = 0
       let retailer_data = await Retailer.findOne({_id: visit_details_data[j].retailer_id,});
       let visit_data = await Visit.findOne({$and: [{ retailer_id: visit_details_data[j].retailer_id },{ emp_id: employee_id },{ visit_date: date }]});
       let order_data = await Order.findOne({retailer_id: retailer_data._id,}).sort({ order_date: -1 });
+      let all_order_details = await Order.find({retailer_id: retailer_data._id,});
+      total_num_of_orders = all_order_details.length;
+      for(let a = 0;a<all_order_details.length;a++){
+        total_order_sum += parseInt(all_order_details[a].total_amount);
+      }
+      average_order_value = Math.ceil(total_order_sum/total_num_of_orders)
       if(order_data){
         let u_data = {
           retailer_name: retailer_data.customerName,
           last_visit: visit_data.visit_date,
+          last_order_date:order_data.order_date,
           order_value: order_data.total_amount,
+          avg_amount:average_order_value
         };
         final_list.push(u_data);
       }else{
         let u_data = {
           retailer_name: retailer_data.customerName,
           last_visit: "NA",
+          last_order_date:"NA",
           order_value: "0",
+          avg_amount:average_order_value
         };
         final_list.push(u_data);
       }
@@ -456,24 +489,33 @@ router.post('/creating_pending_visits',async (req,res)=>{
   let beat_id = req.body.beat_id?req.body.beat_id:"";
   if(beat_id=="") return res.json({status:false,message:'Please give beat id'})
   if(retailer_id_arr==null) return res.json({status:true,message:'No pending visits',result:[]})
+  let count = 0
   for(let i = 0;i<retailer_id_arr.length;i++){
-    let new_visit = new Visit({
-      emp_id: employee_id,
+    let data = await Visit.findOne({
       beat_id: beat_id,
       retailer_id: retailer_id_arr[i],
-      visit_status: "Pending",
       visit_date: date,
-      Created_date: get_current_date(),
-      Updated_date: get_current_date(),
-      status: "Active",
-    });
-    let visit_data = await new_visit.save();
+      emp_id: employee_id,
+      visit_status: "Pending",
+    })
+    if(!data){
+      let new_visit = new Visit({
+        emp_id: employee_id,
+        beat_id: beat_id,
+        retailer_id: retailer_id_arr[i],
+        visit_status: "Pending",
+        visit_date: date,
+        Created_date: get_current_date(),
+        Updated_date: get_current_date(),
+        status: "Active",
+      });
+      let visit_data = await new_visit.save();
+    }else{
+      if(count == retailer_id_arr.length) return res.json({status:true,message:'Pending visits created successfully'});
+      continue;
+    }
+    count++
   }
-  return res.json({status:true,message:'Pending visits created successfully'})
-})
-
-router.post('/get_pending_visits',(req,res)=>{
-
 })
 
 module.exports = router;
