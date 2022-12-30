@@ -366,7 +366,10 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
           $and: [{ retailer_id: retailer_data._id }, { order_date: date }],
         });
         let u_data = {
+          retailer_id:retailer_data._id,
+          retailer_address:retailer_data.address,
           retailer_name: retailer_data.customerName,
+          retailer_firmname: retailer_data.firmName,
           order_value: order_data.total_amount,
           order_status: visit_details_data[j].order_status,
           phone:retailer_data.mobileNo,
@@ -382,6 +385,9 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
           _id: visit_details_data[j].retailer_id,
         });
         let u_data = {
+          retailer_id:retailer_data._id,
+          retailer_address:retailer_data.address,
+          retailer_firmname: retailer_data.firmName,
           retailer_name: retailer_data.customerName,
           reason: visit_details_data[j].no_order_reason,
           order_status: visit_details_data[j].order_status,
@@ -417,6 +423,9 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
       average_order_value = Math.ceil(total_order_sum/total_num_of_orders)
       if(order_data){
         let u_data = {
+          retailer_address:retailer_data.address,
+          retailer_firmname: retailer_data.firmName,
+          retailer_id:retailer_data._id,
           retailer_name: retailer_data.customerName,
           last_visit: visit_data.visit_date,
           order_value: order_data.total_amount,
@@ -429,7 +438,15 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
         final_list.push(u_data);
       }else{
         let u_data = {
+          retailer_id:retailer_data._id,
           retailer_name: retailer_data.customerName,
+          retailer_firmname: retailer_data.firmName,
+          retailer_address:retailer_data.address,
+          avg_amount:average_order_value,
+          phone:retailer_data.mobileNo,
+          lat:retailer_data.lat,
+          long:retailer_data.long,
+          last_order_date: order_data.order_date,
           last_visit: "NA",
           order_value: "0",
         };
@@ -452,7 +469,10 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
       average_order_value = Math.ceil(total_order_sum/total_num_of_orders)
       if(order_data){
         let u_data = {
+          retailer_id:retailer_data._id,
+          retailer_address:retailer_data.address,
           retailer_name: retailer_data.customerName,
+          retailer_firmname: retailer_data.firmName,
           last_visit: visit_data.visit_date,
           last_order_date:order_data.order_date,
           order_value: order_data.total_amount,
@@ -461,7 +481,10 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
         final_list.push(u_data);
       }else{
         let u_data = {
+          retailer_id:retailer_data._id,
+          retailer_address:retailer_data.address,
           retailer_name: retailer_data.customerName,
+          retailer_firmname: retailer_data.firmName,
           last_visit: "NA",
           last_order_date:"NA",
           order_value: "0",
