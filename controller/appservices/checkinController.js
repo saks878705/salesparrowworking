@@ -27,11 +27,18 @@ router.post('/check_in',async (req,res)=>{
     if(!employee) return res.json({status: false,message: "Employee not found",});
     if(employee.status == "InActive" || employee.status == "UnApproved") return res.json({status: false,message: `you are ${employee.status}. Contact company.`,});
     if(location==null) return res.json({status:false,message:"Provide the location"});
-    let today = new Date();
+    let today= new Date().toLocaleDateString("en-IN", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+    let a = today.split(",")
     let date = get_current_date().split(" ")[0];
-    var time =today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var time =a[1];
     let check =await Check.findOne({$and:[{check_in_date:date},{emp_id:employee_id}]});
-    if(check) return res.json({status:false,message:"Already checked inn"})
+    if(check) return res.json({status:false,message:"Already checked inn",result:check})
     let new_check_in = new Check({
         emp_id:employee_id,
         check_in_time:time,

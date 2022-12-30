@@ -104,19 +104,30 @@ router.post("/retailer_acc_to_beat", async (req, res) => {
   if (retailer_data.length < 1) return res.json({ status: true, message: "No data" });
   let list = []
   for (let j = 0; j < retailer_data.length; j++) {
+    let total_num_of_orders =0;
+    let total_order_sum =0;
+    let average_order_value = 0
     let order_detail = await Order.findOne({retailer_id: retailer_data[j]._id,}).sort({ order_date: -1 });
+    let all_order_details = await Order.find({retailer_id: retailer_data[j]._id,});
     if (order_detail) {
+    total_num_of_orders = all_order_details.length;
+    for(let a = 0;a<all_order_details.length;a++){
+      total_order_sum += parseInt(all_order_details[a].total_amount);
+    }
+    average_order_value = Math.ceil(total_order_sum/total_num_of_orders)
       console.log("insidde if");
       list.push({
         retailer_data: retailer_data[j],
         last_visit: order_detail.order_date,
         total_order_amount: order_detail.total_amount,
+        avg_amount:average_order_value,
       });
     } else {
       list.push({
         retailer_data: retailer_data[j],
         last_visit: "NA",
         total_order_amount: "NA",
+        avg_amount:"NA",
       });
     }
   }
