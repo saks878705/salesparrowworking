@@ -226,94 +226,112 @@ router.post("/create_visit_summary", async (req, res) => {
     return res.json({ status: false, message: "Please provide visit status" });
   let date = get_current_date().split(" ")[0];
   if (str == "visit_later") {
-    let existing_visit_data = await Visit.find({
-      $and: [
-        { beat_id: beat_id },
-        { retailer_id: retailer_id },
-        { visit_date: date },
-        { emp_id: employee_id },
-        { visit_status: "Progress" },
-      ],
-    });
-    console.log(existing_visit_data);
-    if (existing_visit_data.length > 0)
-      return res.json({
-        status: true,
-        message: "Already in progress",
-        result: [],
-      });
-    let new_visit = new Visit({
-      emp_id: employee_id,
-      beat_id: beat_id,
-      retailer_id: retailer_id,
-      visit_status: "Progress",
-      visit_date: date,
-      Created_date: get_current_date(),
-      Updated_date: get_current_date(),
-      status: "Active",
-    });
-    let visit_data = await new_visit.save();
-    return res.json({
-      status: true,
-      message: "Pending Visit",
-      result: visit_data,
-    });
+    let existing_visit_data = await Visit.findOneAndUpdate({
+         beat_id: beat_id,
+         retailer_id: retailer_id,
+         visit_date: date,
+         emp_id: employee_id,
+         visit_status: "Pending",
+      },{$set:{visit_status: "Progress"}}, {new:true});
+    // console.log(existing_visit_data);
+    // if (existing_visit_data.length > 0)
+    //   return res.json({
+    //     status: true,
+    //     message: "Already in progress",
+    //     result: [],
+    //   });
+    // let visit_data = Visit.create({
+    //   emp_id: employee_id,
+    //   beat_id: beat_id,
+    //   retailer_id: retailer_id,
+    //   visit_status: "Progress",
+    //   visit_date: date,
+    //   Created_date: get_current_date(),
+    //   Updated_date: get_current_date(),
+    //   status: "Active",
+    // });
+    return res.json({status: true,message: "Pending Visit",result: existing_visit_data,});
   } else if (str == "no_order") {
-    let existing_visit_data2 = await Visit.find({$and: [{ beat_id: beat_id },{ retailer_id: retailer_id },{ visit_date: date },{ emp_id: employee_id },{ visit_status: "NPCompleted" },],});
-    console.log(existing_visit_data2);
-    if (existing_visit_data2.length > 0) return res.json({status: true,message: "Already completed",result: [],});
-    let new_visit = new Visit({
-      emp_id: employee_id,
-      beat_id: beat_id,
-      retailer_id: retailer_id,
-      visit_status: "Completed",
-      visit_date: date,
-      no_order_reason: reason,
-      order_status: "Non-Productive",
-      Created_date: get_current_date(),
-      Updated_date: get_current_date(),
-      status: "Active",
-    });
-    let visit_data = await new_visit.save();
+    if(reason=="") return res.json({status:false,message:"Please give the reason"})
+    let existing_visit_data = await Visit.findOne({$and: [{ beat_id: beat_id },{ retailer_id: retailer_id },{ visit_date: date },{ emp_id: employee_id }]});
+    if(existing_visit_data.visit_status=="Pending"){
+      var visit_data = await Visit.findOneAndUpdate({
+        beat_id: beat_id,
+        retailer_id: retailer_id ,
+        visit_date: date ,
+        emp_id: employee_id,
+        visit_status: "Pending" 
+      },{$set:{visit_status:"Completed" ,no_order_reason:reason,order_status:"Non-Productive"}},{new:true});
+    }else if(existing_visit_data.visit_status=="Progress"){
+      var visit_data = await Visit.findOneAndUpdate({
+        beat_id: beat_id,
+        retailer_id: retailer_id ,
+        visit_date: date ,
+        emp_id: employee_id,
+        visit_status: "Progress" 
+      },{$set:{visit_status:"Completed" ,no_order_reason:reason,order_status:"Non-Productive"}},{new:true});
+    }
+    // console.log(existing_visit_data2);
+    // if (existing_visit_data2.length > 0) return res.json({status: true,message: "Already completed",result: [],});
+    // let new_visit = new Visit({
+    //   emp_id: employee_id,
+    //   beat_id: beat_id,
+    //   retailer_id: retailer_id,
+    //   visit_status: "Completed",
+    //   visit_date: date,
+    //   no_order_reason: reason,
+    //   order_status: "Non-Productive",
+    //   Created_date: get_current_date(),
+    //   Updated_date: get_current_date(),
+    //   status: "Active",
+    // });
+    // let visit_data = await new_visit.save();
     return res.json({
       status: true,
       message: "Completed Visit",
       result: visit_data,
     });
   } else if (str == "order") {
-    let existing_visit_data3 = await Visit.find({
-      $and: [
-        { beat_id: beat_id },
-        { retailer_id: retailer_id },
-        { visit_date: date },
-        { emp_id: employee_id },
-        { visit_status: "PCompleted" },
-      ],
-    });
-    console.log(existing_visit_data3);
-    if (existing_visit_data3.length > 0)
+    console.log("Inside order elseif")
+    let existing_visit_data = await Visit.findOne({$and: [{ beat_id: beat_id },{ retailer_id: retailer_id },{ visit_date: date },{ emp_id: employee_id }]});
+    console.log(existing_visit_data);
+    if(existing_visit_data.visit_status=="Pending"){
+      console.log("Inside pending if");
+      var visit_data = await Visit.findOneAndUpdate({beat_id: beat_id , retailer_id: retailer_id , visit_date: date , emp_id: employee_id ,visit_status:"Pending"},{$set:{visit_status:"Completed",order_status: "Productive",no_order_reason:""}},{new:true});
       return res.json({
-        status: true,
-        message: "Already completed",
-        result: [],
-      });
-    let new_visit = new Visit({
-      emp_id: employee_id,
-      beat_id: beat_id,
-      retailer_id: retailer_id,
-      visit_status: "Completed",
-      visit_date: date,
-      order_status: "Productive",
-      Created_date: get_current_date(),
-      Updated_date: get_current_date(),
-      status: "Active",
-    });
-    let visit_data = await new_visit.save();
-    return res.json({
       status: true,
       message: "Completed Visit",
       result: visit_data,
     });
+    }else if(existing_visit_data.visit_status=="Progress"){
+      console.log("Inside progress else if");
+      var visit_data = await Visit.findOneAndUpdate({beat_id: beat_id , retailer_id: retailer_id , visit_date: date , emp_id: employee_id ,visit_status:"Progress"},{$set:{visit_status:"Completed",order_status: "Productive",no_order_reason:""}},{new:true});
+      return res.json({
+      status: true,
+      message: "Completed Visit",
+      result: visit_data,
+    });
+    }
+    // console.log(existing_visit_data3);
+    // if (existing_visit_data3.length > 0)
+    //   return res.json({
+    //     status: true,
+    //     message: "Already completed",
+    //     result: [],
+    //   });
+    // let new_visit = new Visit({
+    //   emp_id: employee_id,
+    //   beat_id: beat_id,
+    //   retailer_id: retailer_id,
+    //   visit_status: "Completed",
+    //   visit_date: date,
+    //   order_status: "Productive",
+    //   Created_date: get_current_date(),
+    //   Updated_date: get_current_date(),
+    //   status: "Active",
+    // });
+    // let visit_data = await new_visit.save();
+
   }
 });
 
@@ -331,12 +349,7 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
   if (visit_status == "")
     return res.json({ status: false, message: "Please provide visit status" });
   let visit_details_data = await Visit.find({
-    $and: [
-      { visit_date: date },
-      { emp_id: employee_id },
-      { visit_status: visit_status },
-    ],
-  });
+  $and: [{ visit_date: date },{ emp_id: employee_id },{ visit_status: visit_status }]});
   console.log(visit_details_data);
   if (visit_details_data.length < 1)
     return res.json({ status: true, message: "No data", result: [] });
@@ -404,11 +417,63 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
       }
       // count++;
       // if(count == visit_details_data.length) return res.json({status:true,message:"Data",result:list})
+    }else if (visit_status == "Pending") {
+      let retailer_data = await Retailer.findOne({_id: visit_details_data[j].retailer_id,});
+      let visit_data = await Visit.findOne({$and: [{ retailer_id: visit_details_data[j].retailer_id },{ emp_id: employee_id },{ visit_date: date }]});
+      let order_data = await Order.findOne({retailer_id: retailer_data._id,}).sort({ order_date: -1 });
+      if(order_data){
+        let u_data = {
+          retailer_name: retailer_data.customerName,
+          last_visit: visit_data.visit_date,
+          order_value: order_data.total_amount,
+        };
+        final_list.push(u_data);
+      }else{
+        let u_data = {
+          retailer_name: retailer_data.customerName,
+          last_visit: "NA",
+          order_value: "0",
+        };
+        final_list.push(u_data);
+      }
     }
     count++;
-    if (count == visit_details_data.length)
-      return res.json({ status: true, message: "Data", result: final_list });
+    if (count == visit_details_data.length) return res.json({ status: true, message: "Data", result: final_list });
   }
 });
+
+router.post('/creating_pending_visits',async (req,res)=>{
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.json({ status: false, message: "Token is required" });
+  let x = token.split(".");
+  if (x.length < 3)
+    return res.send({ status: false, message: "Invalid token" });
+  var decodedToken = jwt.verify(token, "test");
+  var employee_id = decodedToken.user_id;
+  let date = get_current_date().split(" ")[0];
+  let retailer_id_arr = req.body.retailer_id_arr?req.body.retailer_id_arr:null;
+  let beat_id = req.body.beat_id?req.body.beat_id:"";
+  if(beat_id=="") return res.json({status:false,message:'Please give beat id'})
+  if(retailer_id_arr==null) return res.json({status:true,message:'No pending visits',result:[]})
+  for(let i = 0;i<retailer_id_arr.length;i++){
+    let new_visit = new Visit({
+      emp_id: employee_id,
+      beat_id: beat_id,
+      retailer_id: retailer_id_arr[i],
+      visit_status: "Pending",
+      visit_date: date,
+      Created_date: get_current_date(),
+      Updated_date: get_current_date(),
+      status: "Active",
+    });
+    let visit_data = await new_visit.save();
+  }
+  return res.json({status:true,message:'Pending visits created successfully'})
+})
+
+router.post('/get_pending_visits',(req,res)=>{
+
+})
 
 module.exports = router;
