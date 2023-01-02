@@ -446,7 +446,7 @@ router.post("/retailer_acc_to_visit_status", async (req, res) => {
           phone:retailer_data.mobileNo,
           lat:retailer_data.lat,
           long:retailer_data.long,
-          last_order_date: order_data.order_date,
+          last_order_date: "NA",
           last_visit: "NA",
           order_value: "0",
         };
