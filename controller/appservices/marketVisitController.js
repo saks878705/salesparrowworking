@@ -534,10 +534,11 @@ router.post('/creating_pending_visits',async (req,res)=>{
       });
       let visit_data = await new_visit.save();
     }else{
-      if(count == retailer_id_arr.length) return res.json({status:true,message:'Pending visits created successfully'});
-      continue;
+      console.log("Already exists")
+      if(count == retailer_id_arr.length-1 ) return res.json({status:true,message:'Pending visits created successfully for remaining'});
     }
     count++
+    if(count == retailer_id_arr.length) return res.json({status:true,message:'Pending visits created successfully'});
   }
 })
 
