@@ -519,8 +519,8 @@ router.post('/creating_pending_visits',async (req,res)=>{
       retailer_id: retailer_id_arr[i],
       visit_date: date,
       emp_id: employee_id,
-      visit_status: "Pending",
     })
+    console.log(data);
     if(!data){
       let new_visit = new Visit({
         emp_id: employee_id,
