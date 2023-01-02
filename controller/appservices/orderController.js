@@ -303,7 +303,8 @@ router.post('/previous_retailer_orders',async (req,res)=>{
     let id = req.body.id?req.body.id:"";
     if(id=="") return res.json({status:false,message:"Please give id ."});
     let arr = [];
-    let order_data = await Order.find({retailer_id:id}).sort({Created_date:-1});
+    let limit = 5;
+    let order_data = await Order.find({retailer_id:id}).sort({Created_date:-1}).limit(limit*1);
     if(order_data.length<1) return res.json({status:true,message:"No data",result:[]});
     for(let i = 0;i<order_data.length;i++){
         let sub_arr = [];
