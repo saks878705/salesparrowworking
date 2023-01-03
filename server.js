@@ -22,7 +22,10 @@ app.use(bodyparser.json());
 app.use("/images", express.static(__dirname + "/images"));
 
 app.get("/", (req, res) => {
-  res.status(200).send("Homepage");
+  res.status(200).json({
+    message:"Ping Successfully.",
+    time:new Date()
+  });
 });
 
 app.use("/auth_api", require("./controllers/webservice/AuthAPIController"));

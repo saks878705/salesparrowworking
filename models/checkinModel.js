@@ -6,20 +6,16 @@ const check_in_out_schema = new Schema({
         type:String
     },
     check_in_time:{
-        type:String,
-        default: ""
+        type:Date,
     },
     check_out_time:{
-        type:String,
-        default: ""
+        type:Date,
     },
     check_in_date:{
-        type:String,
-        default: ""
+        type:Date,
     },
     check_out_date:{
-        type:String,
-        default: ""
+        type:Date,
     },
     location:{
         type:Array,
