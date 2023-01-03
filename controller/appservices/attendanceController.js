@@ -53,7 +53,7 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                                 emp_id:employee_id,
                                 party_id:party,
                                 beat_id:beat,
-                                date:date,
+                                date:new Date(),
                                 activity_id:activity,
                                 selfie:base_url+req.files.selfie[0].path,
                                 location:location,
@@ -63,9 +63,10 @@ router.post('/punchAttendance',imageUpload.fields([{name:"selfie"}]),(req,res)=>
                             });
                             new_attendance.save().then(async (data)=>{
                                 if(data){
+                                    let attendance_data = await Attendance.findOne({emp_id:employee_id}).sort({Created_date:-1})
                                     let beat_data = await Beat.findOne({_id:data.beat_id});
                                     let party_data = await Party.findOne({_id:data.party_id});
-                                    let arr = [beat_data,party_data];
+                                    let arr = [beat_data,party_data,attendance_data];
                                     return res.json({
                                         status:true,
                                         message:"Attendance marked successfully",
