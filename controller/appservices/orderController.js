@@ -60,7 +60,7 @@ router.post("/get_all_product_catagory",async (req, res) => {
                     image:rowData.display_image,
                     mrp:rowData.mrp,
                     price:rowData.price,
-                    packing_details:rowData.packing_details[0]?JSON.parse(rowData.packing_details[0]):"",
+                    packing_details:rowData.packing_details[0]?JSON.parse(rowData.packing_details[0]):[],
                     status:rowData.status,
                 };
                 // console.log("hey>>",rowData.packing_details[0]);
