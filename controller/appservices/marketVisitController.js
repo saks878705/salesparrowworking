@@ -188,9 +188,7 @@ router.get("/get_todays_beat", async (req, res) => {
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   let date = get_current_date().split(" ")[0];
-  let todays_attendance_data = await Attendance.findOne({
-    $and: [{ emp_id: employee_id }, { date: date }],
-  });
+  let todays_attendance_data = await Attendance.findOne({emp_id: employee_id}).sort({Created_date:-1})
   if (!todays_attendance_data)
     return res.json({
       status: true,

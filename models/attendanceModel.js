@@ -12,7 +12,7 @@ const attendance_schema = new Schema({
         type:String
     },
     date:{
-        type:String
+        type:Date
     },
     activity_id:{
         type:String
