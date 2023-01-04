@@ -5,6 +5,8 @@ const Employee = mongoose.model("Employee");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
+
+
 function get_current_date() {
   var today = new Date();
   var dd = String(today.getDate()).padStart(2, "0");
@@ -32,7 +34,7 @@ router.post('/check_in',async (req,res)=>{
     //   month: "2-digit",
     //   day: "2-digit",
     //   hour: "2-digit",
-    //   minute: "2-digit",
+    //   minute: "2-digit",    
     // })
     // let a = today.split(",")
     let date = get_current_date().split(" ")[0];

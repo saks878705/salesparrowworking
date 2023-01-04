@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const ProductCatagory = mongoose.model("ProductCatagory");
+const Product = mongoose.model("Product");
 const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
 const multer = require("multer");
@@ -170,8 +171,9 @@ router.post("/get_all_product_catagory",async (req, res) => {
   //       if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
   //       if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
   //   }
-  let count = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]});
-  let catagory_data = await ProductCatagory.find({$and:[{company_id},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+  let count = await ProductCatagory.find({$and:[{company_id},{is_delete:"0"}]});
+  let catagory_data = await ProductCatagory.find({$and:[{company_id},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+  console.log(catagory_data);
   if(catagory_data.length>0) return res.json({status:true,message:"Catagories found.",result:catagory_data,pagelength:Math.ceil(count.length/limit)})
   if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
 });
@@ -185,9 +187,14 @@ router.delete('/delete_catagory',async (req,res)=>{
   //   console.log(i);
   //   await ProductCatagory.findOneAndUpdate({_id:sub_catagory_data[i]._id},{$set:{is_delete:"1"}});
   // }
-  ProductCatagory.findOneAndUpdate({_id:id},{$set:{is_delete:"1"}}).exec().then(()=>{
-    res.json({status:true,message:"Deleted successfully"});
-  })
+  let product_data = await Product.find({catagory_id:id})
+  if(product_data.length>0){
+    return res.json({status:false,message:"Please delete the products of this catagory"});
+  }else{
+    ProductCatagory.findOneAndUpdate({_id:id},{$set:{is_delete:"1"}}).exec().then(()=>{
+      return res.json({status:true,message:"Deleted successfully"});
+    })
+  }
 })
 
 // router.delete('/delete_sub_catagory',async (req,res)=>{
