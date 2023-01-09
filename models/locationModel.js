@@ -11,9 +11,9 @@ const location_schema = new Schema({
     P_id:{
         type:String
     },
-    subP_id:{
-        type:String
-    },
+    // subP_id:{
+    //     type:String
+    // },
     status:{
         type:String,
         default:"InActive"

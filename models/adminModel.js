@@ -63,10 +63,10 @@ var AdminSchema = new Schema({
         type:String,
         default:""
     },
-    district:{
-        type:String,
-        default:""
-    },
+    // district:{
+    //     type:String,
+    //     default:""
+    // },
     signatureImage:{
         type:String,
         default:""

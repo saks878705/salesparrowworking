@@ -29,9 +29,9 @@ const party_schema = new Schema({
     city:{
         type:String
     },
-    district:{
-        type:String
-    },
+    // district:{
+    //     type:String
+    // },
     firmName:{
         type:String
     },

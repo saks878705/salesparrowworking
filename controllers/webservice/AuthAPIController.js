@@ -286,9 +286,9 @@ router.post('/updateProfile',(req,res)=>{
         if(req.body.city){
           updated_admin.city = req.body.city;
         }
-        if(req.body.district){
-          updated_admin.district = req.body.district;
-        }
+        // if(req.body.district){
+        //   updated_admin.district = req.body.district;
+        // }
         if(req.body.GSTNo){
           updated_admin.GSTNo = req.body.GSTNo;
         }
@@ -388,62 +388,63 @@ router.get('/getadminprofile',(req,res)=>{
       console.log(admin_data)
         Location.findOne({ _id: admin_data.state }).exec().then((state_data) => {
           Location.findOne({ _id: admin_data.city }).exec().then((city_data) => {
-            if(admin_data.district==""){
-              var u_data = {
-                id:admin_data._id,
-                company_name:admin_data.company_name,
-                phone:admin_data.phone,
-                companyShortCode:`${admin_data.companyShortCode}${admin_data.companyShortCode2}`,
-                password:admin_data.password,
-                email:admin_data.email,
-                city:{name:city_data.name,id:city_data._id},
-                state:{name:state_data.name,id:state_data._id},
-                pincode:admin_data.pincode,
-                GSTNo:admin_data.GSTNo,
-                companyAddress:admin_data.companyAddress,
-                companyCatagory:admin_data.companyCatagory,
-                companyDescription:admin_data.companyDescription,
-                companyType:admin_data.companyType,
-                contactPersonName:admin_data.contactPersonName,
-                district:"",
-                signatureImage:admin_data.signatureImage,
-                profileImage:admin_data.profileImage,
-              };
-              res.status(200).json({
-                status:true,
-                message:"Get Successfully",
-                result:[u_data]
-              })
-            }else{
-              Location.findOne({ _id: admin_data.district}).exec().then(async (area_data) => {
-                  console.log("inside if");
-                  var u_data = {
-                    id:admin_data._id,
-                    company_name:admin_data.company_name,
-                    phone:admin_data.phone,
-                    password:admin_data.password,
-                    email:admin_data.email,
-                    city:{name:city_data.name,id:city_data._id},
-                    companyShortCode:`${admin_data.companyShortCode}${admin_data.companyShortCode2}`,
-                    state:{name:state_data.name,id:state_data._id},
-                    pincode:admin_data.pincode,
-                    GSTNo:admin_data.GSTNo,
-                    companyAddress:admin_data.companyAddress,
-                    companyCatagory:admin_data.companyCatagory,
-                    companyDescription:admin_data.companyDescription,
-                    companyType:admin_data.companyType,
-                    contactPersonName:admin_data.contactPersonName,
-                    district:{name:area_data.name,id:area_data._id},
-                    signatureImage:admin_data.signatureImage,
-                    profileImage:admin_data.profileImage,
-                  };
-                  res.status(200).json({
-                    status:true,
-                    message:"Get Successfully",
-                    result:[u_data]
-                  })
-                })
-              }
+            var u_data = {
+              id:admin_data._id,
+              company_name:admin_data.company_name,
+              phone:admin_data.phone,
+              companyShortCode:`${admin_data.companyShortCode}${admin_data.companyShortCode2}`,
+              password:admin_data.password,
+              email:admin_data.email,
+              city:{name:city_data.name,id:city_data._id},
+              state:{name:state_data.name,id:state_data._id},
+              pincode:admin_data.pincode,
+              GSTNo:admin_data.GSTNo,
+              companyAddress:admin_data.companyAddress,
+              companyCatagory:admin_data.companyCatagory,
+              companyDescription:admin_data.companyDescription,
+              companyType:admin_data.companyType,
+              contactPersonName:admin_data.contactPersonName,
+              district:"",
+              signatureImage:admin_data.signatureImage,
+              profileImage:admin_data.profileImage,
+            };
+            res.status(200).json({
+              status:true,
+              message:"Get Successfully",
+              result:[u_data]
+            })
+            // if(admin_data.district==""){
+              
+            // }else{
+            //   Location.findOne({ _id: admin_data.district}).exec().then(async (area_data) => {
+            //       console.log("inside if");
+            //       var u_data = {
+            //         id:admin_data._id,
+            //         company_name:admin_data.company_name,
+            //         phone:admin_data.phone,
+            //         password:admin_data.password,
+            //         email:admin_data.email,
+            //         city:{name:city_data.name,id:city_data._id},
+            //         companyShortCode:`${admin_data.companyShortCode}${admin_data.companyShortCode2}`,
+            //         state:{name:state_data.name,id:state_data._id},
+            //         pincode:admin_data.pincode,
+            //         GSTNo:admin_data.GSTNo,
+            //         companyAddress:admin_data.companyAddress,
+            //         companyCatagory:admin_data.companyCatagory,
+            //         companyDescription:admin_data.companyDescription,
+            //         companyType:admin_data.companyType,
+            //         contactPersonName:admin_data.contactPersonName,
+            //         district:{name:area_data.name,id:area_data._id},
+            //         signatureImage:admin_data.signatureImage,
+            //         profileImage:admin_data.profileImage,
+            //       };
+            //       res.status(200).json({
+            //         status:true,
+            //         message:"Get Successfully",
+            //         result:[u_data]
+            //       })
+            //     })
+            //   }
             });
         });
       });

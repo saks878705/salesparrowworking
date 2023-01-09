@@ -48,7 +48,7 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
     var headquarterCity = req.body.headquarterCity? req.body.headquarterCity: "";
     var city = req.body.city ? req.body.city : "";
     var pincode = req.body.pincode ? req.body.pincode : "";
-    var district = req.body.district ? req.body.district : "";
+    // var district = req.body.district ? req.body.district : "";
     if (employeeName != "") {
       if (phone != "") {
         if (companyShortCode != "") {
@@ -79,7 +79,7 @@ router.post( "/addEmployee", imageUpload.fields([{ name: "Employee_image" }]), (
                   companyId: admin_info._id,
                   image: base_url + req.files.Employee_image[0].path,
                   state: state,
-                  district: district,
+                  // district: district,
                   pincode: pincode,
                   Created_date: get_current_date(),
                   Updated_date: get_current_date(),
@@ -282,9 +282,9 @@ router.get("/getEmployee", (req, res) => {
             Location.findOne({ _id: employee_data.city })
               .exec()
               .then((city_data) => {
-                Location.findOne({ _id: employee_data.district })
-                  .exec()
-                  .then(async (area_data) => {
+                // Location.findOne({ _id: employee_data.district })
+                //   .exec()
+                //   .then(async (area_data) => {
                     Location.findOne({ _id: employee_data.headquarterState })
                       .exec()
                       .then(async (headquarter_state_data) => {
@@ -306,7 +306,7 @@ router.get("/getEmployee", (req, res) => {
                               state: state_data.name,
                               image: employee_data.image,
                               city: city_data.name,
-                              district: area_data.name,
+                              // district: area_data.name,
                               experience: employee_data.experience,
                               qualification: employee_data.qualification,
                               userExpenses: employee_data.userExperience,
@@ -320,7 +320,7 @@ router.get("/getEmployee", (req, res) => {
                             });
                           });
                       });
-                  });
+                  // });
               });
           });
       } else {
@@ -374,9 +374,9 @@ router.post("/profile_update", (req, res) => {
         if (req.body.city) {
           updated_emp.city = req.body.city;
         }
-        if (req.body.district) {
-          updated_emp.district = req.body.district;
-        }
+        // if (req.body.district) {
+        //   updated_emp.district = req.body.district;
+        // }
         if (req.body.pincode) {
           updated_emp.pincode = req.body.pincode;
         }
@@ -491,7 +491,7 @@ router.post("/addPartyEmp", (req, res) => {
   var pincode = req.body.pincode ? req.body.pincode : "";
   var state = req.body.state ? req.body.state : "";
   var city = req.body.city ? req.body.city : "";
-  var district = req.body.district ? req.body.district : "";
+  // var district = req.body.district ? req.body.district : "";
   var address1 = req.body.address1 ? req.body.address1 : "";
   var address2 = req.body.address2 ? req.body.address2 : "";
   var DOB = req.body.DOB ? req.body.DOB : "";
@@ -503,7 +503,7 @@ router.post("/addPartyEmp", (req, res) => {
         if (pincode != "") {
           if (city != "") {
             if (state != "") {
-              if (district != "") {
+              // if (district != "") {
                 if (address1 != "") {
                   Employee.findOne({ _id: employee_id })
                     .exec()
@@ -533,7 +533,7 @@ router.post("/addPartyEmp", (req, res) => {
                         state: state,
                         route: route,
                         city: city,
-                        district: district,
+                        // district: district,
                         address1: address1,
                         address2: address2,
                         DOB: DOB,
@@ -556,12 +556,12 @@ router.post("/addPartyEmp", (req, res) => {
                     message: "address is required",
                   });
                 }
-              } else {
-                res.json({
-                  status: false,
-                  message: "district is required",
-                });
-              }
+              // } else {
+              //   res.json({
+              //     status: false,
+              //     message: "district is required",
+              //   });
+              // }
             } else {
               res.json({
                 status: false,
@@ -618,14 +618,14 @@ router.post("/getAllPartyEmp", async (req, res) => {
         for (let i = 0; i < party_data.length; i++) {
           let state_data = await Location.findOne({ _id: party_data[i].state });
           let city_data = await Location.findOne({ _id: party_data[i].city });
-          let district_data = await Location.findOne({ _id: party_data[i].district });
+          // let district_data = await Location.findOne({ _id: party_data[i].district });
           let party_type_data = await PartyType.findOne({ _id: party_data[i].partyType });
           await (async function (rowData) {
             var u_data = {
               id: rowData._id,
               state: { name: state_data.name, id: rowData.state },
               city: { name: city_data.name, id: rowData.city },
-              district: {name: district_data.name,id: rowData.district,},
+              // district: {name: district_data.name,id: rowData.district,},
               firmName: rowData.firmName,
               party_unique_id:`${rowData.company_code}${rowData.party_code}`,
               address1: rowData.address1,
@@ -684,49 +684,59 @@ router.post('/authorizedParty',(req,res)=>{
   }
   Employee.findOne({_id:employee_id}).exec().then(emp_data=>{
     Beat.findOne({_id:beat_id}).exec().then(beat_data=>{
+      let final_arr = []
       if(!beat_data) return res.send({status:true, message:"No Beat found", result:[] }) 
       Party.find({company_id:emp_data.companyId}).exec().then(party_data=>{
         if(party_data.length<1) return res.send({status:true, message:"No party found", result:[] }) 
         let count = 0;
-        for(let i = 0;i<party_data.length;i++){
-          console.log(party_data[i])
-          console.log(party_data[i].route)
-          if(party_data[i].route==null){
-            continue;
-          }else{
-            var arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
-            if(arr==""){
-              console.log("inside first if")
-              if(count==party_data.length-1){
-                res.json({
-                  status:true,
-                  message:"No party data found",
-                  result:[]
-                })
-              }
+        let route_arr = beat_data.route;
+        console.log(route_arr);
+        for(let x = 0;x<route_arr.length;x++){
+          console.log(route_arr[x]);
+          for(let i = 0;i<party_data.length;i++){
+            console.log(party_data[i])
+            console.log(party_data[i].route)
+            if(party_data[i].route==null){
+              continue;
             }else{
-              console.log("insidde else");
-              console.log(arr.length);
-              for(let j = 0;j<arr.length;j++){
-                console.log("inside for");
-                if(arr[j]==beat_data.route_id){
-                  console.log("insidde if");
-                  return res.json({
+              var arr = party_data[i].route[0]?party_data[i].route[0].split(","):"";
+              if(arr==""){
+                console.log("inside first if")
+                if(count==party_data.length-1){
+                  res.json({
                     status:true,
-                    message:"Authorized party found",
-                    result:party_data[i]
+                    message:"No party data found",
+                    result:[]
                   })
+                }
+              }else{
+                console.log("insidde else");
+                console.log(arr.length);
+                for(let j = 0;j<arr.length;j++){
+                  console.log("inside for");
+                  if(arr[j]==route_arr[x]){
+                    console.log("insidde if");
+                    final_arr.push(party_data[i])
+                  }
                 }
               }
             }
           }
           count++;
+          if(final_arr==[]){
+            return res.json({
+              status:true,
+              message:"Authorized party not found",
+              result:[]
+            })
+          }else{
+            return res.json({
+              status:true,
+              message:"Authorized parties found",
+              result:final_arr
+            }) 
+          }
         }
-          return res.json({
-            status:true,
-            message:"Authorized party not found",
-            result:[]
-          })
       })
     })
   })
@@ -747,9 +757,9 @@ router.post("/getParty", (req, res) => {
               Location.findOne({ _id: party_data.city })
                 .exec()
                 .then((city_data) => {
-                  Location.findOne({ _id: party_data.district })
-                    .exec()
-                    .then((district_data) => {
+                  // Location.findOne({ _id: party_data.district })
+                  //   .exec()
+                  //   .then((district_data) => {
                       PartyType.findOne({ _id: party_data.partyType })
                         .exec()
                         .then((party_type_data) => {
@@ -766,10 +776,10 @@ router.post("/getParty", (req, res) => {
                             id: party_data.state,
                           },
                           city: { name: city_data.name, id: party_data.city },
-                          district: {
-                            name: district_data.name,
-                            id: party_data.district,
-                          },
+                          // district: {
+                          //   name: district_data.name,
+                          //   id: party_data.district,
+                          // },
                           firmName: party_data.firmName,
                           party_unique_id:`${rowData.company_code}${rowData.party_code}`,
                           address1: party_data.address1,
@@ -799,8 +809,7 @@ router.post("/getParty", (req, res) => {
                             .then((route_data) => {
                               console.log("routedata", route_data);
                               let data = {
-                                start_point: route_data.start_point,
-                                end_point: route_data.end_point,
+                                route_name:route_data.route_name,
                                 id: route_data._id,
                               };
                               list.push(data);
@@ -816,10 +825,10 @@ router.post("/getParty", (req, res) => {
                                     name: city_data.name,
                                     id: party_data.city,
                                   },
-                                  district: {
-                                    name: district_data.name,
-                                    id: party_data.district,
-                                  },
+                                  // district: {
+                                  //   name: district_data.name,
+                                  //   id: party_data.district,
+                                  // },
                                   firmName: party_data.firmName,
                                   party_unique_id:`${rowData.company_code}${rowData.party_code}`,
                                   address1: party_data.address1,
@@ -846,7 +855,7 @@ router.post("/getParty", (req, res) => {
                         }
                       }
                     });
-                  })
+                  // })
                 });
             });
         } else {
@@ -885,13 +894,13 @@ router.post("/addBeatEmp", (req, res) => {
   var state = req.body.state ? req.body.state : "";
   var city = req.body.city ? req.body.city : "";
   var day = req.body.day ? req.body.day : "";
-  var route_id = req.body.route_id ? req.body.route_id : "";
+  var route_id_arr = req.body.route_id_arr ? req.body.route_id_arr : null;
   if (state != "") {
     if (city != "") {
       if (beatName != "") {
         if (employee_id != "") {
           if (day != "") {
-            if (route_id != "") {
+            if (route_id_arr != null) {
               Employee.findOne({ _id: employee_id }).exec().then((emp_data) => {
                   Beat.find({ beatName: beatName }).exec().then((beat_info) => {
                       if (beat_info.length < 1) {
@@ -902,7 +911,7 @@ router.post("/addBeatEmp", (req, res) => {
                           state: state,
                           city: city,
                           company_id: emp_data.companyId,
-                          route_id: route_id,
+                          route: route_id_arr,
                           Created_date: get_current_date(),
                           Updated_date: get_current_date(),
                           status: "UnApproved",
@@ -926,7 +935,7 @@ router.post("/addBeatEmp", (req, res) => {
             } else {
               return res.json({
                 status: false,
-                message: "Route id is required",
+                message: "Routes are required",
               });
             }
           } else {
@@ -980,60 +989,61 @@ router.post("/getAllBeat", async (req, res) => {
   }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
-  Beat.find({ employee_id }).sort({"status":-1}).limit(limit * 1).skip((page - 1) * limit).sort({ Created_date: -1 }).exec().then((beat_data) => {
+  Beat.find({ employee_id }).sort({"status":-1}).limit(limit * 1).skip((page - 1) * limit).sort({ Created_date: -1 }).exec().then(async (beat_data) => {
       let counInfo = 0;
       if (beat_data.length > 0) {
         for (let i = 0; i < beat_data.length; i++) {
-          Employee.findOne({ _id: beat_data[i].employee_id }).exec().then((emp_data) => {
-              if (!emp_data) {
-                res.json({
-                  status: true,
-                  message: "No employee found",
-                });
-              }
-              console.log(beat_data[i].employee_id);
-              Route.findOne({ _id: beat_data[i].route_id }).exec().then((route_data) => {
-                  Location.findOne({ _id: beat_data[i].state }).exec().then((state_data) => {
-                      Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
-                          await (async function (rowData) {
-                            var u_data = {
-                              id: rowData._id,
-                              state: {
-                                name: state_data.name,
-                                id: beat_data[i].state,
-                              },
-                              city: {
-                                name: city_data.name,
-                                id: beat_data[i].city,
-                              },
-                              employee_name: emp_data.employeeName,
-                              route_name: {
-                                start_point: route_data.start_point,
-                                end_point: route_data.end_point,
-                              },
-                              beatName: rowData.beatName,
-                              day: rowData.day,
-                              status: rowData.status,
-                            };
-                            list.push(u_data);
-                          })(beat_data[i]);
-                          counInfo++;
-                          if (counInfo == beat_data.length) {
-                            let c = Math.ceil(count.length / limit);
-                            if (c == 0) {
-                              c += 1;
-                            }
-                            res.json({
-                              status: true,
-                              message: "All Beats found successfully",
-                              result: list,
-                              pageLength: c,
-                            });
-                          }
-                        });
-                    });
-                });
+          let emp_data = await Employee.findOne({ _id: beat_data[i].employee_id })
+          if (!emp_data) {
+            res.json({
+              status: true,
+              message: "No employee found",
             });
+          }
+          console.log(beat_data[i].employee_id);
+          let list2 = beat_data[i].route
+            let arr = [];
+            for(let x = 0;x<list2.length;x++){
+              var route_data = await Route.findOne({_id: list2[x]});
+              let u_data = {
+                route_name:route_data.route_name,
+              }
+              arr.push(u_data);
+            }
+          let state_data = await Location.findOne({ _id: beat_data[i].state })
+          let city_data = await Location.findOne({ _id: beat_data[i].city })
+          await (async function (rowData) {
+            var u_data = {
+              id: rowData._id,
+              state: {
+                name: state_data.name,
+                id: beat_data[i].state,
+              },
+              city: {
+                name: city_data.name,
+                id: beat_data[i].city,
+              },
+              employee_name: emp_data.employeeName,
+              route:arr,
+              beatName: rowData.beatName,
+              day: rowData.day,
+              status: rowData.status,
+            };
+            list.push(u_data);
+          })(beat_data[i]);
+          counInfo++;
+          if (counInfo == beat_data.length) {
+            let c = Math.ceil(count.length / limit);
+            if (c == 0) {
+              c += 1;
+            }
+            res.json({
+              status: true,
+              message: "All Beats found successfully",
+              result: list,
+              pageLength: c,
+            });
+          }
         }
       } else {
         return res.json({
@@ -1061,92 +1071,56 @@ router.post("/beatListing", async (req, res) => {
   }
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
-  Beat.find({ employee_id }).sort({ Created_date: -1 }).exec().then((beat_data) => {
+  Beat.find({ employee_id }).sort({ Created_date: -1 }).exec().then(async (beat_data) => {
       let counInfo = 0;
       if (beat_data.length > 0) {
         for (let i = 0; i < beat_data.length; i++) {
-          Employee.findOne({ _id: beat_data[i].employee_id }).exec().then((emp_data) => {
-              if (!emp_data) {
-                res.json({
-                  status: true,
-                  message: "No employee found",
-                });
-              }
-              console.log(beat_data[i].employee_id);
-              Route.findOne({ _id: beat_data[i].route_id }).exec().then((route_data) => {
-                if(route_data){
-                  Location.findOne({ _id: beat_data[i].state }).exec().then((state_data) => {
-                    Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
-                        await (async function (rowData) {
-                          var u_data = {
-                            id: rowData._id,
-                            state: {
-                              name: state_data.name,
-                              id: beat_data[i].state,
-                            },
-                            city: {
-                              name: city_data.name,
-                              id: beat_data[i].city,
-                            },
-                            employee_name: emp_data.employeeName,
-                            route_name: {
-                              start_point: route_data.start_point,
-                              end_point: route_data.end_point,
-                            },
-                            beatName: rowData.beatName,
-                            day: rowData.day,
-                            status: rowData.status,
-                          };
-                          list.push(u_data);
-                        })(beat_data[i]);
-                        counInfo++;
-                        if (counInfo == beat_data.length) {
-                          res.json({
-                            status: true,
-                            message: "All Beats found successfully",
-                            result: list,
-                          });
-                        }
-                      });
-                  });
-                }else{
-                  Location.findOne({ _id: beat_data[i].state }).exec().then((state_data) => {
-                    Location.findOne({ _id: beat_data[i].city }).exec().then(async (city_data) => {
-                        await (async function (rowData) {
-                          var u_data = {
-                            id: rowData._id,
-                            state: {
-                              name: state_data.name,
-                              id: beat_data[i].state,
-                            },
-                            city: {
-                              name: city_data.name,
-                              id: beat_data[i].city,
-                            },
-                            employee_name: emp_data.employeeName,
-                            route_name: {
-                              start_point: "",
-                              end_point: "",
-                            },
-                            beatName: rowData.beatName,
-                            day: rowData.day,
-                            status: rowData.status,
-                          };
-                          list.push(u_data);
-                        })(beat_data[i]);
-                        counInfo++;
-                        if (counInfo == beat_data.length) {
-                          res.json({
-                            status: true,
-                            message: "All Beats found successfully",
-                            result: list,
-                          });
-                        }
-                      });
-                  });
-                }
-                });
+          let emp_data = await Employee.findOne({ _id: beat_data[i].employee_id })
+          if (!emp_data) {
+            res.json({
+              status: true,
+              message: "No employee found",
             });
+          }
+          console.log(beat_data[i].employee_id);
+            let list2 = beat_data[i].route
+            let arr = [];
+            for(let x = 0;x<list2.length;x++){
+              var route_data = await Route.findOne({_id: list2[x]});
+              let u_data = {
+                route_name:route_data.route_name,
+              }
+              arr.push(u_data);
+            }
+            let state_data = await Location.findOne({ _id: beat_data[i].state })
+            let city_data = await Location.findOne({ _id: beat_data[i].city })
+            await (async function (rowData) {
+              var u_data = {
+                id: rowData._id,
+                state: {
+                  name: state_data.name,
+                  id: beat_data[i].state,
+                },
+                city: {
+                  name: city_data.name,
+                  id: beat_data[i].city,
+                },
+                employee_name: emp_data.employeeName,
+                route:arr,
+                beatName: rowData.beatName,
+                day: rowData.day,
+                status: rowData.status,
+              };
+              list.push(u_data);
+            })(beat_data[i]);
+            counInfo++;
+            if (counInfo == beat_data.length) {
+              res.json({
+                status: true,
+                message: "All Beats found successfully",
+                result: list,
+              });
+            }
         }
       } else {
         return res.json({
@@ -1158,54 +1132,44 @@ router.post("/beatListing", async (req, res) => {
     });
 });
 
-router.post("/getBeat", (req, res) => {
+router.post("/getBeat", async (req, res) => {
   var id = req.body.id ? req.body.id : "";
-  Beat.findOne({ _id: id })
-    .exec()
-    .then((beat_data) => {
-      if (beat_data) {
-        Location.findOne({ _id: beat_data.state })
-          .exec()
-          .then((state_data) => {
-            Location.findOne({ _id: beat_data.city })
-              .exec()
-              .then((city_data) => {
-                Employee.findOne({ _id: beat_data.employee_id })
-                  .exec()
-                  .then((emp_data) => {
-                    Route.findOne({ _id: beat_data.route_id })
-                      .exec()
-                      .then((route_data) => {
-                        var u_data = {
-                          id: beat_data._id,
-                          state: { name: state_data.name, id: beat_data.state },
-                          city: { name: city_data.name, id: beat_data.city },
-                          employee_name: emp_data.employeeName,
-                          route_name: {
-                            start_point: route_data.start_point,
-                            end_point: route_data.end_point,
-                          },
-                          day: beat_data.day,
-                          beatName: beat_data.beatName,
-                          status: beat_data.status,
-                        };
-                        res.json({
-                          status: true,
-                          message: "data fetched",
-                          result: [u_data],
-                        });
-                      });
-                  });
-              });
-          });
-      } else {
-        res.json({
-          status: false,
-          message: "Beat not found",
-          result: [],
-        });
+  let beat_data = await Beat.findOne({ _id: id })
+  if (beat_data) {
+    let state_data = await Location.findOne({ _id: beat_data.state })
+    let city_data = await Location.findOne({ _id: beat_data.city })
+    let emp_data = await Employee.findOne({ _id: beat_data.employee_id })
+    let list2 = beat_data[i].route
+    let arr = [];
+    for(let x = 0;x<list2.length;x++){
+      var route_data = await Route.findOne({_id: list2[x]});
+      let u_data = {
+        route_name:route_data.route_name,
       }
-    });
+      arr.push(u_data);
+    }
+    var u_data = {
+      id: beat_data._id,
+      state: { name: state_data.name, id: beat_data.state },
+      city: { name: city_data.name, id: beat_data.city },
+      employee_name: emp_data.employeeName,
+      route:arr,
+      day: beat_data.day,
+      beatName: beat_data.beatName,
+      status: beat_data.status,
+    };
+    res.json({
+      status: true,
+      message: "data fetched",
+      result: [u_data],
+    });                     
+  } else {
+      res.json({
+        status: false,
+        message: "Beat not found",
+        result: [],
+      });
+    }
 });
 
 router.post("/editBeat", (req, res) => {
@@ -1228,8 +1192,8 @@ router.post("/editBeat", (req, res) => {
           if (req.body.city) {
             updated_beat.city = req.body.city;
           }
-          if (req.body.route_id) {
-            updated_beat.route_id = req.body.route_id;
+          if (req.body.route_id_arr) {
+            updated_beat.route = req.body.route_id_arr;
           }
           updated_beat.Updated_date = get_current_date();
           Beat.findOneAndUpdate(
@@ -1281,12 +1245,13 @@ router.post("/addRoute", (req, res) => {
   var state = req.body.state ? req.body.state : "";
   var distance = req.body.distance ? req.body.distance : "";
   var city = req.body.city ? req.body.city : "";
-  var area = req.body.area ? req.body.area : "";
+  var route_name = req.body.route_name ? req.body.route_name : "";
+  // var area = req.body.area ? req.body.area : "";
   var start_point = req.body.start_point ? req.body.start_point : "";
   var end_point = req.body.end_point ? req.body.end_point : "";
   if (state != "") {
     if (city != "") {
-      if (area != "") {
+      // if (area != "") {
         if (start_point != "") {
           if (end_point != "") {
             Employee.findOne({ _id: employee_id })
@@ -1302,7 +1267,7 @@ router.post("/addRoute", (req, res) => {
                   var new_route = new Route({
                     state: state,
                     city: city,
-                    area: area,
+                    route_name: route_name,
                     distance: distance,
                     start_point: start_point,
                     company_id: emp_data.companyId,
@@ -1332,12 +1297,12 @@ router.post("/addRoute", (req, res) => {
             message: "Starting point  is required.",
           });
         }
-      } else {
-        res.json({
-          status: false,
-          message: "Area is required.",
-        });
-      }
+      // } else {
+      //   res.json({
+      //     status: false,
+      //     message: "Area is required.",
+      //   });
+      // }
     } else {
       res.json({
         status: false,
@@ -1495,9 +1460,9 @@ router.post("/routeListing", (req, res) => {
                   Location.findOne({ _id: route_data[i].city })
                     .exec()
                     .then((city_data) => {
-                      Location.findOne({ _id: route_data[i].area })
-                        .exec()
-                        .then(async (area_data) => {
+                      // Location.findOne({ _id: route_data[i].area })
+                      //   .exec()
+                      //   .then(async (area_data) => {
                           await (async function (rowData) {
                             var u_data = {
                               id: rowData._id,
@@ -1509,10 +1474,7 @@ router.post("/routeListing", (req, res) => {
                                 name: city_data.name,
                                 id: rowData.city,
                               },
-                              area: {
-                                name: area_data.name,
-                                id: rowData.area,
-                              },
+                              route_name:rowData.route_name,
                               start_point: rowData.start_point,
                               distance: rowData.distance,
                               end_point: rowData.end_point,
@@ -1527,7 +1489,7 @@ router.post("/routeListing", (req, res) => {
                               result: list,
                             });
                           }
-                        });
+                        // });
                     });
                 });
             }
@@ -1552,8 +1514,8 @@ router.post("/edit_route", (req, res) => {
     if (req.body.city) {
       updated_route.city = req.body.city;
     }
-    if (req.body.area) {
-      updated_route.area = req.body.area;
+    if (req.body.route_name) {
+      updated_route.route_name = req.body.route_name;
     }
     if (req.body.distance) {
       updated_route.distance = req.body.distance;

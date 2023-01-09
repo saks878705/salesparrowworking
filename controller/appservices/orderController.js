@@ -337,20 +337,21 @@ router.post('/previous_retailer_orders',async (req,res)=>{
     return res.json({status:true,message:"Found successfully",result:arr}); 
 });
 
-// router.post('/view_retailer_todays_order',async (req,res)=>{
-//     const authHeader = req.headers["authorization"];
-//     const token = authHeader && authHeader.split(" ")[1];
-//     if (!token) return res.json({ status: false, message: "Token is required" });
-//     let x = token.split(".");
-//     if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
-//     var decodedToken = jwt.verify(token, "test");
-//     var employee_id = decodedToken.user_id;
-//     let id = req.body.id?req.body.id:"";
-//     if(id == "") return res.json({status:false,message:"Please provide the retailer id"});
-//     let date = get_current_date().split(" ")[0];
-//     let retailer_todays_order_data = await Order.findOne({$and:[{emp_id:employee_id},{retailer_id:id},{order_date:date}]});
-//     if(!retailer_todays_order_data) return res.json({status:false,message:"First place order",result:[]})
-//     return res.json({status:true,message:"Order data",result:retailer_todays_order_data})
-// })
+router.post('/view_retailer_todays_order',async (req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) return res.json({ status: false, message: "Token is required" });
+    let x = token.split(".");
+    if (x.length < 3) return res.send({ status: false, message: "Invalid token" });
+    var decodedToken = jwt.verify(token, "test");
+    var employee_id = decodedToken.user_id;
+    let id = req.body.id?req.body.id:"";
+    if(id == "") return res.json({status:false,message:"Please provide the retailer id"});
+    let date = get_current_date().split(" ")[0];
+    let retailer_todays_order_data = await Order.findOne({$and:[{emp_id:employee_id},{retailer_id:id},{order_date:date}]});
+    let order_item_data = await OrderItem.find({order_id:retailer_todays_order_data._id})
+    if(!retailer_todays_order_data) return res.json({status:false,message:"First place order",result:[]})
+    return res.json({status:true,message:"Order data",result:retailer_todays_order_data,order_item_data})
+})
 
 module.exports = router;

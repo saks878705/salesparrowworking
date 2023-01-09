@@ -90,16 +90,14 @@ router.post("/retailer_acc_to_beat", async (req, res) => {
     return res.json({ status: false, message: "No employee data" });
   let id = req.body.id ? req.body.id : "";
   if (id == "") return res.json({ status: false, message: "Please give id" });
-  let beat_data = await Beat.findOne({ _id: id });
-  // console.log("beat_data",beat_data)
-  if (!beat_data)
-    return res.json({
-      status: false,
-      message: "No beat data. Please check id",
-    });
-  let retailer_data = await Retailer.find({
-    $and: [{ beat_id: id }, { company_id: emp_data.companyId }],
-  });
+  // let beat_data = await Beat.findOne({ _id: id });
+  // // console.log("beat_data",beat_data)
+  // if (!beat_data)
+  //   return res.json({
+  //     status: false,
+  //     message: "No beat data. Please check id",
+  //   });
+  let retailer_data = await Retailer.find({route_id: id,company_id: emp_data.companyId});
   // console.log("party_data",party_data.length)
   if (retailer_data.length < 1) return res.json({ status: true, message: "No data" });
   let list = []
@@ -195,9 +193,20 @@ router.get("/get_todays_beat", async (req, res) => {
       message: "Not punched attendance for today.",
     });
   let beat_data = await Beat.findOne({ _id: todays_attendance_data.beat_id });
-  if (!beat_data)
+  if (!beat_data){
     return res.json({ status: true, message: "Beat data not found" });
-  return res.json({ status: true, message: "data found", result: beat_data });
+  }else{
+    let list2 = beat_data.route
+    let arr = [];
+    for(let x = 0;x<list2.length;x++){
+      var route_data = await Route.findOne({_id: list2[x]});
+      let u_data = {
+        route_name:route_data.route_name,
+      }
+      arr.push(u_data);
+    }
+    return res.json({ status: true, message: "data found", result: beat_data,arr });
+  }
 });
 
 router.post("/create_visit_summary", async (req, res) => {

@@ -47,7 +47,7 @@ router.post("/addSubAdmin",imageUpload.fields([{name:"subAdmin_image"}]), (req, 
   var role = req.body.role ? req.body.role : "";
   var state = req.body.state ? req.body.state : "";
   var city = req.body.city ? req.body.city : "";
-  var district = req.body.district ? req.body.district : "";
+  // var district = req.body.district ? req.body.district : "";
   var phone = req.body.phone ? req.body.phone : "";
   var password = req.body.password ? req.body.password : "";
   var pincode = req.body.pincode ? req.body.pincode : "";
@@ -69,7 +69,7 @@ router.post("/addSubAdmin",imageUpload.fields([{name:"subAdmin_image"}]), (req, 
                       city: city,
                       pincode: pincode,
                       image:base_url + req.files.subAdmin_image[0].path,
-                      district: district,
+                      // district: district,
                       email: email,
                       company_id:company_id,
                       role:role,
@@ -219,7 +219,7 @@ router.get('/getAllSubAdmins',async (req,res)=>{
       for(let i=0;i<subadmin_data.length;i++){
         Location.findOne({ _id: subadmin_data[i].state }).exec().then((state_data) => {
           Location.findOne({ _id: subadmin_data[i].city }).exec().then((city_data) => {
-              Location.findOne({ _id: subadmin_data[i].district }).exec().then(async (area_data) => {
+              // Location.findOne({ _id: subadmin_data[i].district }).exec().then(async (area_data) => {
                 await (async function (rowData) {
                   var u_data = {
                     id:rowData._id,
@@ -232,7 +232,7 @@ router.get('/getAllSubAdmins',async (req,res)=>{
                     state: state_data.name,
                     image: rowData.image,
                     city: city_data.name,
-                    district: area_data.name,
+                    // district: area_data.name,
                   };
                   list.push(u_data);
                 })(subadmin_data[i]);
@@ -245,7 +245,7 @@ router.get('/getAllSubAdmins',async (req,res)=>{
                     pageLength:Math.ceil(count.length/limit)
                   })
                 }
-                });
+                // });
             });
         });
     }

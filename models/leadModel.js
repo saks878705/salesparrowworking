@@ -20,9 +20,9 @@ const lead_model = new Schema({
     state:{
         type:String
     },
-    district:{
-        type:String
-    },
+    // district:{
+    //     type:String
+    // },
     city:{
         type:String
     },

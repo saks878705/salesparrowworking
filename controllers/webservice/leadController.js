@@ -20,7 +20,7 @@ router.post('/addLead',(req,res)=>{
     var email = req.body.email?req.body.email:"";
     var pincode = req.body.pincode?req.body.pincode:"";
     var state = req.body.state?req.body.state:"";
-    var district = req.body.district?req.body.district:"";
+    // var district = req.body.district?req.body.district:"";
     var city = req.body.city?req.body.city:"";
     var leadSource = req.body.leadSource?req.body.leadSource:"";
     var addBy = req.body.addBy?req.body.addBy:"";
@@ -32,7 +32,6 @@ router.post('/addLead',(req,res)=>{
             if (email != "") {
               if (state != "") {
                 if (city != "") {
-                    if (district != "") {
                         if (leadSource != "") {
                           if (addBy != "") {
                             if (assignToEmp != "") {
@@ -43,7 +42,7 @@ router.post('/addLead',(req,res)=>{
                                     email:email,
                                     pincode:pincode,
                                     state:state,
-                                    district:district,
+                                    // district:district,
                                     city:city,
                                     leadSource:leadSource,
                                     addBy:addBy,
@@ -81,13 +80,6 @@ router.post('/addLead',(req,res)=>{
                             results: null,
                           });
                         }
-                      } else {
-                        return res.json({
-                          status: false,
-                          message: "district is required",
-                          results: null,
-                        });
-                      }
 
                 } else {
                     return res.json({

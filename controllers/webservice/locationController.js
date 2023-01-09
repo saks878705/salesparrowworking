@@ -17,14 +17,14 @@ router.post('/addLocation',(req,res)=>{
     var name = req.body.name?req.body.name:"";
     var p_id = req.body.p_id?req.body.p_id:"";
     // var superp_id = req.body.superp_id?req.body.superp_id:"";
-    var subp_id = req.body.subp_id?req.body.subp_id:"";
+    // var subp_id = req.body.subp_id?req.body.subp_id:"";
     if(name!=""){
-        Location.find({$and:[{name:name},{P_id:p_id},{subP_id:subp_id}]}).exec().then(location_data=>{
+        Location.find({$and:[{name:name},{P_id:p_id}]}).exec().then(location_data=>{
             if(location_data.length<1){
                 var new_location = new Location({
                     name:name,
                     P_id:p_id,
-                    subP_id:subp_id,
+                    // subP_id:subp_id,
                     // superp_id:superp_id,
                     status:"Active",
                     Created_date:get_current_date(),
@@ -56,29 +56,22 @@ router.post('/addLocation',(req,res)=>{
 router.get('/getLocation',(req,res)=>{
     console.log(req.query);
     var p_id = req.query.p_id?req.query.p_id:"";
-    var subp_id = req.query.subp_id?req.query.subp_id:"";
-    if(p_id=="" && subp_id==""){
-        Location.find({$and:[{P_id:""},{subP_id:""}]}).exec().then(state_data=>{
+    // var subp_id = req.query.subp_id?req.query.subp_id:"";
+
+    if(p_id==""){
+        Location.find({P_id:""}).exec().then(state_data=>{
             res.json({
                 status:true,
                 message:"States get successfully",
                 result:state_data
             });
         });
-    }else if(p_id!="" && subp_id==""){
-        Location.find({$and:[{P_id:p_id},{subP_id:""}]}).exec().then(city_data=>{
+    }else if(p_id!=""){
+        Location.find({P_id:p_id}).exec().then(city_data=>{
             res.json({
                 status:true,
                 message:"City data fetch successfully",
                 result:city_data
-            });
-        });
-    }else if(p_id!="" && subp_id!=""){
-        Location.find({$and:[{P_id:p_id},{subP_id:subp_id}]}).exec().then(area_data=>{
-            res.json({
-                status:true,
-                message:"Area data fetch successfully",
-                result:area_data
             });
         });
     }

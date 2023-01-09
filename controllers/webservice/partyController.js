@@ -57,7 +57,7 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
     var pincode = req.body.pincode ? req.body.pincode : "";
     var state = req.body.state ? req.body.state : "";
     var city = req.body.city ? req.body.city : "";
-    var district = req.body.district ? req.body.district : "";
+    // var district = req.body.district ? req.body.district : "";
     var address1 = req.body.address1 ? req.body.address1 : "";
     var address2 = req.body.address2 ? req.body.address2 : "";
     var DOB = req.body.DOB ? req.body.DOB : "";
@@ -69,7 +69,6 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
           if (pincode != "") {
             if (city != "") {
               if (state != "") {
-                if (district != "") {
                   if (address1 != "") {
                     let company = await Admin.findOne({_id:company_id});
                     var party_data = await Party.findOne({company_id:company._id}).sort({party_code:-1});
@@ -96,7 +95,7 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
                       state: state,
                       route: route,
                       city: city,
-                      district: district,
+                      // district: district,
                       address1: address1,
                       address2: address2,
                       DOB: DOB,
@@ -118,12 +117,6 @@ router.post("/addParty",imageUpload.fields([{ name: "Party_image" }]),async (req
                       message: "address is required",
                     });
                   }
-                } else {
-                  res.json({
-                    status: false,
-                    message: "district is required",
-                  });
-                }
               } else {
                 res.json({
                   status: false,
@@ -195,9 +188,9 @@ router.post("/editParty", (req, res) => {
         if (req.body.DOB) {
           updated_party.DOB = req.body.DOB;
         }
-        if (req.body.district) {
-          updated_party.district = req.body.district;
-        }
+        // if (req.body.district) {
+        //   updated_party.district = req.body.district;
+        // }
         if (req.body.DOA) {
           updated_party.DOA = req.body.DOA;
         }
@@ -282,9 +275,9 @@ router.post("/getAllParty", async (req, res) => {
               var city_data = await Location.findOne({
                 _id: party_data[i].city,
               });
-              var district_data = await Location.findOne({
-                _id: party_data[i].district,
-              });
+              // var district_data = await Location.findOne({
+              //   _id: party_data[i].district,
+              // });
               var party_type_data = await PartyType.findOne({
                 _id: party_data[i].partyType,
               });
@@ -292,10 +285,10 @@ router.post("/getAllParty", async (req, res) => {
                 id: rowData._id,
                 state: { name: state_data.name, id: rowData.state },
                 city: { name: city_data.name, id: rowData.city },
-                district: {
-                  name: district_data.name,
-                  id: rowData.district,
-                },
+                // district: {
+                //   name: district_data.name,
+                //   id: rowData.district,
+                // },
                 firmName: rowData.firmName,
                 partyType: party_type_data.party_type,
                 partyid:`${rowData.company_code}${rowData.party_code}`,
@@ -337,9 +330,9 @@ router.post("/getAllParty", async (req, res) => {
               var city_data = await Location.findOne({
                 _id: party_data[i].city,
               });
-              var district_data = await Location.findOne({
-                _id: party_data[i].district,
-              });
+              // var district_data = await Location.findOne({
+              //   _id: party_data[i].district,
+              // });
               var party_type_data = await PartyType.findOne({
                 _id: party_data[i].partyType,
               });
@@ -348,8 +341,7 @@ router.post("/getAllParty", async (req, res) => {
               var route_data = await Route.findOne({ _id: arr[j] })
                   console.log("routedata", route_data);
                   let data = {
-                    start_point: route_data.start_point,
-                    end_point: route_data.end_point,
+                    route_name:route_data.route_name,
                     id: route_data._id,
                   };
                   list2.push(data);
@@ -368,10 +360,10 @@ router.post("/getAllParty", async (req, res) => {
                           name: city_data.name,
                           id: rowData.city,
                         },
-                        district: {
-                          name: district_data.name,
-                          id: rowData.district,
-                        },
+                        // district: {
+                        //   name: district_data.name,
+                        //   id: rowData.district,
+                        // },
                         firmName: rowData.firmName,
                         partyType: party_type_data.party_type,
                         pincode: rowData.pincode,
@@ -425,7 +417,7 @@ router.post("/getParty", (req, res) => {
         if (party_data) {
           Location.findOne({ _id: party_data.state }).exec().then((state_data) => {
               Location.findOne({ _id: party_data.city }).exec().then((city_data) => {
-                  Location.findOne({ _id: party_data.district }).exec().then((district_data) => {
+                  // Location.findOne({ _id: party_data.district }).exec().then((district_data) => {
                       PartyType.findOne({ _id: party_data.partyType }).exec().then((party_type_data) => {
                       //console.log(party_data.route[0])
                       var arr = party_data.route? party_data.route[0].split(","): "";
@@ -438,10 +430,10 @@ router.post("/getParty", (req, res) => {
                             id: party_data.state,
                           },
                           city: { name: city_data.name, id: party_data.city },
-                          district: {
-                            name: district_data.name,
-                            id: party_data.district,
-                          },
+                          // district: {
+                          //   name: district_data.name,
+                          //   id: party_data.district,
+                          // },
                           firmName: party_data.firmName,
                           partyid:`${party_data.company_code}${party_data.party_code}`,
                           address1: party_data.address1,
@@ -471,8 +463,7 @@ router.post("/getParty", (req, res) => {
                             .then((route_data) => {
                               console.log("routedata", route_data);
                               let data = {
-                                start_point: route_data.start_point,
-                                end_point: route_data.end_point,
+                                route_name:route_data.route_name,
                                 id: route_data._id,
                               };
                               list.push(data);
@@ -488,10 +479,10 @@ router.post("/getParty", (req, res) => {
                                     name: city_data.name,
                                     id: party_data.city,
                                   },
-                                  district: {
-                                    name: district_data.name,
-                                    id: party_data.district,
-                                  },
+                                  // district: {
+                                  //   name: district_data.name,
+                                  //   id: party_data.district,
+                                  // },
                                   firmName: party_data.firmName,
                                   partyid:`${party_data.company_code}${party_data.party_code}`,
                                   address1: party_data.address1,
@@ -518,7 +509,7 @@ router.post("/getParty", (req, res) => {
                         }
                       }
                     })
-                    });
+                    // });
                 });
             });
         } else {
@@ -633,9 +624,9 @@ router.post(
             Location.findOne({ name: xlData[i].City })
               .exec()
               .then((city_data) => {
-                Location.findOne({ name: xlData[i].District })
-                  .exec()
-                  .then((area_data) => {
+                // Location.findOne({ name: xlData[i].District })
+                //   .exec()
+                //   .then((area_data) => {
                     var new_party = new Party({
                       partyType: xlData[i].Party_Type,
                       firmName: xlData[i].Firm_Name,
@@ -649,7 +640,7 @@ router.post(
                       pincode: xlData[i].Pincode,
                       state: state_data._id,
                       city: city_data._id,
-                      district: area_data._id,
+                      // district: area_data._id,
                       address1: xlData[i].Address_1,
                       address2: xlData[i].Address_2,
                       DOB: xlData[i].DOB,
@@ -668,7 +659,7 @@ router.post(
                         result: list,
                       });
                     }
-                  });
+                  // });
               });
           });
       }

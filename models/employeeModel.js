@@ -53,9 +53,9 @@ const employee_schema = new Schema({
     city:{
         type:String
     },
-    district:{
-        type:String
-    },
+    // district:{
+    //     type:String
+    // },
     experience:{
         type:String
     },

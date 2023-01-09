@@ -63,7 +63,7 @@ router.post(
     var state = req.body.state ? req.body.state : "";
     var city = req.body.city ? req.body.city : "";
     var pincode = req.body.pincode ? req.body.pincode : "";
-    var district = req.body.district ? req.body.district : "";
+    // var district = req.body.district ? req.body.district : "";
     var experience = req.body.experience ? req.body.experience : "";
     var qualification = req.body.qualification ? req.body.qualification : "";
     if (employeeName != "") {
@@ -92,7 +92,7 @@ router.post(
                     companyId: user_id,
                     image: base_url + req.files.Employee_image[0].path,
                     state: state,
-                    district: district,
+                    // district: district,
                     pincode: pincode,
                     qualification: qualification,
                     experience: experience,
@@ -194,9 +194,9 @@ router.patch("/editEmployee", (req, res) => {
           if (req.body.pincode) {
             updated_employee.pincode = req.body.pincode;
           }
-          if (req.body.district) {
-            updated_employee.district = req.body.district;
-          }
+          // if (req.body.district) {
+          //   updated_employee.district = req.body.district;
+          // }
           if (req.body.experience) {
             updated_employee.experience = req.body.experience;
           }
@@ -287,9 +287,9 @@ router.post("/getAllEmployee", async (req, res) => {
                 _id: emp_data[i].headquarterCity,
               });
               let city_data = await Location.findOne({ _id: emp_data[i].city });
-              let area_data = await Location.findOne({
-                _id: emp_data[i].district,
-              });
+              // let area_data = await Location.findOne({
+              //   _id: emp_data[i].district,
+              // });
               var u_data = {
                 id: rowData._id,
                 employeeName: rowData.employeeName,
@@ -317,10 +317,10 @@ router.post("/getAllEmployee", async (req, res) => {
                   name: city_data.name,
                   id: city_data._id,
                 },
-                district: {
-                  name: area_data.name,
-                  id: area_data._id,
-                },
+                // district: {
+                //   name: area_data.name,
+                //   id: area_data._id,
+                // },
                 experience: rowData.experience,
                 qualification: rowData.qualification,
                 status: rowData.status,
@@ -349,9 +349,9 @@ router.post("/getAllEmployee", async (req, res) => {
                 _id: emp_data[i].headquarterCity,
               });
               let city_data = await Location.findOne({ _id: emp_data[i].city });
-              let area_data = await Location.findOne({
-                _id: emp_data[i].district,
-              });
+              // let area_data = await Location.findOne({
+              //   _id: emp_data[i].district,
+              // });
               let role_data = await Role.findOne({ _id: emp_data[i].roleId });
               var u_data = {
                 id: rowData._id,
@@ -380,10 +380,10 @@ router.post("/getAllEmployee", async (req, res) => {
                   name: city_data.name,
                   id: city_data._id,
                 },
-                district: {
-                  name: area_data.name,
-                  id: area_data._id,
-                },
+                // district: {
+                //   name: area_data.name,
+                //   id: area_data._id,
+                // },
                 experience: rowData.experience,
                 qualification: rowData.qualification,
                 status: rowData.status,
@@ -510,9 +510,9 @@ router.post("/getEmp", (req, res) => {
                   Location.findOne({ _id: employee_data.city })
                     .exec()
                     .then((city_data) => {
-                      Location.findOne({ _id: employee_data.district })
-                        .exec()
-                        .then(async (area_data) => {
+                      // Location.findOne({ _id: employee_data.district })
+                      //   .exec()
+                      //   .then(async (area_data) => {
                           if (!employee_data.roleId) {
                             var u_data = {
                               employeeName: employee_data.employeeName,
@@ -528,7 +528,7 @@ router.post("/getEmp", (req, res) => {
                               headquarterCity: headquarter_city_data.name,
                               image: employee_data.image,
                               city: city_data.name,
-                              district: area_data.name,
+                              // district: area_data.name,
                               experience: employee_data.experience,
                               qualification: employee_data.qualification,
                               userExpenses: employee_data.userExpenses,
@@ -581,7 +581,7 @@ router.post("/getEmp", (req, res) => {
                                           headquarter_city_data.name,
                                         image: employee_data.image,
                                         city: city_data.name,
-                                        district: area_data.name,
+                                        // district: area_data.name,
                                         experience: employee_data.experience,
                                         qualification:
                                           employee_data.qualification,
@@ -623,7 +623,7 @@ router.post("/getEmp", (req, res) => {
                                               headquarter_city_data.name,
                                             image: employee_data.image,
                                             city: city_data.name,
-                                            district: area_data.name,
+                                            // district: area_data.name,
                                             experience:
                                               employee_data.experience,
                                             qualification:
@@ -645,7 +645,7 @@ router.post("/getEmp", (req, res) => {
                                   });
                               });
                           }
-                        });
+                        // });
                     });
                 });
             });
@@ -683,9 +683,9 @@ router.post(
             Location.findOne({ name: xlData[i].City })
               .exec()
               .then((city_data) => {
-                Location.findOne({ name: xlData[i].District })
-                  .exec()
-                  .then((area_data) => {
+                // Location.findOne({ name: xlData[i].District })
+                //   .exec()
+                //   .then((area_data) => {
                     Location.findOne({ name: xlData[i].Headquarter_State })
                       .exec()
                       .then((headquarter_state_data) => {
@@ -703,7 +703,7 @@ router.post(
                               headquarterState: headquarter_state_data._id,
                               headquarterCity: headquarter_city_data._id,
                               state: state_data._id,
-                              district: area_data._id,
+                              // district: area_data._id,
                               pincode: xlData[i].Pincode,
                               qualification: xlData[i].Qualification,
                               experience: xlData[i].Experience,
@@ -723,7 +723,7 @@ router.post(
                             }
                           });
                       });
-                  });
+                  // });
               });
           });
       }

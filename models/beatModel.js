@@ -20,8 +20,8 @@ const beat_schema = new Schema({
     company_id:{
         type:String,
     },
-    route_id:{
-        type:String,
+    route:{
+        type:Array,
     },
     Created_date: {
         type: String,

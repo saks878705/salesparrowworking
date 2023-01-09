@@ -3,9 +3,9 @@ const { DependentPhoneNumberList } = require("twilio/lib/rest/api/v2010/account/
 const Schema = mongoose.Schema;
 
 const retailer_schema = new Schema({
-    beat_id:{
-        type:String,
-    },
+    // beat_id:{
+    //     type:String,
+    // },
     customer_type:{
         type:String,
     },
@@ -30,27 +30,27 @@ const retailer_schema = new Schema({
     customerName:{
         type:String
     },
-    area:{
-        type:String
-    },
+    // area:{
+    //     type:String
+    // },
     lat:{
         type:Number,
     },
     long:{
         type:Number,
     },
-    // route:{
-    //     type:Array
-    // },
+    route_id:{
+        type:String
+    },
     mobileNo:{
         type:String
     },
-    // state:{
-    //     type:String
-    // },
-    // city:{
-    //     type:String
-    // },
+    state:{
+        type:String
+    },
+    city:{
+        type:String
+    },
     DOB:{
         type:String
     },

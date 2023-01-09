@@ -34,7 +34,7 @@ router.post("/addBeat", (req, res) => {
   var city = req.body.city ? req.body.city : "";
   var employee_id = req.body.employee_id ? req.body.employee_id : "";
   var day = req.body.day ? req.body.day : "";
-  var route_id = req.body.route_id ? req.body.route_id : "";
+  var route_id_arr = req.body.route_id_arr ? req.body.route_id_arr :null ;
   if (state != "") {
     if (city != "") {
       if (beatName != "") {
@@ -52,7 +52,7 @@ router.post("/addBeat", (req, res) => {
                       state: state,
                       city: city,
                       company_id: company_id,
-                      route_id: route_id,
+                      route: route_id_arr,
                       Created_date: get_current_date(),
                       Updated_date: get_current_date(),
                       status: "Active",
@@ -133,8 +133,8 @@ router.post("/editBeat", (req, res) => {
           if (req.body.day) {
             updated_beat.day = req.body.day;
           }
-          if (req.body.route_id) {
-            updated_beat.route_id = req.body.route_id;
+          if (req.body.route_id_arr) {
+            updated_beat.route = req.body.route_id_arr;
           }
           if (req.body.status) {
             updated_beat.status = req.body.status;
@@ -199,10 +199,18 @@ router.post("/getAllBeat", async (req, res) => {
         for (let i = 0; i < beat_data.length; i++) {
           await (async function (rowData) {
             var emp_data = await Employee.findOne({_id: beat_data[i].employee_id});
-            var route_data = await Route.findOne({_id: beat_data[i].route_id});
+            let list2 = beat_data[i].route
+            let arr = [];
+            for(let x = 0;x<list2.length;x++){
+              var route_data = await Route.findOne({_id: list2[x]});
+              let u_data = {
+                route_name:route_data.route_name,
+              }
+              arr.push(u_data);
+            }
+            console.log(arr);
             var state_data = await Location.findOne({_id: beat_data[i].state});
             var city_data = await Location.findOne({ _id: beat_data[i].city });
-
             var u_data = {
               id: rowData._id,
               state: {
@@ -214,10 +222,7 @@ router.post("/getAllBeat", async (req, res) => {
                 id: beat_data[i].city,
               },
               employee_name: emp_data.employeeName,
-              route_name: {
-                start_point: route_data.start_point,
-                end_point: route_data.end_point,
-              },
+              route:arr,
               beatName: rowData.beatName,
               day: rowData.day,
               status: rowData.status,
@@ -248,45 +253,36 @@ router.post("/getAllBeat", async (req, res) => {
     });
 });
 
-router.post("/getBeat", (req, res) => {
+router.post("/getBeat",  (req, res) => {
   var id = req.body.id ? req.body.id : "";
-  Beat.findOne({ _id: id })
-    .exec()
-    .then((beat_data) => {
+  Beat.findOne({ _id: id }).exec().then(async(beat_data) => {
       if (beat_data) {
-        Location.findOne({ _id: beat_data.state })
-          .exec()
-          .then((state_data) => {
-            Location.findOne({ _id: beat_data.city })
-              .exec()
-              .then((city_data) => {
-                Employee.findOne({ _id: beat_data.employee_id })
-                  .exec()
-                  .then((emp_data) => {
-                    Route.findOne({ _id: beat_data.route_id })
-                      .exec()
-                      .then((route_data) => {
-                        var u_data = {
-                          id: beat_data._id,
-                          state: { name: state_data.name, id: beat_data.state },
-                          city: { name: city_data.name, id: beat_data.city },
-                          employee_name: emp_data.employeeName,
-                          route_name: {
-                            start_point: route_data.start_point,
-                            end_point: route_data.end_point,
-                          },
-                          day: beat_data.day,
-                          beatName: beat_data.beatName,
-                        };
-                        res.json({
-                          status: true,
-                          message: "data fetched",
-                          result: [u_data],
-                        });
-                      });
-                  });
-              });
-          });
+        let state_data = await Location.findOne({ _id: beat_data.state })
+        let city_data = await Location.findOne({ _id: beat_data.city })
+        let emp_data = await Employee.findOne({ _id: beat_data.employee_id })
+        let list2 = beat_data.route
+        let arr = [];
+        for(let x = 0;x<list2.length;x++){
+          var route_data = await Route.findOne({_id: list2[x]});
+          let u_data = {
+            route_name:route_data.route_name,
+          }
+          arr.push(u_data);
+        }
+        var u_data = {
+          id: beat_data._id,
+          state: { name: state_data.name, id: beat_data.state },
+          city: { name: city_data.name, id: beat_data.city },
+          employee_name: emp_data.employeeName,
+          route:arr,
+          day: beat_data.day,
+          beatName: beat_data.beatName,
+        };
+        res.json({
+          status: true,
+          message: "data fetched",
+          result: [u_data],
+        });
       } else {
         res.json({
           status: false,

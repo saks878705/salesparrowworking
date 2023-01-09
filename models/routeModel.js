@@ -8,7 +8,7 @@ const route_schema = new Schema({
     city:{
         type:String,
     },
-    area:{
+    route_name:{
         type:String,
     },
     is_assigned:{

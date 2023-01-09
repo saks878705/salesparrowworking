@@ -29,19 +29,18 @@ router.post("/addRoute", (req, res) => {
   var state = req.body.state ? req.body.state : "";
   var distance = req.body.distance ? req.body.distance : "";
   var city = req.body.city ? req.body.city : "";
-  var area = req.body.area ? req.body.area : "";
+  var route_name = req.body.route_name ? req.body.route_name : "";
   var start_point = req.body.start_point ? req.body.start_point : "";
   var end_point = req.body.end_point ? req.body.end_point : "";
   if (authHeader != "") {
     if (state != "") {
       if (city != "") {
-        if (area != "") {
           if (start_point != "") {
             if (end_point != "") {
               var new_route = new Route({
                 state: state,
                 city: city,
-                area: area,
+                route_name: route_name,
                 distance: distance,
                 start_point: start_point,
                 company_id: company_id,
@@ -69,12 +68,6 @@ router.post("/addRoute", (req, res) => {
               message: "Starting point  is required.",
             });
           }
-        } else {
-          res.json({
-            status: false,
-            message: "Area is required.",
-          });
-        }
       } else {
         res.json({
           status: false,
@@ -286,13 +279,13 @@ router.post("/routeListing", async (req, res) => {
             for (let i = 0; i < route_data.length; i++) {
               Location.findOne({ _id: route_data[i].state }).exec().then((state_data) => {
                   Location.findOne({ _id: route_data[i].city }).exec().then((city_data) => {
-                      Location.findOne({ _id: route_data[i].area }).exec().then(async (area_data) => {
+                      // Location.findOne({ _id: route_data[i].area }).exec().then(async (area_data) => {
                           await (async function (rowData) {
                             var u_data = {
                               id: rowData._id,
                               state:{name:state_data.name,id:rowData.state},
                               city:{name:city_data.name,id:rowData.city},
-                              area:{name:area_data.name,id:rowData.area},
+                              route_name:rowData.route_name,
                               start_point: rowData.start_point,
                               distance: rowData.distance,
                               end_point: rowData.end_point,
@@ -310,7 +303,7 @@ router.post("/routeListing", async (req, res) => {
                             });
                           }
                         });
-                    });
+                    // });
                 });
             }
             }else{
@@ -397,8 +390,8 @@ router.post("/edit_route", (req, res) => {
     if (req.body.city) {
       updated_route.city = req.body.city;
     }
-    if (req.body.area) {
-      updated_route.area = req.body.area;
+    if (req.body.route_name) {
+      updated_route.route_name = req.body.route_name;
     }
     if (req.body.distance) {
       updated_route.distance = req.body.distance;

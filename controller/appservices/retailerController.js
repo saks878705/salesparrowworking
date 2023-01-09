@@ -29,18 +29,18 @@ router.post('/addRetailer',(req,res)=>{
     }
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
-   let beat_id= req.body.beat_id?req.body.beat_id:""
+//    let beat_id= req.body.beat_id?req.body.beat_id:""
    let customer_type= req.body.customer_type?req.body.customer_type:""
    let pincode= req.body.pincode?req.body.pincode:""
    let address= req.body.address?req.body.address:""
    let firmName= req.body.firmName?req.body.firmName:""
    let GSTNo= req.body.GSTNo?req.body.GSTNo:""
    let customerName= req.body.customerName?req.body.customerName:""
-//    let state= req.body.state?req.body.state:""
-//    let city= req.body.city?req.body.city:""
+   let state= req.body.state?req.body.state:""
+   let city= req.body.city?req.body.city:""
    let lat= req.body.lat?req.body.lat:""
    let long= req.body.long?req.body.long:""
-//    let route= req.body.route?req.body.route:""
+   let route_id= req.body.route_id?req.body.route_id:""
    let mobileNo= req.body.mobileNo?req.body.mobileNo:""
    let DOB= req.body.DOB?req.body.DOB:""
    let DOA= req.body.DOA?req.body.DOA:""
@@ -59,7 +59,7 @@ router.post('/addRetailer',(req,res)=>{
                                         }) 
                                 }else{
                                     let new_retailer = new Retailer({
-                                        beat_id:beat_id,
+                                        // beat_id:beat_id,
                                         customer_type:customer_type,
                                         company_id:emp_data.companyId,
                                         employee_id:emp_data._id,
@@ -68,11 +68,11 @@ router.post('/addRetailer',(req,res)=>{
                                         firmName:firmName,
                                         GSTNo:GSTNo,
                                         customerName:customerName,
-                                        // city:city,
-                                        // state:state,
+                                        city:city,
+                                        state:state,
                                         lat:lat,
                                         long:long,
-                                        // route:route,
+                                        route_id:route_id,
                                         mobileNo:mobileNo,
                                         DOB:DOB,
                                         DOA:DOA,
