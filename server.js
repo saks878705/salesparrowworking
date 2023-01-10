@@ -65,7 +65,10 @@ app.use("/app_api", require("./controller/appservices/retailerController"));
 app.use("/app_api", require("./controller/appservices/checkinController"));
 app.use("/app_api", require("./controller/appservices/marketVisitController"));
 app.use("/app_api", require("./controller/appservices/orderController"));
-app.use("/app_api", require("./controller/appservices/salesReportController"));
+app.use("/app_api", require("./controller/appservices/reportsController"));
+app.use("/app_api", require("./controller/appservices/claimController"));
+app.use("/app_api", require("./controller/appservices/primaryOrderController"));
+app.use("/app_api", require("./controller/appservices/goodsReturnController"));
 
 app.listen(PORT, () => {
   console.log(`Express server started at port : ${PORT}`);

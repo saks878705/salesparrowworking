@@ -51,4 +51,9 @@ require('./productUnitModel');
 require('./visitModel');
 require('./pricelistModel');
 require('./salesReportModel');
+require('./claimModel');
+require('./PrimaryOrderItemModel');
+require('./primaryOrderModel');
+require('./goodReturnVoucherModel');
+require('./expenseReportModel');
 

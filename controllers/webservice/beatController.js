@@ -34,13 +34,13 @@ router.post("/addBeat", (req, res) => {
   var city = req.body.city ? req.body.city : "";
   var employee_id = req.body.employee_id ? req.body.employee_id : "";
   var day = req.body.day ? req.body.day : "";
-  var route_id_arr = req.body.route_id_arr ? req.body.route_id_arr :null ;
+  var route = req.body.route ? req.body.route :null ;
   if (state != "") {
     if (city != "") {
       if (beatName != "") {
         if (employee_id != "") {
           if (day != "") {
-            if (route_id_arr != "") {
+            if (route != "") {
               Beat.find({$and:[{company_id},{ beatName: beatName }]})
                 .exec()
                 .then((beat_info) => {
@@ -52,7 +52,7 @@ router.post("/addBeat", (req, res) => {
                       state: state,
                       city: city,
                       company_id: company_id,
-                      route: route_id_arr,
+                      route: route,
                       Created_date: get_current_date(),
                       Updated_date: get_current_date(),
                       status: "Active",
@@ -133,8 +133,8 @@ router.post("/editBeat", (req, res) => {
           if (req.body.day) {
             updated_beat.day = req.body.day;
           }
-          if (req.body.route_id_arr) {
-            updated_beat.route = req.body.route_id_arr;
+          if (req.body.route) {
+            updated_beat.route = req.body.route;
           }
           if (req.body.status) {
             updated_beat.status = req.body.status;
@@ -204,6 +204,7 @@ router.post("/getAllBeat", async (req, res) => {
             for(let x = 0;x<list2.length;x++){
               var route_data = await Route.findOne({_id: list2[x]});
               let u_data = {
+                id:route_data._id,
                 route_name:route_data.route_name,
               }
               arr.push(u_data);
@@ -265,6 +266,7 @@ router.post("/getBeat",  (req, res) => {
         for(let x = 0;x<list2.length;x++){
           var route_data = await Route.findOne({_id: list2[x]});
           let u_data = {
+            id:route_data._id,
             route_name:route_data.route_name,
           }
           arr.push(u_data);

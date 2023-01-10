@@ -67,7 +67,7 @@ router.get('/getLocation',(req,res)=>{
             });
         });
     }else if(p_id!=""){
-        Location.find({P_id:p_id}).exec().then(city_data=>{
+        Location.find({P_id:p_id,subP_id:""}).exec().then(city_data=>{
             res.json({
                 status:true,
                 message:"City data fetch successfully",

@@ -32,49 +32,61 @@ router.post("/get_all_product_catagory",async (req, res) => {
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     let emp_data = await Employee.findOne({_id:employee_id});
+    console.log(emp_data.companyId);
     // let p_id = req.body.p_id?req.body.p_id:"";
     let page = req.body.page?req.body.page:"1";
     let final_list = [];
     let limit = 10;
     let count = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]});
     let catagory_data = await ProductCatagory.find({$and:[{company_id:emp_data.companyId},{p_id:""},{is_delete:"0"}]}).limit(limit*1).sort((page-1)*limit);
+    console.log(catagory_data);
     if(catagory_data.length<1) return res.json({status:true,message:"No data",result:[]})
     let countInfo = 0;
     for(let j = 0;j<catagory_data.length;j++){
+        console.log(countInfo);
         let list = [];
         arr =[{company_id:emp_data.companyId},{catagory_id:catagory_data[j]._id}]
         let product_data = await Product.find({$and:arr});
-        if(product_data.length<1) return res.json({status:true,message:"No data",result:[]});
-        for(let i = 0;i<product_data.length;i++){
-            await (async function (rowData) {
-                let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
-                let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
-                var u_data1 = {
-                    id: rowData._id,
-                    name:rowData.productName,
-                    brand_name:brand_data.name,
-                    hsn_code:rowData.hsn_code,
-                    catagory_name:catagory_data.name,
-                    description:rowData.description,
-                    gst:rowData.gst,
-                    image:rowData.display_image,
-                    mrp:rowData.mrp,
-                    price:rowData.price,
-                    packing_details:rowData.packing_details[0]?JSON.parse(rowData.packing_details[0]):[],
-                    status:rowData.status,
-                };
-                // console.log("hey>>",rowData.packing_details[0]);
-                // console.log("hey>>",JSON.parse(`${rowData.packing_details[0]}`));
-                list.push(u_data1);
-            })(product_data[i]);
+        if(product_data.length>0){
+            for(let i = 0;i<product_data.length;i++){
+                await (async function (rowData) {
+                    let catagory_data = await ProductCatagory.findOne({_id:product_data[i].catagory_id});
+                    let brand_data = await Brand.findOne({_id:product_data[i].brand_id});
+                    var u_data1 = {
+                        id: rowData._id,
+                        name:rowData.productName,
+                        brand_name:brand_data.name,
+                        hsn_code:rowData.hsn_code,
+                        catagory_name:catagory_data.name,
+                        description:rowData.description,
+                        gst:rowData.gst,
+                        image:rowData.display_image,
+                        mrp:rowData.mrp,
+                        price:rowData.price,
+                        packing_details:rowData.packing_details[0]?JSON.parse(rowData.packing_details[0]):[],
+                        status:rowData.status,
+                    };
+                    // console.log("hey>>",rowData.packing_details[0]);
+                    // console.log("hey>>",JSON.parse(`${rowData.packing_details[0]}`));
+                    list.push(u_data1);
+                })(product_data[i]);
+            }
+            var u_data2= {
+                catagory_id: catagory_data[j]._id,
+                catagory_name:catagory_data[j].name,
+                product_details:list
+            };
+            final_list.push(u_data2)
+            console.log("final_list----------",final_list);
+        }else{
+            var u_data2= {
+                catagory_id: catagory_data[j]._id,
+                catagory_name:catagory_data[j].name,
+                product_details:[]
+            };
+            final_list.push(u_data2)
+            console.log("final_list----------",final_list);
         }
-        var u_data2= {
-            catagory_id: catagory_data[j]._id,
-            catagory_name:catagory_data[j].name,
-            product_details:list
-        };
-        final_list.push(u_data2)
-        console.log("final_list----------",final_list);
         countInfo++
         if(countInfo==catagory_data.length) return res.json({status:true,message:"Catagories found.",result:final_list,pagelength:Math.ceil(count.length/limit)})
         
@@ -349,9 +361,21 @@ router.post('/view_retailer_todays_order',async (req,res)=>{
     if(id == "") return res.json({status:false,message:"Please provide the retailer id"});
     let date = get_current_date().split(" ")[0];
     let retailer_todays_order_data = await Order.findOne({$and:[{emp_id:employee_id},{retailer_id:id},{order_date:date}]});
-    let order_item_data = await OrderItem.find({order_id:retailer_todays_order_data._id})
     if(!retailer_todays_order_data) return res.json({status:false,message:"First place order",result:[]})
-    return res.json({status:true,message:"Order data",result:retailer_todays_order_data,order_item_data})
+    let order_item_data = await OrderItem.find({order_id:retailer_todays_order_data._id})
+    let list = []
+    for(let i = 0;i<order_item_data.length;i++){
+        let product_data = await Product.findOne({_id:order_item_data[i].product_id})
+        let u_data = {
+            product_id:order_item_data[i].product_id,
+            product_name:product_data.productName,
+            product_price:order_item_data[i].product_price,
+            quantity:order_item_data[i].quantity,
+            sub_total_price:order_item_data[i].sub_total_price,
+        }
+        list.push(u_data)
+    }
+    return res.json({status:true,message:"Order data",result:retailer_todays_order_data,list})
 })
 
 module.exports = router;
