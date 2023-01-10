@@ -5,6 +5,7 @@ const Retailer = mongoose.model("Retailer");
 const Visit = mongoose.model("Visit");
 const Beat = mongoose.model("Beat");
 const Order = mongoose.model("Order");
+const Route = mongoose.model("Route");
 const Attendance = mongoose.model("Attendance");
 const router = express.Router();
 const base_url = "https://salesparrow.teknikoglobal.com/";
@@ -193,17 +194,21 @@ router.get("/get_todays_beat", async (req, res) => {
       message: "Not punched attendance for today.",
     });
   let beat_data = await Beat.findOne({ _id: todays_attendance_data.beat_id });
-  if (!beat_data){
+  console.log(beat_data);
+  if (!beat_data){ 
     return res.json({ status: true, message: "Beat data not found" });
   }else{
     let list2 = beat_data.route
+    console.log(list2);
     let arr = [];
     for(let x = 0;x<list2.length;x++){
       var route_data = await Route.findOne({_id: list2[x]});
       let u_data = {
+        id:route_data._id,
         route_name:route_data.route_name,
       }
       arr.push(u_data);
+      console.log(arr);
     }
     return res.json({ status: true, message: "data found", result: beat_data,arr });
   }

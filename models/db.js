@@ -50,4 +50,5 @@ require('./orderItemModel');
 require('./productUnitModel');
 require('./visitModel');
 require('./pricelistModel');
+require('./salesReportModel');
 

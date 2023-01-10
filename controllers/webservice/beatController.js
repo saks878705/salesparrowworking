@@ -40,7 +40,7 @@ router.post("/addBeat", (req, res) => {
       if (beatName != "") {
         if (employee_id != "") {
           if (day != "") {
-            if (route_id != "") {
+            if (route_id_arr != "") {
               Beat.find({$and:[{company_id},{ beatName: beatName }]})
                 .exec()
                 .then((beat_info) => {
