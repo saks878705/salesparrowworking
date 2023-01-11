@@ -55,8 +55,8 @@ router.post('/place_primary_order',async (req,res)=>{
     });
     let list = [];
     for(let i = 0;i<line.length;i++){
-        let new_primary_order_line = PrimaryOrderItem.create({
-            order_id:new_order_data._id,
+        let new_primary_order_line =await PrimaryOrderItem.create({
+            order_id:new_order._id,
             product_id:line[i].product_id,
             product_price:line[i].product_price,
             quantity:line[i].quantity,
@@ -65,9 +65,9 @@ router.post('/place_primary_order',async (req,res)=>{
             Updated_date:get_current_date(),
             status:"Active",
         })
-        list.push(new_order_line);
+        list.push(new_primary_order_line);
     }
-    return res.json({status:true,message:"Order placed successfully",result:new_order_data,list})
+    return res.json({status:true,message:"Order placed successfully",result:new_order,list})
 });
 
 router.post('/party_acc_to_partytype',async (req,res)=>{
