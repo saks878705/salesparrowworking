@@ -26,6 +26,9 @@ const expenseReportSchema = new Schema({
     attachment:{
         type:String
     },
+    travelled_distance:{
+        type:String
+    },
     Created_date: {
         type: String,
         default: ""

@@ -41,14 +41,17 @@ router.get('/get_todays_sales',async (req,res)=>{
   var decodedToken = jwt.verify(token, "test");
   var employee_id = decodedToken.user_id;
   let date = get_current_date().split(" ")[0];
+  console.log(date);
   let completd_market_visit_data = await Visit.find({emp_id:employee_id,visit_date:date,visit_status:"Completed"})
   let productive_market_visit_data = await Visit.find({emp_id:employee_id,visit_date:date,visit_status:"Completed",order_status:"Productive"})
+  console.log(productive_market_visit_data.retailer_id);
   if(completd_market_visit_data.length<1) return res.json({status:true,message:"You haven't completed any visit"})
   let tc = completd_market_visit_data.length;
   let pc = productive_market_visit_data.length;
   let sale_amount = 0;
   for(let i = 0;i<productive_market_visit_data.length;i++){
-    let order_data = await Order.findOne({$and: [{ retailer_id: productive_market_visit_data.retailer_id }, { order_date: date }],})
+    let order_data = await Order.findOne({$and: [{ retailer_id: productive_market_visit_data[i].retailer_id }, { order_date: date }],})
+    console.log(order_data);
     sale_amount += parseInt(order_data.total_amount);
   }
   let data = {
@@ -99,6 +102,7 @@ router.post('/submit_expense_report',(req,res)=>{
     var decodedToken = jwt.verify(token, "test");
     var employee_id = decodedToken.user_id;
     let ta_amount = req.body.ta_amount?req.body.ta_amount:"";
+    let travelled_distance = req.body.travelled_distance?req.body.travelled_distance:"";
     let da_amount = req.body.da_amount?req.body.da_amount:"";
     let hotel = req.body.hotel?req.body.hotel:"";
     let stationary = req.body.stationary?req.body.stationary:"";
@@ -111,6 +115,7 @@ router.post('/submit_expense_report',(req,res)=>{
       employee_id:employee_id,
       ta_amount:ta_amount,
       da_amount:da_amount,
+      travelled_distance:travelled_distance,
       stationary:stationary,
       hotel:hotel,
       misc_amount:misc_amount,
@@ -120,7 +125,7 @@ router.post('/submit_expense_report',(req,res)=>{
       Updated_date:get_current_date(),
       status:"Active",
     })
-    return res.json({status:true,message:"submitted successfully",result:new_expense_report})
+    return res.json({status:true,message:"Expense report submitted successfully",result:new_expense_report})
   })
 })
 
