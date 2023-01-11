@@ -12,7 +12,7 @@ const claim_schema = new Schema({
         type:String
     },
     claim_date:{
-        type:Date
+        type:String
     },
     claim_amount:{
         type:String
